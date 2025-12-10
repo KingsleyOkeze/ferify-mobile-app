@@ -35,7 +35,7 @@ const slides = [
     {
         id: 2,
         title: "Earn Rewards",
-        subtitle: "Get rewarded for taking safe and verified routes.",
+        subtitle: "Get rewarded for submitting accurate fare. Your contributing help others",
         images: require("../../assets/images/onboarding/rewardImage.png"),
     },
 ];
@@ -47,7 +47,7 @@ const handFareCheckImageStyle = {
     resizeMode: 'contain', 
     position: 'fixed', 
     zIndex: 10, 
-    top: '87%', 
+    top: '97%', 
     left: '17.7%', 
     transform: 'translate(-50%, -50%)'
 };
@@ -57,7 +57,7 @@ const busAndConductorImageStyle = {
     height: 142.5, 
     resizeMode: 'contain', 
     position: 'absolute', 
-    top: '65%', 
+    top: '75%', 
     left: '50%', 
     transform: 'translate(-50%, -50%)'
 };
@@ -67,7 +67,7 @@ const busConductorWordsImageStyle = {
     height: 112.86, 
     resizeMode: 'contain', 
     position: 'absolute', 
-    top: '30%', 
+    top: '35%', 
     left: '50%', 
     transform: 'translate(-50%, -50%)'
 };
@@ -78,7 +78,7 @@ const baricadeImageStyle = {
     resizeMode: 'contain', 
     position: 'absolute', 
     right: 0, 
-    bottom: '14%', 
+    bottom: '3.5%', 
 };
 
 export default function OnboardingScreen({ navigation }: any) {
@@ -101,7 +101,7 @@ export default function OnboardingScreen({ navigation }: any) {
             <View style={styles.imageArea}>
                 {
                     step === 0 ?
-                        slides[0].images.map((img, index) => (
+                        slides[0].images.map((img: any, index: number) => (
                             <Image 
                                 key={index}
                                 source={img} 
@@ -135,7 +135,7 @@ export default function OnboardingScreen({ navigation }: any) {
                                 width: 296.51, 
                                 height: 298.04,
                                 position: 'absolute',
-                                top: '65%', 
+                                top: '66%', 
                                 left:' 50%',
                                 transform: 'translate(-33%, -50%)', 
                                 zIndex: 10
