@@ -11,7 +11,10 @@ import {
     SafeAreaView,
     Keyboard,
 } from 'react-native';
-import axios from 'axios';
+import axios, { CancelTokenSource } from 'axios';
+
+// This variable lives outside the component to persist across re-renders
+let searchCancelSource: CancelTokenSource | null = null;
 
 interface Place {
     name: string;
@@ -46,29 +49,57 @@ const RouteBreakdownScreen: React.FC = () => {
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const searchPlaces = (query: string) => {
+        const cleanQuery = query.trim();
+
+        // Reset list if user clears the input
+        if (cleanQuery.length < 2) {
+            setSuggestions([]);
+            setSuggestionsLoading(false);
+            return;
+        }
+
+        // --- STEP 1: REQUEST CANCELLATION ---
+        // If a search is already in progress, KILL IT. 
+        // This stops "ghost" results from old keystrokes appearing.
+        if (searchCancelSource) {
+            searchCancelSource.cancel('Operation canceled by the user.');
+        }
+        
+        // Create a fresh token for the current keystroke
+        searchCancelSource = axios.CancelToken.source();
+
+        // --- STEP 2: CLEAR OLD TIMERS ---
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
+        setSuggestionsLoading(true);
+
+        // --- STEP 3: AGGRESSIVE DEBOUNCE ---
+        // 150ms is perfect. It's fast enough to feel instant, 
+        // but slow enough to catch the next letter in a fast sequence.
         timeoutRef.current = setTimeout(async () => {
-            if (query.trim().length < 3) {
-                setSuggestions([]);
-                setSuggestionsLoading(false);
-                return;
-            }
-
-            setSuggestionsLoading(true);
-
             try {
-                const res = await axios.get<{ result: Place[] }>('/api/route/placesearch', {
-                    params: { query: query.trim() },
+                const res = await axios.get('/api/route/placesearch', {
+                    params: { query: cleanQuery },
+                    // Attach the cancellation token here
+                    cancelToken: searchCancelSource?.token,
+                    timeout: 5000, 
                 });
+
+                // Only update if we actually got results
                 setSuggestions(res.data.result || []);
             } catch (err) {
-                console.log('Search failed');
-                setSuggestions([]);
+                // Ignore errors caused by our own cancellation
+                if (axios.isCancel(err)) {
+                    console.log('Previous request ignored:', cleanQuery);
+                } else {
+                    console.log('Search error:', err);
+                    setSuggestions([]);
+                }
             } finally {
+                // Only stop loading if this was the latest request
                 setSuggestionsLoading(false);
             }
-        }, 300);
+        }, 150); 
     };
 
     const selectPlace = (place: Place) => {
