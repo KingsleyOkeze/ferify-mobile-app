@@ -50,7 +50,7 @@ function HomeScreen () {
                         </TouchableOpacity>
                     </View>
                     <Image
-                        source={require("../../assets/images/travel.png")}
+                        source={require("../../assets/images/contributeAndEarnImage.png")}
                         style={styles.cardImage}
                         resizeMode="contain"
                     />

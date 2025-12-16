@@ -98,10 +98,15 @@ const RouteBreakdownScreen: React.FC = () => {
                 origin: originId,
                 destination: destinationId,
                 mode: 'transit',
-            });
+            },
+            {
+                timeout: 60000, 
+            }
+        );
             console.log("route break down result", res.data.route)
             setRouteSteps(res.data.route || []);
         } catch (err: any) {
+            console.log("error getting routes breakdown", err)
             setError('No route found. Try different locations.');
         } finally {
             setLoading(false);
