@@ -5,6 +5,6 @@ axios.defaults.baseURL = process.env.EXPO_PUBLIC_SERVER_URL;
 
 export default function Index() {
   return (
-      <Redirect href="./RouteBreakdownScreen"/>
+    <Redirect href="./fare-contribution/FareContributionScreen" />
   );
 }

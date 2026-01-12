@@ -1,23 +1,36 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import okadaImage from '../assets/images/okadaImage.png';
 import kekeImage from '../assets/images/kekeImage.png';
-import busImage from '../assets/images/busImage.png'; // You can change if bus has a unique image
+import busImage from '../assets/images/busImage.png';
 
-function ModeOfTransportSelect() {
+interface ModeOfTransportSelectProps {
+    selectedMode?: string | null;
+    onSelect?: (mode: string) => void;
+}
+
+function ModeOfTransportSelect({ selectedMode, onSelect }: ModeOfTransportSelectProps) {
     const transportModes = [
-        { id: 1, name: 'Bus', image: busImage },
-        { id: 2, name: 'Keke', image: kekeImage },
-        { id: 3, name: 'Okada', image: okadaImage },
+        { id: 'bus', name: 'Bus', image: busImage },
+        { id: 'keke', name: 'Keke', image: kekeImage },
+        { id: 'bike', name: 'Okada', image: okadaImage },
     ];
 
     return (
         <View style={styles.container}>
             {transportModes.map((mode) => (
-                <View key={mode.id} style={styles.card}>
+                <TouchableOpacity
+                    key={mode.id}
+                    style={[
+                        styles.card,
+                        selectedMode === mode.id && styles.cardSelected // Apply border if selected
+                    ]}
+                    onPress={() => onSelect && onSelect(mode.id)}
+                    activeOpacity={0.7}
+                >
                     <Image source={mode.image} style={styles.image} />
                     <Text style={styles.text}>{mode.name}</Text>
-                </View>
+                </TouchableOpacity>
             ))}
         </View>
     );
@@ -28,21 +41,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // padding: 16,
         backgroundColor: '#FFFFFF',
     },
     card: {
         alignItems: 'center',
         backgroundColor: '#F5F5F5',
         borderRadius: 18,
-        // padding: 10,
-        // elevation: 1, // Android shadow
-        // shadowColor: '#000', // iOS shadow
-        // shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 4,
         width: 108,
-        height: 129
+        height: 129,
+        borderWidth: 1,
+        borderColor: 'transparent', // Default transparent border
+    },
+    cardSelected: {
+        borderColor: '#000', // Black border when selected
+        backgroundColor: '#fff',
     },
     image: {
         width: '100%',

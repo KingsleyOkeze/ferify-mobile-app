@@ -8,11 +8,23 @@ import {
     TouchableOpacity,
     ScrollView,
     Image,
+    Pressable
 } from "react-native";
-import Ionicons from "react-native-vector-icons/Ionicons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 
-function HomeScreen () {
+function HomeScreen() {
+    const router = useRouter();
     const [searchText, setSearchText] = useState("");
+    const [selectedMode, setSelectedMode] = useState<string | null>(null);
+
+    const handleSearchPress = () => {
+        // Navigate to RouteSelect modal, passing the selected mode if any
+        router.push({
+            pathname: "/RouteSelect",
+            params: selectedMode ? { mode: selectedMode } : {}
+        });
+    };
 
     return (
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -22,23 +34,33 @@ function HomeScreen () {
             {/* Search Bar */}
             <View style={styles.searchContainer}>
                 <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Where do you want to go?"
-                    placeholderTextColor="#393939"
-                    value={searchText}
-                    onChangeText={setSearchText}
-                />
-                <Ionicons name="mic" size={20} color="#666" style={styles.micIcon} />
+
+                <TouchableOpacity onPress={handleSearchPress} style={{ flex: 1 }}>
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Where do you want to go?"
+                        placeholderTextColor="#393939"
+                        value={searchText}
+                        editable={false} // Disable direct editing to prioritize navigation
+                        pointerEvents="none" // Ensure touch passes to TouchableOpacity
+                    />
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => console.log('Mic pressed')}>
+                    <Ionicons name="mic" size={20} color="#666" style={styles.micIcon} />
+                </TouchableOpacity>
             </View>
 
             {/* Mode Selector */}
             <Text style={styles.sectionTitle}>Mode Selector</Text>
-            <ModeOfTransportSelect />
+            <ModeOfTransportSelect
+                selectedMode={selectedMode}
+                onSelect={(mode) => setSelectedMode(mode)}
+            />
 
             {/* Scrollable Cards Section */}
             {/* <Text style={styles.sectionTitle}>Discover</Text> */}
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 25}}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 25 }}>
                 <View style={[styles.featureCard, { backgroundColor: "#014C1D" }]}>
                     <View style={styles.cardLeft}>
                         <Text style={styles.cardTitle}>Just finished a trip?</Text>
