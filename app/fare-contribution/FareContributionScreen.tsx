@@ -10,13 +10,14 @@ import {
     Animated,
     Dimensions,
     SafeAreaView,
-    ActivityIndicator,
+    ActivityIndicator
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TimeSelectionModal from './TimeSelectionModal';
 import SuccessModal from './SuccessModal';
 import RewardsModal from './RewardsModal';
 import ModeOfTransportSelect from '../../components/ModeOfTransportSelect';
+import { useRouter } from "expo-router";
 
 const { height } = Dimensions.get('window');
 
@@ -60,6 +61,7 @@ const predefinedConditions: ConditionOption[] = [
 ];
 
 function FareContributionScreen() {
+    const router = useRouter();
     // Form state
     const [fromLocation, setFromLocation] = useState('');
     const [toLocation, setToLocation] = useState('');
@@ -182,7 +184,10 @@ function FareContributionScreen() {
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity style={styles.backButton}>
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => router.back()}
+                >
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
             </View>
@@ -268,8 +273,8 @@ function FareContributionScreen() {
                 <ModeOfTransportSelect
                     selectedMode={selectedVehicle}
                     onSelect={(mode) => {
-                        setSelectedVehicle(mode);
-                        const label = vehicleOptions.find(o => o.value === mode)?.label || '';
+                        setSelectedVehicle(mode || '');
+                        const label = mode ? (vehicleOptions.find(o => o.value === mode)?.label || '') : '';
                         setSelectedVehicleLabel(label);
                     }}
                 />

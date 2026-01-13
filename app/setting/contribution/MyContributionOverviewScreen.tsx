@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -6,19 +6,64 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    RefreshControl,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function MyContributionOverviewScreen() {
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [stats, setStats] = useState([
+        { id: 1, title: 'Contribution points', emoji: '🏆', value: '0', key: 'points' },
+        { id: 2, title: 'People helped', emoji: '👥', value: '0', key: 'peopleHelped' },
+        { id: 3, title: 'Routes confirmed', emoji: '✅', value: '0', key: 'routesConfirmed' },
+        { id: 4, title: 'Fair updated', emoji: '💰', value: '0', key: 'faresUpdated' },
+    ]);
 
-    const stats = [
-        { id: 1, title: 'Contribution points', emoji: '🏆', value: '1,250' },
-        { id: 2, title: 'People helped', emoji: '👥', value: '342' },
-        { id: 3, title: 'Routes confirmed', emoji: '✅', value: '85' },
-        { id: 4, title: 'Fair updated', emoji: '💰', value: '12' },
-    ];
+    const loadCachedStats = async () => {
+        try {
+            const cached = await AsyncStorage.getItem('user_contribution_stats');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                updateStatsArray(parsed);
+            }
+        } catch (e) {
+            console.error('Error loading cached stats:', e);
+        }
+    };
+
+    const fetchStats = async () => {
+        setIsLoading(true);
+        try {
+            const response = await api.get('/api/user/contribution/overview');
+            if (response.data && response.data.stats) {
+                const freshStats = response.data.stats;
+                updateStatsArray(freshStats);
+                await AsyncStorage.setItem('user_contribution_stats', JSON.stringify(freshStats));
+            }
+        } catch (error) {
+            console.error('Error fetching contribution stats:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const updateStatsArray = (data: any) => {
+        setStats(prev => prev.map(s => ({
+            ...s,
+            value: data[s.key]?.toLocaleString() || '0'
+        })));
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadCachedStats();
+            fetchStats();
+        }, [])
+    );
 
     const menuItems = [
         {
@@ -31,16 +76,16 @@ function MyContributionOverviewScreen() {
         {
             id: 'contributions',
             title: 'My contributions',
-            description: 'History of your shared data',
+            description: "Route, Fares and updates you've submitted",
             icon: 'list-outline',
-            onPress: () => { },
+            onPress: () => { router.push('./setting/contribution/AllContributionsScreen') },
         },
         {
             id: 'trust',
             title: 'Trust and reputation',
             description: 'Your standing in the community',
             icon: 'shield-checkmark-outline',
-            onPress: () => { },
+            onPress: () => { router.push('./setting/contribution/TrustReputationScreen') },
         },
     ];
 
@@ -55,7 +100,13 @@ function MyContributionOverviewScreen() {
                 <Text style={styles.headerSubtitle}>See how you're helping the community</Text>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={isLoading} onRefresh={fetchStats} />
+                }
+            >
                 {/* Stats Grid */}
                 <View style={styles.statsGrid}>
                     {stats.map((stat) => (

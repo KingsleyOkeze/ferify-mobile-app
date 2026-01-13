@@ -8,9 +8,9 @@ import {
     Image
 } from 'react-native';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons'; // For dot icons
-import startToEndImage from "../assets/images/startToEndImage.png";
-import startingRouteIcon from "../assets/images/startingRouteIcon.png";
-import endingRouteIcon from "../assets/images/endingRouteIcon.png"
+import startToEndImage from "../../assets/images/startToEndImage.png";
+import startingRouteIcon from "../../assets/images/startingRouteIcon.png";
+import endingRouteIcon from "../../assets/images/endingRouteIcon.png"
 
 
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,44 +8,97 @@ import {
     ScrollView,
     Modal,
     Pressable,
+    ActivityIndicator,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function PrivacyAndSafetySettingScreen() {
     const router = useRouter();
     const [modalVisible, setModalVisible] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [profileVisibility, setProfileVisibility] = useState('public'); // 'public' | 'private'
     const [tempSelection, setTempSelection] = useState('public');
+
+    const loadCachedSettings = async () => {
+        try {
+            const cached = await AsyncStorage.getItem('user_privacy_settings');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.profileVisibility) setProfileVisibility(parsed.profileVisibility);
+            }
+        } catch (e) {
+            console.error('Error loading cached privacy settings:', e);
+        }
+    };
+
+    const fetchPrivacySettings = async () => {
+        setIsLoading(true);
+        try {
+            const response = await api.get('/api/user/privacy');
+            if (response.data && response.data.privacy) {
+                const { profileVisibility: visibility } = response.data.privacy;
+                setProfileVisibility(visibility);
+                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+            }
+        } catch (error) {
+            console.error('Error fetching privacy settings:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadCachedSettings();
+            fetchPrivacySettings();
+        }, [])
+    );
 
     const openModal = () => {
         setTempSelection(profileVisibility);
         setModalVisible(true);
     };
 
-    const saveSelection = () => {
-        setProfileVisibility(tempSelection);
+    const saveSelection = async () => {
+        const previousVisibility = profileVisibility;
+        setProfileVisibility(tempSelection); // Optimistic update
         setModalVisible(false);
+
+        try {
+            const response = await api.patch('/api/user/privacy/update', {
+                profileVisibility: tempSelection
+            });
+            if (response.data && response.data.privacy) {
+                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+            }
+        } catch (error) {
+            console.error('Error updating profile visibility:', error);
+            setProfileVisibility(previousVisibility); // Rollback
+            alert('Failed to update privacy settings. Please try again.');
+        }
     };
 
     const settingsItems = [
         {
             id: 'profile',
             title: 'Profile visibility',
-            description: 'Manage who can see your profile info',
+            description: 'Who can see your profile info',
             onPress: openModal,
         },
         {
             id: 'contribution',
             title: 'Contribution visibility',
-            description: 'Control visibility of your contributions',
-            onPress: () => { },
+            description: 'Show or hide your visibility',
+            onPress: () => { router.push("./ContributionVisibilitySettingScreen") },
         },
         {
             id: 'location',
             title: 'Location data',
             description: 'Manage your location usage',
-            onPress: () => { },
+            onPress: () => { router.push("./LocationDataSettingScreen") },
         },
     ];
 

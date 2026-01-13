@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -6,17 +6,56 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    RefreshControl,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function TrustAndReputationScreen() {
     const router = useRouter();
+    const [isLoading, setIsLoading] = useState(false);
+    const [trustScore, setTrustScore] = useState(0);
+
+    const loadCachedData = async () => {
+        try {
+            const cached = await AsyncStorage.getItem('user_trust_overview');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                setTrustScore(parsed.trustScore || 0);
+            }
+        } catch (e) {
+            console.error('Error loading cached trust data:', e);
+        }
+    };
+
+    const fetchTrustData = async () => {
+        setIsLoading(true);
+        try {
+            const response = await api.get('/api/user/contribution/trust');
+            if (response.data) {
+                setTrustScore(response.data.trustScore);
+                await AsyncStorage.setItem('user_trust_overview', JSON.stringify(response.data));
+            }
+        } catch (error) {
+            console.error('Error fetching trust data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadCachedData();
+            fetchTrustData();
+        }, [])
+    );
 
     const factors = [
         {
             id: 'verified',
-            text: 'Contribution verified by other',
+            text: 'Contribution verified by others',
             icon: 'checkmark-circle-outline',
             color: '#2E7D32', // Green
         },
@@ -28,7 +67,7 @@ function TrustAndReputationScreen() {
         },
         {
             id: 'rejected',
-            text: 'Recent rejected updated',
+            text: 'Recent rejected updates',
             icon: 'close-circle-outline',
             color: '#C62828', // Red
         },
@@ -45,14 +84,17 @@ function TrustAndReputationScreen() {
                 <Text style={styles.headerSubtitle}>See your standing in the community</Text>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                refreshControl={<RefreshControl refreshing={isLoading} onRefresh={fetchTrustData} />}
+            >
                 {/* Score Section */}
                 <View style={styles.scoreContainer}>
                     <View style={styles.scoreIconContainer}>
                         <Ionicons name="medal-outline" size={40} color="#FBC02D" />
                     </View>
                     <Text style={styles.scoreLabel}>Trust score</Text>
-                    <Text style={styles.scoreValue}>24%</Text>
+                    <Text style={styles.scoreValue}>{trustScore}%</Text>
                     <Text style={styles.scoreDescription}>
                         Your trust score helps others know how{'\n'}reliable your contributions are.
                     </Text>

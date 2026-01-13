@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -12,30 +12,55 @@ import {
     UIManager,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import RouteFromAndTo from '@/components/RouteFromAndTo';
 import busImage from '@/assets/images/busImage.png';
+import okadaImage from '@/assets/images/okadaImage.png';
+import kekeImage from '@/assets/images/kekeImage.png';
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// Mock Data for Route Breakdown
+// Mock Data for Route Breakdown (Optional/Placeholder for future real integration)
 const routeLegs = [
-    { id: '1', from: 'Agege', to: 'Ikeja Along', price: '₦200 - ₦300', reliability: 'High', contributors: 42, type: 'Bus' },
-    { id: '2', from: 'Ikeja Along', to: 'Oshodi', price: '₦150 - ₦250', reliability: 'Medium', contributors: 15, type: 'Bus' },
-    { id: '3', from: 'Oshodi', to: 'Mile 2', price: '₦400 - ₦600', reliability: 'High', contributors: 89, type: 'Bus' },
-    { id: '4', from: 'Mile 2', to: 'Festac', price: '₦200 - ₦300', reliability: 'High', contributors: 30, type: 'Keke' },
+    { id: '1', from: 'Point A', to: 'Point B', price: '₦100 - ₦200', reliability: 'High', contributors: 10, type: 'Bus' },
 ];
 
 function RouteSummaryScreen() {
     const router = useRouter();
+    const params = useLocalSearchParams();
+
+    const from = params.from as string || "Unknown";
+    const to = params.to as string || "Unknown";
+    const mode = params.mode as string || "Bus";
+    const [fareData, setFareData] = useState<any>(null);
+
     const [breakdownVisible, setBreakdownVisible] = useState(false);
+
+    useEffect(() => {
+        if (params.fareData) {
+            try {
+                setFareData(JSON.parse(params.fareData as string));
+            } catch (e) {
+                console.error("Error parsing fare data:", e);
+            }
+        }
+    }, [params.fareData]);
 
     const toggleBreakdown = () => {
         LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         setBreakdownVisible(!breakdownVisible);
+    };
+
+    const getModeImage = (modeName: string) => {
+        switch (modeName) {
+            case 'Okada': return okadaImage;
+            case 'Keke': return kekeImage;
+            case 'Bus': return busImage;
+            default: return busImage;
+        }
     };
 
     return (
@@ -61,30 +86,46 @@ function RouteSummaryScreen() {
                 </View>
 
                 {/* Route From/To */}
-                <RouteFromAndTo from="Agege" to="Festac" />
+                <RouteFromAndTo from={from} to={to} />
 
                 {/* Summary Card */}
                 <View style={styles.summaryCard}>
                     {/* Top Row: Fare & Transport Icon */}
                     <View style={styles.summaryTopRow}>
-                        <View>
-                            <Text style={styles.summaryLabel}>Estimated Fare</Text>
-                            <Text style={styles.summaryPrice}>₦1,000 - ₦1,800</Text>
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.summaryLabel}>Estimated Fare ({mode})</Text>
+                            <Text style={styles.summaryPrice}>
+                                {fareData ? `₦${fareData.minPrice.toLocaleString()} - ₦${fareData.maxPrice.toLocaleString()}` : 'Calculating...'}
+                            </Text>
+                            {fareData && (
+                                <Text style={styles.typicalText}>Typical: ₦${fareData.typicalPrice.toLocaleString()}</Text>
+                            )}
                         </View>
-                        <Image source={busImage} style={styles.transportIconLarge} resizeMode="contain" />
+                        <Image source={getModeImage(mode)} style={styles.transportIconLarge} resizeMode="contain" />
                     </View>
 
                     {/* Bottom Row: Reliability & Contributors */}
                     <View style={styles.summaryBottomRow}>
                         <View style={styles.badgeContainer}>
-                            <Ionicons name="shield-checkmark" size={16} color="#000" style={styles.badgeIcon} />
-                            <Text style={styles.badgeText}>Highly Reliable</Text>
+                            <Ionicons
+                                name={fareData?.confidence === 'HIGH' ? "shield-checkmark" : "information-circle-outline"}
+                                size={16}
+                                color="#000"
+                                style={styles.badgeIcon}
+                            />
+                            <Text style={styles.badgeText}>
+                                {fareData?.confidence === 'HIGH' ? 'Highly Reliable' : fareData?.confidence === 'MEDIUM' ? 'Reliable' : 'Estimate'}
+                            </Text>
                         </View>
                         <View style={styles.badgeContainer}>
                             <Ionicons name="people" size={16} color="#000" style={styles.badgeIcon} />
-                            <Text style={styles.badgeText}>24 Contributors</Text>
+                            <Text style={styles.badgeText}>{fareData?.dataPoints || 0} Contributors</Text>
                         </View>
                     </View>
+
+                    {fareData?.message && (
+                        <Text style={styles.dataMessage}>{fareData.message}</Text>
+                    )}
                 </View>
 
                 {/* Show Fare Breakdown Toggle */}
@@ -103,7 +144,7 @@ function RouteSummaryScreen() {
                         {/* Progress Line (Left) */}
                         <View style={styles.progressContainer}>
                             <View style={styles.progressLine} />
-                            {routeLegs.map((_, index) => (
+                            {routeLegs.map((_leg: any, index: number) => (
                                 <View key={index} style={[styles.progressNode, { top: index * 160 + 20 }]}>
                                     <Text style={styles.progressNodeText}>L{index + 1}</Text>
                                 </View>
@@ -112,7 +153,7 @@ function RouteSummaryScreen() {
 
                         {/* Breakdown Cards (Right) */}
                         <View style={styles.cardsContainer}>
-                            {routeLegs.map((leg, index) => (
+                            {routeLegs.map((leg: any, _index: number) => (
                                 <View key={leg.id} style={styles.legCardWrapper}>
                                     {/* The Leg Card */}
                                     <View style={styles.legCard}>
@@ -261,6 +302,20 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#333',
         fontWeight: '500',
+    },
+    typicalText: {
+        fontSize: 14,
+        color: '#666',
+        marginTop: 2,
+    },
+    dataMessage: {
+        fontSize: 12,
+        color: '#014C1D',
+        marginTop: 12,
+        fontStyle: 'italic',
+        backgroundColor: '#E8F5E9',
+        padding: 8,
+        borderRadius: 8,
     },
     breakdownToggle: {
         flexDirection: 'row',

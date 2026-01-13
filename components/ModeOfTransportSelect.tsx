@@ -6,7 +6,7 @@ import busImage from '../assets/images/busImage.png';
 
 interface ModeOfTransportSelectProps {
     selectedMode?: string | null;
-    onSelect?: (mode: string) => void;
+    onSelect?: (mode: string | null) => void;
 }
 
 function ModeOfTransportSelect({ selectedMode, onSelect }: ModeOfTransportSelectProps) {
@@ -25,7 +25,11 @@ function ModeOfTransportSelect({ selectedMode, onSelect }: ModeOfTransportSelect
                         styles.card,
                         selectedMode === mode.id && styles.cardSelected // Apply border if selected
                     ]}
-                    onPress={() => onSelect && onSelect(mode.id)}
+                    onPress={() => {
+                        if (onSelect) {
+                            onSelect(selectedMode === mode.id ? null : mode.id);
+                        }
+                    }}
                     activeOpacity={0.7}
                 >
                     <Image source={mode.image} style={styles.image} />

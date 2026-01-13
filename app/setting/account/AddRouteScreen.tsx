@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -8,53 +8,79 @@ import {
     SafeAreaView,
     ScrollView,
     Keyboard,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-
-// Mock Data for Recommendations (reused from RouteSelect)
-const recommendations = [
-    {
-        id: '1',
-        title: 'Ikeja City Mall',
-        address: 'Obafemi Awolowo Way, Ikeja',
-        distance: '5km',
-    },
-    {
-        id: '2',
-        title: 'Computer Village',
-        address: 'Otigba Street, Ikeja',
-        distance: '3.2km',
-    },
-    {
-        id: '3',
-        title: 'Murtala Muhammed Airport',
-        address: 'Ikeja, Lagos',
-        distance: '8km',
-    },
-    {
-        id: '4',
-        title: 'Alausa Secretariat',
-        address: 'Alausa, Ikeja',
-        distance: '2km',
-    },
-    {
-        id: '5',
-        title: 'Allen Avenue',
-        address: 'Allen, Ikeja',
-        distance: '4km',
-    },
-];
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function AddRouteScreen() {
     const router = useRouter();
     const { type } = useLocalSearchParams(); // 'home' or 'work'
 
-    const [toLocation, setToLocation] = useState('');
-    const [toFocused, setToFocused] = useState(false);
+    const [query, setQuery] = useState('');
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
 
-    // Dynamic Title
+    // Fetch suggestions from backend
+    useEffect(() => {
+        const fetchSuggestions = async () => {
+            if (query.length < 3) {
+                setSuggestions([]);
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const response = await api.get('/api/location/suggest', {
+                    params: { input: query }
+                });
+                if (response.data && response.data.suggestions) {
+                    setSuggestions(response.data.suggestions);
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const timeoutId = setTimeout(fetchSuggestions, 500);
+        return () => clearTimeout(timeoutId);
+    }, [query]);
+
+    const handleSaveRoute = async (item: any) => {
+        setIsSaving(true);
+        try {
+            const payload = {
+                type: type,
+                title: item.title,
+                address: item.address,
+                latitude: item.latitude || 0,
+                longitude: item.longitude || 0
+            };
+
+            const response = await api.post('/api/user/route/save-route', payload);
+
+            if (response.status === 200) {
+                // Save to local storage
+                await AsyncStorage.setItem(`${type}_address`, item.address);
+                Alert.alert('Success', `${type === 'home' ? 'Home' : 'Work'} address saved!`);
+                router.back();
+            }
+        } catch (error: any) {
+            console.error('Error saving route:', error);
+            Alert.alert('Error', error.response?.data?.error || 'Failed to save address');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     const pageTitle = type === 'work' ? 'Add work' : 'Add home';
 
     return (
@@ -78,52 +104,62 @@ function AddRouteScreen() {
                     <View style={styles.inputsSection}>
                         <View style={styles.locationContainer}>
                             <TextInput
-                                style={[styles.locationInput, toFocused && styles.locationInputFocused]}
+                                style={[styles.locationInput, isFocused && styles.locationInputFocused]}
                                 placeholder={`Enter ${type === 'work' ? 'work' : 'home'} address`}
                                 placeholderTextColor="#999"
-                                value={toLocation}
-                                onChangeText={setToLocation}
-                                onFocus={() => setToFocused(true)}
-                                onBlur={() => setToFocused(false)}
+                                value={query}
+                                onChangeText={setQuery}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
                                 autoFocus
                             />
+                            {isLoading && (
+                                <ActivityIndicator
+                                    style={styles.inputLoader}
+                                    size="small"
+                                    color="#000"
+                                />
+                            )}
                         </View>
                     </View>
 
-                    {/* Recommendations List */}
-                    <Text style={styles.sectionTitle}>Suggestions</Text>
+                    {/* Suggestions List */}
+                    <Text style={styles.sectionTitle}>
+                        {suggestions.length > 0 ? 'Suggestions' : (query.length >= 3 ? 'No results found' : 'Start typing to see suggestions')}
+                    </Text>
+
                     <ScrollView
                         contentContainerStyle={styles.resultsList}
                         showsVerticalScrollIndicator={false}
                         keyboardShouldPersistTaps="handled"
                     >
-                        {recommendations.map((item) => (
+                        {suggestions.map((item, index) => (
                             <TouchableOpacity
-                                key={item.id}
+                                key={index}
                                 style={styles.resultCard}
-                                onPress={() => {
-                                    // Normally this would save the route
-                                    router.back();
-                                }}
+                                onPress={() => handleSaveRoute(item)}
+                                disabled={isSaving}
                             >
-                                {/* Left: Icon */}
                                 <View style={styles.iconContainer}>
                                     <Ionicons name="location-sharp" size={20} color="#000" />
                                 </View>
 
-                                {/* Middle: Details */}
                                 <View style={styles.resultDetails}>
                                     <Text style={styles.resultTitle}>{item.title}</Text>
                                     <Text style={styles.resultAddress}>{item.address}</Text>
                                 </View>
 
-                                {/* Right: Distance */}
-                                <View style={styles.distanceBadge}>
-                                    <Text style={styles.distanceText}>{item.distance}</Text>
-                                </View>
+                                <Ionicons name="chevron-forward" size={18} color="#CCC" />
                             </TouchableOpacity>
                         ))}
                     </ScrollView>
+
+                    {isSaving && (
+                        <View style={styles.savingOverlay}>
+                            <ActivityIndicator size="large" color="#000" />
+                            <Text style={styles.savingText}>Saving...</Text>
+                        </View>
+                    )}
                 </View>
             </TouchableWithoutFeedback>
         </SafeAreaView>
@@ -160,15 +196,16 @@ const styles = StyleSheet.create({
     },
     locationContainer: {
         position: 'relative',
+        justifyContent: 'center',
     },
     locationInput: {
         backgroundColor: '#F5F5F5',
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
+        paddingRight: 40, // space for loader
         fontSize: 16,
         color: '#000',
-        marginBottom: 8,
         borderWidth: 2,
         borderColor: 'transparent',
     },
@@ -176,14 +213,14 @@ const styles = StyleSheet.create({
         borderColor: '#000',
         backgroundColor: '#fff',
     },
-    toLocationInput: {
-        marginBottom: 0,
+    inputLoader: {
+        position: 'absolute',
+        right: 15,
     },
-    // connectorArrow removed as we now have a single input
     sectionTitle: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#000',
+        color: '#666',
         paddingHorizontal: 20,
         marginBottom: 12,
         marginTop: 10,
@@ -222,16 +259,16 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#666',
     },
-    distanceBadge: {
-        backgroundColor: '#F5F5F5',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 8,
+    savingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    distanceText: {
-        fontSize: 12,
+    savingText: {
+        marginTop: 10,
         fontWeight: '600',
-        color: '#666',
+        color: '#000',
     },
 });
 

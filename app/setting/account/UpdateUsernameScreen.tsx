@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -9,21 +9,55 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-
-// Dummy user data
-const USER_DATA = {
-    username: 'johndoe',
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function UpdateUsernameScreen() {
     const router = useRouter();
+    const [currentUsername, setCurrentUsername] = useState('Not set');
     const [newUsername, setNewUsername] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const isFormValid = newUsername.trim().length > 0;
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const username = await AsyncStorage.getItem('username');
+                if (username) setCurrentUsername(username);
+            } catch (error) {
+                console.error('Error fetching username from storage:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
+
+    const isFormValid = newUsername.trim().length > 0 && !isLoading;
+
+    const handleUpdate = async () => {
+        if (!isFormValid) return;
+
+        setIsLoading(true);
+        try {
+            const response = await api.put('/api/user/account/update-username', { newUsername: newUsername.trim() });
+            if (response.status === 200) {
+                // Update local storage
+                await AsyncStorage.setItem('username', response.data.username);
+
+                Alert.alert('Success', 'Username updated successfully', [
+                    { text: 'OK', onPress: () => router.back() }
+                ]);
+            }
+        } catch (error) {
+            console.error('Update username error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -51,7 +85,7 @@ function UpdateUsernameScreen() {
                     {/* Current Username */}
                     <View style={styles.infoGroup}>
                         <Text style={styles.label}>Current username</Text>
-                        <Text style={styles.currentValue}>@{USER_DATA.username}</Text>
+                        <Text style={styles.currentValue}>@{currentUsername}</Text>
                     </View>
 
                     {/* New Username Input */}
@@ -70,6 +104,7 @@ function UpdateUsernameScreen() {
                             onBlur={() => setIsInputFocused(false)}
                             autoCapitalize="none"
                             autoCorrect={false}
+                            editable={!isLoading}
                         />
                     </View>
                 </ScrollView>
@@ -82,14 +117,18 @@ function UpdateUsernameScreen() {
                             !isFormValid && styles.updateButtonDisabled
                         ]}
                         disabled={!isFormValid}
-                        onPress={() => router.back()}
+                        onPress={handleUpdate}
                     >
-                        <Text style={[
-                            styles.updateButtonText,
-                            !isFormValid && styles.updateButtonTextDisabled
-                        ]}>
-                            Update
-                        </Text>
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={[
+                                styles.updateButtonText,
+                                !isFormValid && styles.updateButtonTextDisabled
+                            ]}>
+                                Update
+                            </Text>
+                        )}
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>

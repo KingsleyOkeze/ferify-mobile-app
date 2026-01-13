@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -12,18 +12,50 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-
-// Dummy user data
-const USER_DATA = {
-    email: 'john.doe@example.com',
-};
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function UpdateUserEmailScreen() {
     const router = useRouter();
+    const [currentEmail, setCurrentEmail] = useState('');
     const [newEmail, setNewEmail] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const isFormValid = newEmail.trim().length > 0 && newEmail.includes('@');
+    useEffect(() => {
+        const fetchCurrentEmail = async () => {
+            try {
+                const email = await AsyncStorage.getItem('userEmail');
+                if (email) {
+                    setCurrentEmail(email);
+                } else {
+                    setCurrentEmail('Not set');
+                }
+            } catch (error) {
+                console.error('Error fetching email:', error);
+            }
+        };
+        fetchCurrentEmail();
+    }, []);
+
+    const handleUpdate = async () => {
+        setIsLoading(true);
+        try {
+            const response = await api.post('/api/user/account/update-email/initiate', { newEmail });
+            if (response.status === 200) {
+                router.push({
+                    pathname: '/setting/account/VerifyUpdateUserEmailScreen',
+                    params: { email: newEmail }
+                });
+            }
+        } catch (error) {
+            console.error('Update email error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const isFormValid = newEmail.trim().length > 0 && newEmail.includes('@') && !isLoading;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -51,27 +83,36 @@ function UpdateUserEmailScreen() {
                     {/* Current Email */}
                     <View style={styles.infoGroup}>
                         <Text style={styles.label}>Current email address</Text>
-                        <Text style={styles.currentValue}>{USER_DATA.email}</Text>
+                        <Text style={styles.currentValue}>{currentEmail}</Text>
                     </View>
 
                     {/* New Email Input */}
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>New email address</Text>
-                        <TextInput
-                            style={[
-                                styles.input,
-                                isInputFocused && styles.inputFocused
-                            ]}
-                            placeholder="Enter new email"
-                            placeholderTextColor="#999"
-                            value={newEmail}
-                            onChangeText={setNewEmail}
-                            onFocus={() => setIsInputFocused(true)}
-                            onBlur={() => setIsInputFocused(false)}
-                            autoCapitalize="none"
-                            autoCorrect={false}
-                            keyboardType="email-address"
-                        />
+                        <View style={styles.inputWrapper}>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    isInputFocused && styles.inputFocused,
+                                    isLoading && { opacity: 0.5 }
+                                ]}
+                                placeholder="Enter new email"
+                                placeholderTextColor="#999"
+                                value={newEmail}
+                                onChangeText={setNewEmail}
+                                onFocus={() => setIsInputFocused(true)}
+                                onBlur={() => setIsInputFocused(false)}
+                                autoCapitalize="none"
+                                autoCorrect={false}
+                                keyboardType="email-address"
+                                editable={!isLoading}
+                            />
+                            {isLoading && (
+                                <View style={styles.inputLoading}>
+                                    <Text style={{ fontSize: 12, color: '#666' }}>Sending...</Text>
+                                </View>
+                            )}
+                        </View>
                         <Text style={styles.verificationNotice}>
                             A verification code will be sent to your email
                         </Text>
@@ -86,13 +127,13 @@ function UpdateUserEmailScreen() {
                             !isFormValid && styles.updateButtonDisabled
                         ]}
                         disabled={!isFormValid}
-                        onPress={() => router.push('/setting/account/VerifyUpdateUserEmail')}
+                        onPress={handleUpdate}
                     >
                         <Text style={[
                             styles.updateButtonText,
                             !isFormValid && styles.updateButtonTextDisabled
                         ]}>
-                            Update
+                            {isLoading ? 'Sending...' : 'Update'}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -161,6 +202,10 @@ const styles = StyleSheet.create({
     inputGroup: {
         marginBottom: 20,
     },
+    inputWrapper: {
+        position: 'relative',
+        justifyContent: 'center',
+    },
     input: {
         height: 50,
         borderWidth: 1,
@@ -174,6 +219,10 @@ const styles = StyleSheet.create({
     inputFocused: {
         borderColor: '#000',
         backgroundColor: '#fff',
+    },
+    inputLoading: {
+        position: 'absolute',
+        right: 16,
     },
     verificationNotice: {
         fontSize: 12,

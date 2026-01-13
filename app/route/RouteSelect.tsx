@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -9,62 +9,133 @@ import {
     ScrollView,
     Dimensions,
     Keyboard,
-    TouchableWithoutFeedback
+    TouchableWithoutFeedback,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import ModeOfTransportSelect from '@/components/ModeOfTransportSelect';
+import api from '@/services/api';
 
 const { width } = Dimensions.get('window');
 
-// Mock Data for Recommendations
-const recommendations = [
-    {
-        id: '1',
-        title: 'Ikeja City Mall',
-        address: 'Obafemi Awolowo Way, Ikeja',
-        distance: '5km',
-    },
-    {
-        id: '2',
-        title: 'Computer Village',
-        address: 'Otigba Street, Ikeja',
-        distance: '3.2km',
-    },
-    {
-        id: '3',
-        title: 'Murtala Muhammed Airport',
-        address: 'Ikeja, Lagos',
-        distance: '8km',
-    },
-    {
-        id: '4',
-        title: 'Alausa Secretariat',
-        address: 'Alausa, Ikeja',
-        distance: '2km',
-    },
-    {
-        id: '5',
-        title: 'Allen Avenue',
-        address: 'Allen, Ikeja',
-        distance: '4km',
-    },
-];
+interface Recommendation {
+    name: string;
+    place_id: string;
+}
 
 function RouteSelect() {
     const router = useRouter();
     const params = useLocalSearchParams();
+
+    // Inputs
     const [fromLocation, setFromLocation] = useState('');
     const [toLocation, setToLocation] = useState('');
     const [fromFocused, setFromFocused] = useState(false);
     const [toFocused, setToFocused] = useState(false);
 
-    // Check if mode was passed from previous screen
+    // Selected Objects
+    const [fromResult, setFromResult] = useState<Recommendation | null>(null);
+    const [toResult, setToResult] = useState<Recommendation | null>(null);
+
+    // Search State
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [activeInput, setActiveInput] = useState<'from' | 'to' | null>(null);
+
+    // Mode
     const initialMode = params.mode as string | undefined;
     const [selectedMode, setSelectedMode] = useState<string | null>(initialMode || null);
-
-    // If initialMode exists, we hide the selector by default logic
     const showTransportSelector = !initialMode;
+
+    const toInputRef = useRef<TextInput>(null);
+
+    const handleSearch = async (text: string, type: 'from' | 'to') => {
+        if (type === 'from') {
+            setFromLocation(text);
+            setFromResult(null); // Reset object if user is typing
+        } else {
+            setToLocation(text);
+            setToResult(null);
+        }
+
+        if (text.length < 2) {
+            setRecommendations([]);
+            return;
+        }
+
+        setIsSearching(true);
+        try {
+            const response = await api.get('/api/route/placesearch', {
+                params: { query: text }
+            });
+            // route-service returns an array of { name, place_id }
+            setRecommendations(response.data || []);
+        } catch (error) {
+            console.error('Search error:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleSelectRecommendation = (item: Recommendation) => {
+        if (activeInput === 'from') {
+            setFromLocation(item.name);
+            setFromResult(item);
+            setRecommendations([]);
+            // Auto focus 'to' input
+            setTimeout(() => toInputRef.current?.focus(), 100);
+        } else if (activeInput === 'to') {
+            setToLocation(item.name);
+            setToResult(item);
+            setRecommendations([]);
+            Keyboard.dismiss();
+
+            // If everything is ready, trigger fare check
+            if (fromResult && selectedMode) {
+                performFareCheck(fromResult, item, selectedMode);
+            } else if (!selectedMode) {
+                Alert.alert("Selection Required", "Please select a transport mode to continue.");
+            }
+        }
+    };
+
+    const performFareCheck = async (from: Recommendation, to: Recommendation, mode: string) => {
+        try {
+            setIsSearching(true);
+            const response = await api.get('/api/fare/estimate', {
+                params: {
+                    from: from.name,
+                    to: to.name,
+                    vehicle: mode
+                }
+            });
+
+            // Navigate to RouteSummaryScreen with data
+            router.push({
+                pathname: "/route/RouteSummaryScreen",
+                params: {
+                    from: from.name,
+                    to: to.name,
+                    mode: mode,
+                    fareData: JSON.stringify(response.data)
+                }
+            });
+        } catch (error) {
+            console.error('Fare check error:', error);
+            Alert.alert("Error", "Could not calculate fare estimate. Please try again.");
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    // When mode changes and both locations are selected, auto-trigger
+    useEffect(() => {
+        if (fromResult && toResult && selectedMode) {
+            performFareCheck(fromResult, toResult, selectedMode);
+        }
+    }, [selectedMode]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -78,7 +149,7 @@ function RouteSelect() {
                     {/* Header */}
                     <View style={styles.header}>
                         <View style={styles.headerSpacer} />
-                        <Text style={styles.headerTitle}>Search Result</Text>
+                        <Text style={styles.headerTitle}>Route Select</Text>
                         <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
                             <Ionicons name="close" size={24} color="#000" />
                         </TouchableOpacity>
@@ -92,23 +163,40 @@ function RouteSelect() {
                                 placeholder="From where"
                                 placeholderTextColor="#999"
                                 value={fromLocation}
-                                onChangeText={setFromLocation}
-                                onFocus={() => setFromFocused(true)}
+                                onChangeText={(text) => handleSearch(text, 'from')}
+                                onFocus={() => {
+                                    setFromFocused(true);
+                                    setActiveInput('from');
+                                }}
                                 onBlur={() => setFromFocused(false)}
                             />
 
                             <View style={styles.toInputWrapper}>
                                 <TextInput
-                                    style={[styles.locationInput, styles.toLocationInput, toFocused && styles.locationInputFocused]}
+                                    ref={toInputRef}
+                                    style={[
+                                        styles.locationInput,
+                                        styles.toLocationInput,
+                                        toFocused && styles.locationInputFocused,
+                                        !fromResult && { opacity: 0.5 } // De-emphasize if from isn't selected
+                                    ]}
                                     placeholder="To where"
                                     placeholderTextColor="#999"
                                     value={toLocation}
-                                    onChangeText={setToLocation}
-                                    onFocus={() => setToFocused(true)}
+                                    editable={!!fromResult} // Disable until from is selected
+                                    onChangeText={(text) => handleSearch(text, 'to')}
+                                    onFocus={() => {
+                                        if (!fromResult) {
+                                            Alert.alert("Information", "Please select a starting point first.");
+                                            return;
+                                        }
+                                        setToFocused(true);
+                                        setActiveInput('to');
+                                    }}
                                     onBlur={() => setToFocused(false)}
                                 />
 
-                                <View style={styles.connectorArrow}>
+                                <View style={[styles.connectorArrow, !fromResult && { backgroundColor: '#999' }]}>
                                     <Ionicons name="arrow-down" size={18} color="#fff" />
                                 </View>
                             </View>
@@ -126,10 +214,20 @@ function RouteSelect() {
                         </View>
                     )}
 
-                    {/* Recommendations List */}
+                    {/* Recommendations List or Loading */}
+                    {isSearching && (
+                        <View style={{ padding: 20, alignItems: 'center' }}>
+                            <ActivityIndicator size="small" color="#000" />
+                        </View>
+                    )}
+
                     <ScrollView contentContainerStyle={styles.resultsList} showsVerticalScrollIndicator={false}>
                         {recommendations.map((item) => (
-                            <TouchableOpacity key={item.id} style={styles.resultCard}>
+                            <TouchableOpacity
+                                key={item.place_id}
+                                style={styles.resultCard}
+                                onPress={() => handleSelectRecommendation(item)}
+                            >
                                 {/* Left: Icon */}
                                 <View style={styles.iconContainer}>
                                     <Ionicons name="location-sharp" size={20} color="#000" />
@@ -137,13 +235,8 @@ function RouteSelect() {
 
                                 {/* Middle: Details */}
                                 <View style={styles.resultDetails}>
-                                    <Text style={styles.resultTitle}>{item.title}</Text>
-                                    <Text style={styles.resultAddress}>{item.address}</Text>
-                                </View>
-
-                                {/* Right: Distance */}
-                                <View style={styles.distanceBadge}>
-                                    <Text style={styles.distanceText}>{item.distance}</Text>
+                                    <Text style={styles.resultTitle}>{item.name}</Text>
+                                    <Text style={styles.resultAddress}>{item.name}</Text>
                                 </View>
                             </TouchableOpacity>
                         ))}

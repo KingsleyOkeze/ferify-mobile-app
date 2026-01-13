@@ -38,14 +38,14 @@ function NotificationSettingScreen() {
         {
             id: 'communityActivity',
             title: 'Community activity',
-            description: 'When people contribute to your routes',
+            description: 'When others confirm your route',
             value: communityActivity,
             onValueChange: setCommunityActivity,
         },
         {
             id: 'tipsAndInsight',
             title: 'Tips & insight',
-            description: 'Travel hacks and daily summaries',
+            description: 'Smart suggestions from Ferify',
             value: tipsAndInsight,
             onValueChange: setTipsAndInsight,
         },

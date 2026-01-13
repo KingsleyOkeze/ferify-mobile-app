@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -6,29 +6,80 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    ActivityIndicator
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import api from '@/services/api';
 
 function SavedRoutesScreen() {
     const router = useRouter();
 
-    // Mock state for saved addresses
-    const [homeAddress, setHomeAddress] = React.useState('123 Main Street, Lagos'); // Example address
-    const [workAddress, setWorkAddress] = React.useState(''); // Empty by default
+    const [homeAddress, setHomeAddress] = useState('Add home address');
+    const [workAddress, setWorkAddress] = useState('Add work address');
+    const [isLoading, setIsLoading] = useState(true);
+
+    const loadRoutes = async () => {
+        setIsLoading(true);
+        try {
+            // Try to load from storage first for immediate display
+            const storedHome = await AsyncStorage.getItem('home_address');
+            const storedWork = await AsyncStorage.getItem('work_address');
+            if (storedHome) setHomeAddress(storedHome);
+            if (storedWork) setWorkAddress(storedWork);
+
+            // Then fetch fresh data from backend
+            const response = await api.get('/api/user/route/saved-routes');
+            if (response.data && response.data.routes) {
+                const routes = response.data.routes;
+                const home = routes.find((r: any) => r.type === 'home');
+                const work = routes.find((r: any) => r.type === 'work');
+
+                if (home) {
+                    setHomeAddress(home.address);
+                    await AsyncStorage.setItem('home_address', home.address);
+                } else {
+                    setHomeAddress('Add home address');
+                    await AsyncStorage.removeItem('home_address');
+                }
+
+                if (work) {
+                    setWorkAddress(work.address);
+                    await AsyncStorage.setItem('work_address', work.address);
+                } else {
+                    setWorkAddress('Add work address');
+                    await AsyncStorage.removeItem('work_address');
+                }
+            }
+        } catch (error) {
+            console.error('Error loading saved routes:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    useFocusEffect(
+        React.useCallback(() => {
+            loadRoutes();
+        }, [])
+    );
 
     const menuItems = [
         {
             id: 'home',
-            title: 'Add home',
-            address: homeAddress,
+            title: 'Home',
+            address: homeAddress === 'Add home address' ? '' : homeAddress,
+            placeholder: 'Add home address',
             icon: 'home-outline',
             onPress: () => { router.push({ pathname: '/setting/account/AddRouteScreen', params: { type: 'home' } }) },
         },
         {
             id: 'work',
-            title: 'Add work',
-            address: workAddress,
+            title: 'Work',
+            address: workAddress === 'Add work address' ? '' : workAddress,
+            placeholder: 'Add work address',
             icon: 'briefcase-outline',
             onPress: () => { router.push({ pathname: '/setting/account/AddRouteScreen', params: { type: 'work' } }) },
         },
@@ -44,31 +95,42 @@ function SavedRoutesScreen() {
                 <Text style={styles.headerTitle}>Saved routes</Text>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.menuContainer}>
-                    {menuItems.map((item, index) => (
-                        <TouchableOpacity
-                            key={item.id}
-                            style={[
-                                styles.menuItem,
-                                index === 0 && styles.firstMenuItem
-                            ]}
-                            onPress={item.onPress}
-                        >
-                            <View style={styles.itemLeft}>
-                                <Ionicons name={item.icon as any} size={22} color="#333" style={styles.itemIcon} />
-                                <View>
-                                    <Text style={styles.itemTitle}>{item.title}</Text>
-                                    {item.address ? (
-                                        <Text style={styles.itemAddress}>{item.address}</Text>
-                                    ) : null}
-                                </View>
-                            </View>
-                            <Ionicons name="chevron-forward" size={20} color="#999" />
-                        </TouchableOpacity>
-                    ))}
+            {isLoading ? (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#000" />
                 </View>
-            </ScrollView>
+            ) : (
+                <ScrollView contentContainerStyle={styles.scrollContent}>
+                    <View style={styles.menuContainer}>
+                        {menuItems.map((item, index) => (
+                            <TouchableOpacity
+                                key={item.id}
+                                style={[
+                                    styles.menuItem,
+                                    index === 0 && styles.firstMenuItem
+                                ]}
+                                onPress={item.onPress}
+                            >
+                                <View style={styles.itemLeft}>
+                                    <View style={styles.iconCircle}>
+                                        <Ionicons name={item.icon as any} size={22} color="#000" />
+                                    </View>
+                                    <View>
+                                        <Text style={styles.itemTitle}>{item.title}</Text>
+                                        <Text style={[
+                                            styles.itemAddress,
+                                            !item.address && styles.placeholderText
+                                        ]}>
+                                            {item.address || item.placeholder}
+                                        </Text>
+                                    </View>
+                                </View>
+                                <Ionicons name="chevron-forward" size={20} color="#999" />
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                </ScrollView>
+            )}
         </SafeAreaView>
     );
 }
@@ -82,6 +144,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 10,
         paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
     backButton: {
         padding: 4,
@@ -93,42 +157,58 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#000',
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     scrollContent: {
         paddingBottom: 40,
     },
     menuContainer: {
-        // paddingVertical: 10,
+        paddingTop: 10,
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
+        paddingVertical: 20,
         paddingHorizontal: 20,
         backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
     firstMenuItem: {
-        borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        // borderTopWidth: 1,
+        // borderTopColor: '#F0F0F0',
     },
     itemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
+        flex: 1,
     },
-    itemIcon: {
+    iconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: '#F5F5F5',
+        justifyContent: 'center',
+        alignItems: 'center',
         marginRight: 16,
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: '600',
         color: '#000',
     },
     itemAddress: {
-        fontSize: 13,
-        color: '#666',
+        fontSize: 14,
+        color: '#000',
         marginTop: 2,
+        maxWidth: '90%',
+    },
+    placeholderText: {
+        color: '#999',
     },
 });
 

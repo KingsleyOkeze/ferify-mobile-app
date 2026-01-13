@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,11 +8,65 @@ import {
     ScrollView,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function LocationDataSettingScreen() {
     const router = useRouter();
     const [selectedOption, setSelectedOption] = useState('while_using');
+
+    const loadCachedSettings = async () => {
+        try {
+            const cached = await AsyncStorage.getItem('user_privacy_settings');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                // For MVP, we map shareLocationData (boolean) to 'while_using' or 'never'
+                setSelectedOption(parsed.shareLocationData ? 'while_using' : 'never');
+            }
+        } catch (e) {
+            console.error('Error loading cached settings:', e);
+        }
+    };
+
+    const fetchPrivacySettings = async () => {
+        try {
+            const response = await api.get('/api/user/privacy');
+            if (response.data && response.data.privacy) {
+                const { shareLocationData } = response.data.privacy;
+                setSelectedOption(shareLocationData ? 'while_using' : 'never');
+                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+            }
+        } catch (error) {
+            console.error('Error fetching privacy settings:', error);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadCachedSettings();
+            fetchPrivacySettings();
+        }, [])
+    );
+
+    const updateLocationPreference = async (optionId: string) => {
+        const previousSelection = selectedOption;
+        setSelectedOption(optionId); // Optimistic update
+
+        try {
+            const isSharing = optionId !== 'never';
+            const response = await api.patch('/api/user/privacy/update', {
+                shareLocationData: isSharing
+            });
+            if (response.data && response.data.privacy) {
+                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+            }
+        } catch (error) {
+            console.error('Error updating location preference:', error);
+            setSelectedOption(previousSelection); // Rollback
+            alert('Failed to update location settings. Please try again.');
+        }
+    };
 
     const locationOptions = [
         {
@@ -54,7 +108,7 @@ function LocationDataSettingScreen() {
                                     styles.listItem,
                                     index === 0 && styles.firstListItem
                                 ]}
-                                onPress={() => setSelectedOption(option.id)}
+                                onPress={() => updateLocationPreference(option.id)}
                             >
                                 <View style={styles.textContainer}>
                                     <Text style={styles.itemTitle}>{option.title}</Text>

@@ -5,46 +5,28 @@ import {
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
-    Animated,
-    Easing,
+    TextInput,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
     ActivityIndicator,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
-const OTP_LENGTH = 4;
-
-function VerifyUpdateUserEmail() {
+function VerifyUpdateUserEmailScreen() {
     const router = useRouter();
-    const [otp, setOtp] = useState<string[]>(['', '', '', '']);
+    const { email } = useLocalSearchParams();
+    const [otp, setOtp] = useState(['', '', '', '', '', '']);
+    const [timer, setTimer] = useState(30);
     const [isLoading, setIsLoading] = useState(false);
-    const [timer, setTimer] = useState(0);
-    const spinValue = useRef(new Animated.Value(0)).current;
+    const inputRefs = useRef<Array<TextInput | null>>([]);
 
-    // Spinner Animation
     useEffect(() => {
-        if (isLoading) {
-            Animated.loop(
-                Animated.timing(spinValue, {
-                    toValue: 1,
-                    duration: 1000,
-                    easing: Easing.linear,
-                    useNativeDriver: true,
-                })
-            ).start();
-        } else {
-            spinValue.setValue(0);
-        }
-    }, [isLoading]);
-
-    const spin = spinValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '360deg'],
-    });
-
-    // Timer Logic for Resend
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval>;
+        let interval: NodeJS.Timeout;
         if (timer > 0) {
             interval = setInterval(() => {
                 setTimer((prev) => prev - 1);
@@ -53,137 +35,144 @@ function VerifyUpdateUserEmail() {
         return () => clearInterval(interval);
     }, [timer]);
 
-    const handleKeyPress = (val: string) => {
-        if (isLoading) return;
+    const handleOtpChange = (value: string, index: number) => {
+        const newOtp = [...otp];
+        newOtp[index] = value;
+        setOtp(newOtp);
 
-        const currentOtp = [...otp];
-        const emptyIndex = currentOtp.findIndex((item) => item === '');
+        // Move to next input if value is entered
+        if (value.length === 1 && index < 5) {
+            inputRefs.current[index + 1]?.focus();
+        }
+    };
 
-        if (val === 'delete') {
-            const lastFilledIndex = currentOtp.map((item, i) => item !== '' ? i : -1).reverse().find(i => i !== -1);
-            if (lastFilledIndex !== undefined) {
-                currentOtp[lastFilledIndex] = '';
-                setOtp(currentOtp);
-            }
+    const handleKeyPress = (e: any, index: number) => {
+        if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
+            inputRefs.current[index - 1]?.focus();
+        }
+    };
+
+    const handleVerify = async () => {
+        const otpString = otp.join('');
+        if (otpString.length !== 6) {
+            Alert.alert('Error', 'Please enter a 6-digit code');
             return;
         }
 
-        if (emptyIndex !== -1) {
-            currentOtp[emptyIndex] = val;
-            setOtp(currentOtp);
-
-            // Check if complete
-            if (emptyIndex === OTP_LENGTH - 1) {
-                finishOtp();
-            }
-        }
-    };
-
-    const finishOtp = () => {
         setIsLoading(true);
-        // Simulate API call
-        setTimeout(() => {
-            setIsLoading(false);
-            router.back(); // Mock success
-            router.back();
-        }, 2000);
-    };
+        try {
+            const response = await api.post('/api/user/account/update-email/verify', { otp: otpString });
+            if (response.status === 200) {
+                // Update local storage
+                if (email) {
+                    await AsyncStorage.setItem('userEmail', email as string);
+                }
 
-    const handleResend = () => {
-        if (timer === 0) {
-            setTimer(15);
+                // Redirect back to home or profile
+                Alert.alert('Success', 'Email updated successfully', [
+                    { text: 'OK', onPress: () => router.replace('/tabs/HomeScreen') }
+                ]);
+            }
+        } catch (error) {
+            console.error('Verify OTP error:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const renderKeypadButton = (val: string, icon?: any) => (
-        <TouchableOpacity
-            style={styles.keypadBtn}
-            onPress={() => handleKeyPress(val === 'backspace' ? 'delete' : val)}
-        >
-            {icon ? (
-                <Ionicons name={icon} size={24} color="#000" />
-            ) : (
-                <Text style={styles.keypadText}>{val}</Text>
-            )}
-        </TouchableOpacity>
-    );
+    const handleResend = async () => {
+        if (timer > 0) return;
+
+        setIsLoading(true);
+        try {
+            await api.post('/api/user/account/update-email/initiate', { newEmail: email });
+            setTimer(30);
+            setOtp(['', '', '', '', '', '']);
+            inputRefs.current[0]?.focus();
+        } catch (error) {
+            console.error('Resend OTP error:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const isOtpComplete = otp.join('').length === 6 && !isLoading;
 
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
+                <Text style={styles.headerTitle}>Verify Email</Text>
+                <View style={styles.headerButton} />
             </View>
 
-            <View style={styles.content}>
-                <Text style={styles.title}>Enter the code</Text>
-                <Text style={styles.subtitle}>
-                    Enter the verification code sent to your email address.
-                </Text>
-
-                {/* OTP Boxes */}
-                <View style={styles.otpContainer}>
-                    {otp.map((digit, index) => (
-                        <View
-                            key={index}
-                            style={[
-                                styles.otpBox,
-                                digit !== '' && styles.otpBoxFilled,
-                                // Highlight current empty box
-                                otp.findIndex(d => d === '') === index && styles.otpBoxActive
-                            ]}
-                        >
-                            <Text style={styles.otpDigit}>{digit}</Text>
-                        </View>
-                    ))}
-                </View>
-
-                {/* Resend Link */}
-                <TouchableOpacity onPress={handleResend} style={styles.resendContainer}>
-                    <Text style={styles.resendText}>
-                        Resend code {timer > 0 ? `in ${timer}s` : ''}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.content}
+            >
+                <ScrollView contentContainerStyle={styles.formContainer}>
+                    <Text style={styles.screenTitle}>Enter verification code</Text>
+                    <Text style={styles.descriptionText}>
+                        A 6-digit code has been sent to <Text style={styles.emailText}>{email}</Text>
                     </Text>
-                </TouchableOpacity>
-            </View>
 
-            {/* Custom Keypad */}
-            <View style={styles.keypad}>
-                <View style={styles.keypadRow}>
-                    {renderKeypadButton('1')}
-                    {renderKeypadButton('2')}
-                    {renderKeypadButton('3')}
-                </View>
-                <View style={styles.keypadRow}>
-                    {renderKeypadButton('4')}
-                    {renderKeypadButton('5')}
-                    {renderKeypadButton('6')}
-                </View>
-                <View style={styles.keypadRow}>
-                    {renderKeypadButton('7')}
-                    {renderKeypadButton('8')}
-                    {renderKeypadButton('9')}
-                </View>
-                <View style={styles.keypadRow}>
-                    <View style={styles.keypadBtnEmpty} />
-                    {renderKeypadButton('0')}
-                    {renderKeypadButton('backspace', 'backspace-outline')}
-                </View>
-            </View>
-
-            {/* Spinner Overlay */}
-            {isLoading && (
-                <View style={styles.overlay}>
-                    <View style={styles.spinnerContainer}>
-                        <Animated.View style={{ transform: [{ rotate: spin }] }}>
-                            <Ionicons name="refresh" size={50} color="#fff" />
-                        </Animated.View>
-                        {/* Alternative standard spinner if refresh icon is not exactly "broken circle" enough */}
-                        {/* <ActivityIndicator size="large" color="#fff" /> */}
+                    {/* OTP Inputs */}
+                    <View style={styles.otpContainer}>
+                        {otp.map((digit, index) => (
+                            <TextInput
+                                key={index}
+                                ref={(ref) => (inputRefs.current[index] = ref)}
+                                style={[styles.otpInput, digit !== '' && styles.otpInputFilled]}
+                                value={digit}
+                                onChangeText={(value) => handleOtpChange(value, index)}
+                                onKeyPress={(e) => handleKeyPress(e, index)}
+                                keyboardType="number-pad"
+                                maxLength={1}
+                                selectTextOnFocus
+                                autoFocus={index === 0}
+                                editable={!isLoading}
+                            />
+                        ))}
                     </View>
+
+                    {/* Resend Section */}
+                    <View style={styles.resendContainer}>
+                        {timer > 0 ? (
+                            <Text style={styles.timerText}>Resend code in {timer}s</Text>
+                        ) : (
+                            <TouchableOpacity onPress={handleResend} disabled={isLoading}>
+                                <Text style={styles.resendText}>Resend code</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                </ScrollView>
+
+                {/* Footer Button */}
+                <View style={styles.footer}>
+                    <TouchableOpacity
+                        style={[
+                            styles.verifyButton,
+                            !isOtpComplete && styles.verifyButtonDisabled
+                        ]}
+                        disabled={!isOtpComplete}
+                        onPress={handleVerify}
+                    >
+                        {isLoading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={[
+                                styles.verifyButtonText,
+                                !isOtpComplete && styles.verifyButtonTextDisabled
+                            ]}>
+                                Verify
+                            </Text>
+                        )}
+                    </TouchableOpacity>
                 </View>
-            )}
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -194,99 +183,109 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingTop: 10,
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
-    backButton: {
+    headerButton: {
+        width: 32,
         padding: 4,
     },
-    content: {
-        paddingHorizontal: 25,
-        paddingTop: 10,
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#000',
     },
-    title: {
-        fontSize: 28,
+    content: {
+        flex: 1,
+    },
+    formContainer: {
+        paddingHorizontal: 20,
+        paddingTop: 30,
+        paddingBottom: 40,
+        alignItems: 'center',
+    },
+    screenTitle: {
+        fontSize: 24,
         fontWeight: 'bold',
         color: '#000',
         marginBottom: 10,
+        textAlign: 'center',
     },
-    subtitle: {
-        fontSize: 15,
+    descriptionText: {
+        fontSize: 14,
         color: '#666',
-        lineHeight: 22,
+        lineHeight: 20,
         marginBottom: 40,
+        textAlign: 'center',
+    },
+    emailText: {
+        fontWeight: 'bold',
+        color: '#000',
     },
     otpContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        width: '100%',
         marginBottom: 30,
     },
-    otpBox: {
-        width: 65,
-        height: 65,
-        borderRadius: 12,
-        backgroundColor: '#F9F9F9',
-        borderWidth: 2,
+    otpInput: {
+        width: 45,
+        height: 55,
+        borderWidth: 1,
         borderColor: '#F0F0F0',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    otpBoxActive: {
-        borderColor: '#000',
-        backgroundColor: '#fff',
-    },
-    otpBoxFilled: {
-        borderColor: '#000',
-        backgroundColor: '#fff',
-    },
-    otpDigit: {
+        borderRadius: 8,
         fontSize: 24,
         fontWeight: 'bold',
+        textAlign: 'center',
+        backgroundColor: '#F9F9F9',
         color: '#000',
     },
+    otpInputFilled: {
+        borderColor: '#000',
+        backgroundColor: '#fff',
+    },
     resendContainer: {
-        alignSelf: 'flex-start',
+        marginTop: 10,
+    },
+    timerText: {
+        fontSize: 14,
+        color: '#999',
     },
     resendText: {
         fontSize: 14,
-        fontWeight: '600',
         color: '#000',
+        fontWeight: 'bold',
+        textDecorationLine: 'underline',
     },
-    keypad: {
-        marginTop: 'auto',
-        paddingBottom: 20,
+    footer: {
+        padding: 20,
+        borderTopWidth: 1,
+        borderTopColor: '#F0F0F0',
     },
-    keypadRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly',
-        marginBottom: 10,
-    },
-    keypadBtn: {
-        width: 80,
-        height: 60,
+    verifyButton: {
+        height: 50,
+        backgroundColor: '#000',
+        borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
     },
-    keypadBtnEmpty: {
-        width: 80,
-        height: 60,
+    verifyButtonDisabled: {
+        backgroundColor: '#F0F0F0',
     },
-    keypadText: {
-        fontSize: 24,
-        fontWeight: '500',
-        color: '#000',
+    verifyButtonText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#fff',
     },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 1000,
-    },
-    spinnerContainer: {
-        padding: 30,
-        borderRadius: 20,
+    verifyButtonTextDisabled: {
+        color: '#999',
     },
 });
 
-export default VerifyUpdateUserEmail;
+export default VerifyUpdateUserEmailScreen;

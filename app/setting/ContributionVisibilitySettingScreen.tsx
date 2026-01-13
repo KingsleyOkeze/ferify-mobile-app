@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,11 +8,63 @@ import {
     ScrollView,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
 
 function ContributionVisibilitySettingScreen() {
     const router = useRouter();
     const [selectedOption, setSelectedOption] = useState('everyone');
+
+    const loadCachedSettings = async () => {
+        try {
+            const cached = await AsyncStorage.getItem('user_privacy_settings');
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                if (parsed.contributionVisibility) setSelectedOption(parsed.contributionVisibility);
+            }
+        } catch (e) {
+            console.error('Error loading cached settings:', e);
+        }
+    };
+
+    const fetchPrivacySettings = async () => {
+        try {
+            const response = await api.get('/api/user/privacy');
+            if (response.data && response.data.privacy) {
+                const { contributionVisibility } = response.data.privacy;
+                setSelectedOption(contributionVisibility);
+                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+            }
+        } catch (error) {
+            console.error('Error fetching privacy settings:', error);
+        }
+    };
+
+    useFocusEffect(
+        useCallback(() => {
+            loadCachedSettings();
+            fetchPrivacySettings();
+        }, [])
+    );
+
+    const updateVisibility = async (optionId: string) => {
+        const previousSelection = selectedOption;
+        setSelectedOption(optionId); // Optimistic update
+
+        try {
+            const response = await api.patch('/api/user/privacy/update', {
+                contributionVisibility: optionId
+            });
+            if (response.data && response.data.privacy) {
+                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+            }
+        } catch (error) {
+            console.error('Error updating contribution visibility:', error);
+            setSelectedOption(previousSelection); // Rollback
+            alert('Failed to update visibility. Please try again.');
+        }
+    };
 
     const visibilityOptions = [
         {
@@ -57,7 +109,7 @@ function ContributionVisibilitySettingScreen() {
                                     styles.listItem,
                                     index === 0 && styles.firstListItem
                                 ]}
-                                onPress={() => setSelectedOption(option.id)}
+                                onPress={() => updateVisibility(option.id)}
                             >
                                 <View style={styles.itemLeft}>
                                     <Ionicons name={option.icon as any} size={24} color="#333" style={styles.itemIcon} />
