@@ -8,6 +8,7 @@ import {
     Dimensions,
     SafeAreaView,
 } from "react-native";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
@@ -26,14 +27,7 @@ const slides = [
         ],
     },
     {
-        id: 1,
-        title: "Know Before You Move",
-        subtitle: "Your route, your stops, your price — all in one glance.",
-        images: require("../../assets/images/onboarding/phoneMapImage.png"),
-        
-    },
-    {
-        id: 2,
+        id: 1, // IDs should remain sequential for simplicity if needed
         title: "Earn Rewards",
         subtitle: "Get rewarded for submitting accurate fare. Your contributing help others",
         images: require("../../assets/images/onboarding/rewardImage.png"),
@@ -41,110 +35,102 @@ const slides = [
 ];
 
 
-const handFareCheckImageStyle = {
-    width: 255.28, 
-    height: 334.19, 
-    resizeMode: 'contain', 
-    position: 'fixed', 
-    zIndex: 10, 
-    top: '97%', 
-    left: '17.7%', 
-    transform: 'translate(-50%, -50%)'
+const handFareCheckImageStyle: any = {
+    width: 255.28,
+    height: 334.19,
+    resizeMode: 'contain',
+    position: 'absolute',
+    zIndex: 10,
+    top: '97%',
+    left: '17.7%',
+    transform: [{ translateX: -127 }, { translateY: -167 }]
 };
 
-const busAndConductorImageStyle = {
-    width: 136.17, 
-    height: 142.5, 
-    resizeMode: 'contain', 
-    position: 'absolute', 
-    top: '75%', 
-    left: '50%', 
-    transform: 'translate(-50%, -50%)'
+const busAndConductorImageStyle: any = {
+    width: 136.17,
+    height: 142.5,
+    resizeMode: 'contain',
+    position: 'absolute',
+    top: '75%',
+    left: '50%',
+    transform: [{ translateX: -68 }, { translateY: -71 }]
 };
 
-const busConductorWordsImageStyle = {
-    width: 134.86, 
-    height: 112.86, 
-    resizeMode: 'contain', 
-    position: 'absolute', 
-    top: '35%', 
-    left: '50%', 
-    transform: 'translate(-50%, -50%)'
+const busConductorWordsImageStyle: any = {
+    width: 134.86,
+    height: 112.86,
+    resizeMode: 'contain',
+    position: 'absolute',
+    top: '35%',
+    left: '50%',
+    transform: [{ translateX: -67 }, { translateY: -56 }]
 };
 
-const baricadeImageStyle = {
-    width: 88.57, 
-    height: 23.74, 
-    resizeMode: 'contain', 
-    position: 'absolute', 
-    right: 0, 
-    bottom: '3.5%', 
+const baricadeImageStyle: any = {
+    width: 88.57,
+    height: 23.74,
+    resizeMode: 'contain',
+    position: 'absolute',
+    right: 0,
+    bottom: '3.5%',
 };
 
-export default function OnboardingScreen({ navigation }: any) {
+export default function OnboardingScreen() {
+    const router = useRouter();
     const [step, setStep] = useState(0);
 
     const next = () => {
         if (step < slides.length - 1) {
             setStep(step + 1);
-        } else {
-            navigation.replace("SignIn");
         }
     };
 
     const skip = () => {
-        navigation.replace("SignIn");
+        if (step < slides.length - 1) {
+            setStep(step + 1);
+        } else {
+            router.push("/auth/signup/SignupScreen");
+        }
     };
 
     return (
-        <SafeAreaView style={styles.container} >
-            <View style={styles.imageArea}>
-                {
-                    step === 0 ?
-                        slides[0].images.map((img: any, index: number) => (
-                            <Image 
-                                key={index}
-                                source={img} 
-                                style={
-                                    index === 0 ? handFareCheckImageStyle:
-                                    index === 1 ? busAndConductorImageStyle :
-                                    index === 2 ? busConductorWordsImageStyle: 
-                                    index === 3 ? baricadeImageStyle  :
-                                    null
-                                }
-                            />
-                        ))
-                        :
-                    step === 1 ?
-                        <Image 
-                            source={slides[1].images}
-                            style={{
-                                width: 296.51, 
-                                height: 298.04,
-                                position: 'absolute',
-                                top: '60%', 
-                                left:' 50%', 
-                                transform: 'translate(-50%, -50%)', 
-                            }}
-                        />
-                        :
-                    step === 2 ?
-                        <Image 
-                            source={slides[2].images}
-                            style={{
-                                width: 296.51, 
-                                height: 298.04,
-                                position: 'absolute',
-                                top: '66%', 
-                                left:' 50%',
-                                transform: 'translate(-33%, -50%)', 
-                                zIndex: 10
-                            }}
-                        />
-                        :
-                    null
-                }
+        <SafeAreaView style={styles.container}>
+            {/* Top Right Skip Button */}
+            <View style={styles.topHeader}>
+                <TouchableOpacity onPress={skip} style={styles.skipBtn}>
+                    <Text style={styles.skipText}>Skip</Text>
+                </TouchableOpacity>
+            </View>
 
+            <View style={styles.imageArea}>
+                {step === 0 ? (
+                    (slides[0].images as any[]).map((img: any, index: number) => (
+                        <Image
+                            key={index}
+                            source={img}
+                            style={
+                                (index === 0 ? handFareCheckImageStyle :
+                                    index === 1 ? busAndConductorImageStyle :
+                                        index === 2 ? busConductorWordsImageStyle :
+                                            index === 3 ? baricadeImageStyle :
+                                                null) as any
+                            }
+                        />
+                    ))
+                ) : step === 1 ? (
+                    <Image
+                        source={slides[1].images as any}
+                        style={{
+                            width: 296.51,
+                            height: 298.04,
+                            position: "absolute",
+                            top: "66%",
+                            left: " 50%",
+                            transform: [{ translateX: -98 }, { translateY: -149 }],
+                            zIndex: 10,
+                        }}
+                    />
+                ) : null}
             </View>
 
             <View style={styles.bottomSheet}>
@@ -163,17 +149,22 @@ export default function OnboardingScreen({ navigation }: any) {
                 <Text style={styles.title}>{slides[step].title}</Text>
                 <Text style={styles.subtitle}>{slides[step].subtitle}</Text>
 
-                <TouchableOpacity style={styles.nextBtn} onPress={next}>
-                    <Text style={styles.nextBtnText}>
-                        {step === slides.length - 1 ? "Get Started" : "Next"}
-                    </Text>
-                </TouchableOpacity>
-
-                {step < slides.length - 1 && (
-                    <TouchableOpacity onPress={skip} style={styles.skipBtn}>
-                        <Text style={styles.skipText}>Skip</Text>
+                {/* Bottom Buttons Row */}
+                <View style={styles.buttonRow}>
+                    <TouchableOpacity
+                        style={[styles.btn, styles.loginBtn]}
+                        onPress={() => router.push("/auth/login/LoginScreen")}
+                    >
+                        <Text style={styles.loginBtnText}>Login</Text>
                     </TouchableOpacity>
-                )}
+
+                    <TouchableOpacity
+                        style={[styles.btn, styles.getStartedBtn]}
+                        onPress={() => router.push("/auth/signup/SignupScreen")}
+                    >
+                        <Text style={styles.getStartedBtnText}>Get Started</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </SafeAreaView>
     );
@@ -183,24 +174,23 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        position: 'relative'
+    },
+    topHeader: {
+        flexDirection: "row",
+        justifyContent: "flex-end",
+        paddingHorizontal: 20,
+        paddingTop: 10,
+        zIndex: 10,
     },
     imageArea: {
-        // flex: 3.5,
         flex: 4,
-        // justifyContent: "center",
-        // alignItems: "center",
-        // backgroundColor: 'green',
     },
-   
     bottomSheet: {
         flex: 3,
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-        // backgroundColor: "lightgrey",
         paddingTop: 30,
         paddingHorizontal: 25,
         alignItems: "center",
+        backgroundColor: "#fff",
     },
     dotsRow: {
         flexDirection: "row",
@@ -210,10 +200,10 @@ const styles = StyleSheet.create({
     dot: {
         width: 10,
         height: 10,
-        borderRadius: 50,
+        borderRadius: 5,
     },
     title: {
-        fontSize: 20,
+        fontSize: 24,
         fontWeight: "800",
         textAlign: "center",
         marginBottom: 12,
@@ -224,29 +214,48 @@ const styles = StyleSheet.create({
         color: "#757575",
         textAlign: "center",
         lineHeight: 22,
-        marginBottom: 30,
+        marginBottom: 40,
         paddingHorizontal: 10,
     },
-    nextBtn: {
-        width: 241,
-        height: 54,
-        backgroundColor: "#080808",
-        paddingVertical: 14,
-        borderRadius: 100,
-        alignItems: "center",
-        marginBottom: 16,
+    buttonRow: {
+        flexDirection: "row",
+        width: "100%",
+        gap: 12,
+        paddingBottom: 20,
     },
-    nextBtnText: {
+    btn: {
+        flex: 1,
+        height: 56,
+        borderRadius: 100,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    loginBtn: {
+        backgroundColor: "#F2F2F2",
+    },
+    getStartedBtn: {
+        backgroundColor: "#080808",
+    },
+    loginBtnText: {
+        color: "#080808",
+        fontSize: 16,
+        fontWeight: "700",
+    },
+    getStartedBtnText: {
         color: "#FFFFFF",
         fontSize: 16,
         fontWeight: "700",
     },
     skipBtn: {
-        paddingVertical: 6,
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 100,
+        borderWidth: 1,
+        borderColor: "#E0E0E0",
     },
     skipText: {
         color: "#757575",
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: "700",
     },
 });

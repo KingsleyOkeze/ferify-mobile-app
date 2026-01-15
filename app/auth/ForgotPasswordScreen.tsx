@@ -51,9 +51,8 @@ function ForgotPasswordScreen() {
             {/* Header */}
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
-                    <Ionicons name="arrow-back" size={24} color="#000" />
+                    <Ionicons name="arrow-back" size={24} color="#080808" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Forgot Password</Text>
             </View>
 
             <KeyboardAvoidingView
@@ -70,15 +69,17 @@ function ForgotPasswordScreen() {
                 {/* Email Input */}
                 <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Email address</Text>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="e.g sample@gmail.com"
-                        placeholderTextColor="#999"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={email}
-                        onChangeText={setEmail}
-                    />
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="e.g sample@gmail.com"
+                            placeholderTextColor="#999"
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                            value={email}
+                            onChangeText={setEmail}
+                        />
+                    </View>
                 </View>
 
                 <View style={styles.footer}>
@@ -108,76 +109,72 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
         paddingHorizontal: 20,
         paddingTop: 10,
         paddingBottom: 20,
     },
     headerButton: {
-        padding: 4,
-        marginRight: 10,
-    },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
+        width: 40,
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
     },
     content: {
         flex: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 24,
         paddingTop: 20,
     },
     textSection: {
-        marginBottom: 30,
+        marginBottom: 32,
     },
     screenTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 10,
+        color: '#080808',
+        marginBottom: 8,
     },
     instructionText: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#666',
-        lineHeight: 20,
+        lineHeight: 22,
     },
     inputGroup: {
-        marginBottom: 20,
+        marginBottom: 24,
     },
     inputLabel: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: '500',
+        color: '#080808',
         marginBottom: 8,
+        marginLeft: 4,
+    },
+    inputWrapper: {
+        backgroundColor: "#F5F7F9",
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        height: 56,
+        justifyContent: "center",
     },
     input: {
-        height: 50,
-        borderWidth: 1,
-        borderColor: '#F0F0F0',
-        borderRadius: 8,
-        paddingHorizontal: 16,
         fontSize: 16,
-        color: '#000',
-        backgroundColor: '#F9F9F9',
+        color: '#080808',
     },
     footer: {
-        marginTop: 'auto',
-        marginBottom: 20,
+        marginTop: 20,
     },
     sendButton: {
-        height: 50,
-        backgroundColor: '#000',
-        borderRadius: 25,
+        height: 56,
+        backgroundColor: '#080808',
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
     },
     sendButtonDisabled: {
-        backgroundColor: '#F0F0F0',
+        backgroundColor: '#E0E0E0',
     },
     sendButtonText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '600',
         color: '#fff',
     },
 });

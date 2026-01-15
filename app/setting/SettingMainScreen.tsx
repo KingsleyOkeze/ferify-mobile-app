@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     Text,
@@ -6,12 +6,15 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    Modal,
+    Pressable,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 
 function SettingMainScreen() {
     const router = useRouter();
+    const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
 
     const settingsItems = [
         {
@@ -19,18 +22,27 @@ function SettingMainScreen() {
             title: 'App appearance',
             description: 'Dark mode, light mode, system default',
             icon: 'moon-outline',
+            onPress: () => {
+                // Future implementation
+            }
         },
         {
             id: 'notifications',
             title: 'Notifications',
             description: 'Manage your notification preferences',
             icon: 'notifications-outline',
+            onPress: () => {
+                // Future implementation
+            }
         },
         {
             id: 'privacy',
             title: 'Privacy & safety',
             description: 'Control who sees what',
             icon: 'lock-closed-outline',
+            onPress: () => {
+                // Future implementation
+            }
         },
         {
             id: 'logout',
@@ -38,8 +50,15 @@ function SettingMainScreen() {
             description: 'Sign out of your account',
             icon: 'log-out-outline',
             isDestructive: true,
+            onPress: () => setIsLogoutModalVisible(true)
         },
     ];
+
+    const handleLogout = () => {
+        setIsLogoutModalVisible(false);
+        // Add actual logout logic here (e.g., clear tokens)
+        router.replace('/auth/login/LoginScreen');
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -61,6 +80,7 @@ function SettingMainScreen() {
                                 styles.listItem,
                                 index === 0 && styles.firstListItem // Border top for first item
                             ]}
+                            onPress={item.onPress}
                         >
                             <View style={styles.itemLeft}>
                                 <Ionicons
@@ -84,6 +104,42 @@ function SettingMainScreen() {
                     ))}
                 </View>
             </ScrollView>
+
+            {/* Logout Confirmation Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isLogoutModalVisible}
+                onRequestClose={() => setIsLogoutModalVisible(false)}
+            >
+                <Pressable
+                    style={styles.modalOverlay}
+                    onPress={() => setIsLogoutModalVisible(false)}
+                >
+                    <Pressable style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>Confirm Logout</Text>
+                        <Text style={styles.modalDescription}>
+                            Are you sure you want to logout? You'll need to sign in again to access your account.
+                        </Text>
+
+                        <View style={styles.modalButtonRow}>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.confirmLogoutButton]}
+                                onPress={handleLogout}
+                            >
+                                <Text style={styles.confirmLogoutButtonText}>yes i do</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelModalButton]}
+                                onPress={() => setIsLogoutModalVisible(false)}
+                            >
+                                <Text style={styles.cancelModalButtonText}>Cancel</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Pressable>
+                </Pressable>
+            </Modal>
         </SafeAreaView>
     );
 }
@@ -151,6 +207,65 @@ const styles = StyleSheet.create({
     },
     destructiveText: {
         color: 'red',
+    },
+    // Modal Styles
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    modalContent: {
+        backgroundColor: '#fff',
+        borderRadius: 24,
+        paddingHorizontal: 24,
+        paddingTop: 32,
+        paddingBottom: 32,
+        alignItems: 'center',
+        width: '85%',
+        maxWidth: 400,
+    },
+    modalTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#080808',
+        marginBottom: 12,
+    },
+    modalDescription: {
+        fontSize: 16,
+        color: '#757575',
+        textAlign: 'center',
+        lineHeight: 24,
+        marginBottom: 32,
+        paddingHorizontal: 10,
+    },
+    modalButtonRow: {
+        flexDirection: 'row',
+        width: '100%',
+        gap: 12,
+    },
+    modalButton: {
+        flex: 1,
+        height: 56,
+        borderRadius: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    cancelModalButton: {
+        backgroundColor: '#F2F2F2',
+    },
+    confirmLogoutButton: {
+        backgroundColor: '#FF3B30', // Red background as requested
+    },
+    cancelModalButtonText: {
+        color: '#080808',
+        fontSize: 16,
+        fontWeight: '700',
+    },
+    confirmLogoutButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '700',
     },
 });
 

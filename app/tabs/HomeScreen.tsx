@@ -1,3 +1,4 @@
+import VoiceSearchModal from "@/components/VoiceSearchModal";
 import ModeOfTransportSelect from "@/components/ModeOfTransportSelect";
 import React, { useState } from "react";
 import {
@@ -47,6 +48,7 @@ function HomeScreen() {
     const router = useRouter();
     const [searchText, setSearchText] = useState("");
     const [selectedMode, setSelectedMode] = useState<string | null>(null);
+    const [voiceModalVisible, setVoiceModalVisible] = useState(false);
 
     const handleSearchPress = () => {
         // Navigate to RouteSelect modal, passing the selected mode if any
@@ -77,10 +79,16 @@ function HomeScreen() {
                         />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => console.log('Mic pressed')}>
-                        <Ionicons name="mic" size={20} color="#666" style={styles.micIcon} />
+                    <TouchableOpacity onPress={() => setVoiceModalVisible(true)}>
+                        <Ionicons name="mic" size={20} color="#000" style={styles.micIcon} />
                     </TouchableOpacity>
                 </View>
+
+                {/* Voice Search Modal */}
+                <VoiceSearchModal
+                    visible={voiceModalVisible}
+                    onClose={() => setVoiceModalVisible(false)}
+                />
 
                 {/* Mode Selector */}
                 <Text style={styles.sectionTitle}>Mode Selector</Text>
@@ -183,10 +191,10 @@ function HomeScreen() {
             </ScrollView>
 
             {/* Floating Action Button (FAB) */}
-            <TouchableOpacity 
-               style={styles.fab} 
-               activeOpacity={0.7}
-               onPress={() => router.push('../fare-contribution/FareContributionScreen')}
+            <TouchableOpacity
+                style={styles.fab}
+                activeOpacity={0.7}
+                onPress={() => router.push('../fare-contribution/FareContributionScreen')}
             >
                 <Ionicons name="add" size={24} color="#FFF" />
             </TouchableOpacity>

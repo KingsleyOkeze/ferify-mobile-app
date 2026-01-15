@@ -5,6 +5,6 @@ axios.defaults.baseURL = process.env.EXPO_PUBLIC_SERVER_URL;
 
 export default function Index() {
   return (
-    <Redirect href="./tabs/HomeScreen" />
+    <Redirect href="./setting/account/LeadersBoardScreen" />
   );
 }
