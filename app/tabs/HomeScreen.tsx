@@ -9,7 +9,9 @@ import {
     TouchableOpacity,
     ScrollView,
     Image,
-    Pressable
+    Pressable,
+    FlatList,
+    Dimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -22,7 +24,7 @@ const sharedFares = [
         time: '18mins ago',
         contributors: 12,
         priceRange: '₦400 - ₦500',
-        image: require("../../assets/images/busImage.png")
+        image: require("../../assets/images/transportation-icons/busImage.png")
     },
     {
         id: '2',
@@ -31,7 +33,7 @@ const sharedFares = [
         time: '30mins ago',
         contributors: 8,
         priceRange: '₦600 - ₦800',
-        image: require("../../assets/images/busImage.png")
+        image: require("../../assets/images/transportation-icons/busImage.png")
     },
     {
         id: '3',
@@ -40,7 +42,7 @@ const sharedFares = [
         time: '5mins ago',
         contributors: 25,
         priceRange: '₦1000 - ₦1200',
-        image: require("../../assets/images/busImage.png")
+        image: require("../../assets/images/transportation-icons/busImage.png")
     }
 ];
 
@@ -49,6 +51,62 @@ function HomeScreen() {
     const [searchText, setSearchText] = useState("");
     const [selectedMode, setSelectedMode] = useState<string | null>(null);
     const [voiceModalVisible, setVoiceModalVisible] = useState(false);
+
+    const FEATURED_CARDS = [
+        {
+            id: '1',
+            title: 'Just finished a trip?',
+            description: 'Share your fare to help other commuters plan better.',
+            buttonText: 'Share Fare',
+            backgroundColor: '#014C1D',
+            image: require("../../assets/images/contributeAndEarnImage.png"),
+            onPress: () => router.push('../fare-contribution/FareContributionScreen')
+        },
+        {
+            id: '2',
+            title: 'Get Real Estimates',
+            description: 'Check what others paid for your route before moving.',
+            buttonText: 'Check Fares',
+            backgroundColor: '#080808',
+            image: require("../../assets/images/estimate.png"),
+            onPress: () => { }
+        },
+        {
+            id: '3',
+            title: 'Save Time',
+            description: 'Quickly find previous routes and their price trends.',
+            buttonText: 'Explore',
+            backgroundColor: '#009688',
+            image: require("../../assets/images/speed.png"),
+            onPress: () => { }
+        }
+    ];
+
+    // Triple the data to enable infinite scroll logic
+    const [carouselData] = useState([...FEATURED_CARDS, ...FEATURED_CARDS, ...FEATURED_CARDS]);
+    const flatListRef = React.useRef<FlatList>(null);
+    const CARD_WIDTH = 320;
+    const CARD_MARGIN = 16;
+    const ITEM_WIDTH = CARD_WIDTH + CARD_MARGIN;
+
+    const handleCarouselScroll = (event: any) => {
+        const x = event.nativeEvent.contentOffset.x;
+
+        // When user scrolls to the end of the last set, jump back to the middle set
+        if (x >= ITEM_WIDTH * (FEATURED_CARDS.length * 2)) {
+            flatListRef.current?.scrollToOffset({
+                offset: x - (ITEM_WIDTH * FEATURED_CARDS.length),
+                animated: false
+            });
+        }
+        // When user scrolls before the first set, jump to the middle set
+        else if (x <= ITEM_WIDTH * (FEATURED_CARDS.length - 1)) {
+            flatListRef.current?.scrollToOffset({
+                offset: x + (ITEM_WIDTH * FEATURED_CARDS.length),
+                animated: false
+            });
+        }
+    };
 
     const handleSearchPress = () => {
         // Navigate to RouteSelect modal, passing the selected mode if any
@@ -98,59 +156,41 @@ function HomeScreen() {
                 />
 
                 {/* Scrollable Cards Section */}
-                {/* <Text style={styles.sectionTitle}>Discover</Text> */}
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 25 }}>
-                    <View style={[styles.featureCard, { backgroundColor: "#014C1D" }]}>
-                        <View style={styles.cardLeft}>
-                            <Text style={styles.cardTitle}>Just finished a trip?</Text>
-                            <Text style={styles.cardDescription}>
-                                Share your fare to help other commuters plan better.
-                            </Text>
-                            <TouchableOpacity style={styles.shareButton}>
-                                <Text style={styles.shareButtonText}>Share Fare</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Image
-                            source={require("../../assets/images/contributeAndEarnImage.png")}
-                            style={styles.cardImage}
-                            resizeMode="contain"
-                        />
-                    </View>
-
-                    <View style={[styles.featureCard, { backgroundColor: "#080808" }]}>
-                        <View style={styles.cardLeft}>
-                            <Text style={styles.cardTitle}>Get Real Estimates</Text>
-                            <Text style={styles.cardDescription}>
-                                Check what others paid for your route before moving.
-                            </Text>
-                            <TouchableOpacity style={styles.shareButton}>
-                                <Text style={styles.shareButtonText}>Check Fares</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Image
-                            source={require("../../assets/images/estimate.png")}
-                            style={styles.cardImage}
-                            resizeMode="contain"
-                        />
-                    </View>
-
-                    <View style={[styles.featureCard, { backgroundColor: "#009688" }]}>
-                        <View style={styles.cardLeft}>
-                            <Text style={styles.cardTitle}>Save Time</Text>
-                            <Text style={styles.cardDescription}>
-                                Quickly find previous routes and their price trends.
-                            </Text>
-                            <TouchableOpacity style={styles.shareButton}>
-                                <Text style={styles.shareButtonText}>Explore</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <Image
-                            source={require("../../assets/images/speed.png")}
-                            style={styles.cardImage}
-                            resizeMode="contain"
-                        />
-                    </View>
-                </ScrollView>
+                <View style={{ marginTop: 25 }}>
+                    <FlatList
+                        ref={flatListRef}
+                        data={carouselData}
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        snapToInterval={ITEM_WIDTH}
+                        decelerationRate="fast"
+                        onMomentumScrollEnd={handleCarouselScroll}
+                        initialScrollIndex={FEATURED_CARDS.length}
+                        getItemLayout={(_, index) => ({
+                            length: ITEM_WIDTH,
+                            offset: ITEM_WIDTH * index,
+                            index,
+                        })}
+                        keyExtractor={(_, index) => index.toString()}
+                        renderItem={({ item }) => (
+                            <View style={[styles.featureCard, { backgroundColor: item.backgroundColor, width: CARD_WIDTH }]}>
+                                <View style={styles.cardLeft}>
+                                    {/* <Text style={styles.cardTitle}>{item.title}</Text> */}
+                                    <Text style={styles.cardDescription}>{item.description}</Text>
+                                    <TouchableOpacity style={styles.shareButton} onPress={item.onPress}>
+                                        <Text style={styles.shareButtonText}>{item.buttonText}</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <Image
+                                    source={item.image}
+                                    style={styles.cardImage}
+                                    resizeMode="contain"
+                                />
+                            </View>
+                        )}
+                        scrollEventThrottle={16}
+                    />
+                </View>
 
                 {/* Shared by commuters near you */}
                 <Text style={styles.sectionTitle}>Shared by commuters near you</Text>
@@ -160,7 +200,7 @@ function HomeScreen() {
                             key={item.id}
                             style={[
                                 styles.feedCard,
-                                index === 0 && styles.firstFeedCard,
+                                // index === 0 && styles.firstFeedCard,
                                 { borderBottomWidth: 1, borderBottomColor: '#F2F2F2' }
                             ]}
                         >
@@ -206,7 +246,7 @@ function HomeScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#FBFBFB",
         paddingHorizontal: 16,
         paddingTop: 10,
     },
@@ -240,66 +280,86 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: "500",
+        fontWeight: 600,
         marginBottom: 10,
         color: "#080808",
-        marginTop: 20,
+        marginTop: 25,
     },
     featureCard: {
         flexDirection: "row",
         alignItems: "center",
         borderRadius: 16,
-        padding: 16,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
         marginRight: 16,
-        width: 320,
-        height: 150,
+        height: 127,
+        borderWidth: 1,
+        borderColor: '#DADADA',
+        position: 'relative'
     },
     cardLeft: {
-        flex: 1,
+        height: 99,
+        width: 187,
+        justifyContent: 'space-between',
     },
-    cardTitle: {
-        color: "#fff",
-        fontSize: 18,
-        fontWeight: "bold",
-        marginBottom: 6,
-    },
+    // cardTitle: {
+    //     color: "#FBFBFB",
+    //     fontSize: 14,
+    //     fontWeight: 700,
+    //     marginBottom: 6,
+    // },
     cardDescription: {
-        color: "#fff",
-        fontSize: 13,
+        color: "#FBFBFB",
+        fontSize: 14,
+        fontWeight: 700,
         marginBottom: 10,
         lineHeight: 18,
     },
     shareButton: {
-        backgroundColor: "#fff",
-        borderRadius: 8,
+        backgroundColor: "#FFFFFF",
+        borderRadius: 58,
         paddingHorizontal: 10,
         paddingVertical: 6,
         alignSelf: "flex-start",
+        height: 37,
+        width: 92
     },
     shareButtonText: {
-        color: "#333",
-        fontWeight: "600",
+        color: "#080808",
+        fontWeight: 600,
+        alignSelf: 'center',
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     cardImage: {
-        width: 80,
-        height: 80,
+        width: 88.71,
+        height: 119.59,
         marginLeft: 10,
+        position: 'absolute',
+        bottom: -5,
+        right: 16
+
     },
     feedContainer: {
         marginTop: 10,
         marginBottom: 30,
+        borderTopWidth: 1,
+        borderTopColor: '#F2F2F2',
+        borderBottomWidth: 1,
+        borderBottomColor: '#F2F2F2',
     },
     feedCard: {
         flexDirection: 'row',
-        paddingVertical: 16,
+        paddingVertical: 20,
         alignItems: 'center',
     },
-    firstFeedCard: {
-        borderTopWidth: 1,
-        borderTopColor: '#F2F2F2',
-    },
+    // firstFeedCard: {
+    //     borderTopWidth: 1,
+    //     borderTopColor: '#F2F2F2',
+    // },
     feedCardLeft: {
         marginRight: 12,
+        height: '100%'
     },
     feedTransportImage: {
         width: 54,
@@ -313,7 +373,7 @@ const styles = StyleSheet.create({
     routeEntryText: {
         fontSize: 14,
         color: '#666',
-        marginBottom: 4,
+        marginBottom: 10,
     },
     routeDestinationText: {
         fontWeight: '600',
@@ -322,7 +382,7 @@ const styles = StyleSheet.create({
     feedMetaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 2,
+        marginTop: 8,
     },
     feedMetaText: {
         fontSize: 12,
@@ -331,11 +391,12 @@ const styles = StyleSheet.create({
     },
     feedCardRight: {
         alignItems: 'flex-end',
+        height: '100%'
     },
     feedPriceText: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        color: '#014C1D',
+        fontSize: 14,
+        fontWeight: 600,
+        color: '#080808',
     },
     fab: {
         position: 'absolute',

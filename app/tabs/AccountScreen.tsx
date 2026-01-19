@@ -19,21 +19,31 @@ function MainAccountProfileScreen() {
             id: 'community',
             title: 'Community & Contributions',
             icon: 'people-outline',
+            onPress: () => { router.push('../contribution/MyContributionOverviewScreen') },
         },
         {
             id: 'account',
             title: 'Accounts & Personal',
             icon: 'person-outline',
+            onPress: () => { router.push('../account/AccountAndPersonalMainScreen') },
         },
         {
             id: 'settings',
             title: 'Settings',
             icon: 'settings-outline',
+            onPress: () => { router.push('../setting/SettingMainScreen') },
         },
         {
             id: 'help',
             title: 'Help & Feedback',
             icon: 'help-circle-outline',
+            onPress: () => { router.push('/help/HelpAndFeedbackScreen') },
+        },
+        {
+            id: 'about',
+            title: 'About Ferify',
+            icon: 'information-circle-outline',
+            onPress: () => { router.push('../about/AboutMainScreen') },
         },
     ];
 
@@ -54,9 +64,13 @@ function MainAccountProfileScreen() {
                     </View>
 
                     <Text style={styles.userName}>Kelvin O</Text>
+                    <Text style={styles.userHandle}>@kelvin_o</Text>
                     <Text style={styles.userBadge}>Trusted contributor</Text>
 
-                    <TouchableOpacity style={styles.viewProfileButton}>
+                    <TouchableOpacity
+                        style={styles.viewProfileButton}
+                        onPress={() => router.push('../account/ProfileLandingScreen')}
+                    >
                         <Text style={styles.viewProfileText}>View Profile</Text>
                     </TouchableOpacity>
                 </View>
@@ -64,7 +78,11 @@ function MainAccountProfileScreen() {
                 {/* Menu List */}
                 <View style={styles.menuContainer}>
                     {menuItems.map((item) => (
-                        <TouchableOpacity key={item.id} style={styles.menuItem}>
+                        <TouchableOpacity
+                            key={item.id}
+                            style={styles.menuItem}
+                            onPress={item.onPress}
+                        >
                             <View style={styles.menuLeft}>
                                 <Ionicons name={item.icon as any} size={22} color="#333" style={styles.menuIcon} />
                                 <Text style={styles.menuTitle}>{item.title}</Text>
@@ -81,7 +99,7 @@ function MainAccountProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
@@ -102,9 +120,9 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     avatarContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 24, // Rounded border radius as requested
+        width: 72,
+        height: 72,
+        borderRadius: 55.13,
         backgroundColor: '#F2F2F2',
         justifyContent: 'center',
         alignItems: 'center',
@@ -117,38 +135,46 @@ const styles = StyleSheet.create({
     },
     userName: {
         fontSize: 20,
-        fontWeight: 'bold',
-        color: '#000',
-        marginBottom: 4,
+        fontWeight: 600,
+        color: '#000000',
+        marginBottom: 5,
+    },
+    userHandle: {
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#080808',
+        marginBottom: 9,
     },
     userBadge: {
-        fontSize: 14,
-        color: '#666',
+        fontSize: 15,
+        fontWeight: 400,
+        color: '#646464',
         marginBottom: 16,
-        fontWeight: '500',
     },
     viewProfileButton: {
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#F0F0F0',
         paddingVertical: 10,
         paddingHorizontal: 24,
         borderRadius: 20,
     },
     viewProfileText: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#333',
+        fontWeight: 600,
+        color: '#080808',
     },
     menuContainer: {
         paddingHorizontal: 20,
+        backgroundColor: '#FFFFFF',
+        borderTopWidth: 1,
+        borderTopColor: '#DADADA',
+        borderBottomWidth: 1,
+        borderBottomColor: '#DADADA',
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingVertical: 18,
-        backgroundColor: '#fff',
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#F5F5F5',
     },
     menuLeft: {
         flexDirection: 'row',

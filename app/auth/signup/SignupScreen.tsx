@@ -10,27 +10,68 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Alert,
+    ActivityIndicator
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import api, { setToken } from '@/services/api';
 
 // Logo
 import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
 
-// Steps (Internal or separate)
-// For now, I'll keep the multi-step logic but redesign the first screen completely
-// We will need to transition to other steps like Name, Verify OTP, etc.
+// Determine redirects for auth
+WebBrowser.maybeCompleteAuthSession();
+
+// Placeholder Client IDs - REPLACE THESE WITH YOUR ACTUAL GOOGLE CLOUD CONSOLE IDS
+const ANDROID_CLIENT_ID = "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com";
+const IOS_CLIENT_ID = "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com";
+const WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com";
 
 export default function SignUpScreen() {
     const router = useRouter();
-    const [step, setStep] = useState<number>(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Form State
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const [passwordError, setPasswordError] = useState("");
+
+    // Validation State
     const [isEmailValid, setIsEmailValid] = useState(false);
+
+    // Google Auth Request
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        androidClientId: ANDROID_CLIENT_ID,
+        iosClientId: IOS_CLIENT_ID,
+        webClientId: WEB_CLIENT_ID,
+    });
+
+    useEffect(() => {
+        if (response?.type === 'success') {
+            const { idToken } = response.authentication || {};
+
+            if (idToken) {
+                setIsLoading(true);
+                api.post('/api/user/auth/google-login', { idToken })
+                    .then(async (res) => {
+                        console.log("Google Signup Backend Success:", res.data);
+                        if (res.data.accessToken) {
+                            await setToken(res.data.accessToken);
+                            router.replace('/tabs/HomeScreen');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Google Backend Error:", error.response?.data || error.message);
+                        Alert.alert("Google Sign-Up Failed", "Could not verify with server.");
+                    })
+                    .finally(() => setIsLoading(false));
+            }
+        }
+    }, [response]);
 
     // Validation
     useEffect(() => {
@@ -38,163 +79,190 @@ export default function SignUpScreen() {
         setIsEmailValid(emailRegex.test(email.trim()));
     }, [email]);
 
-    useEffect(() => {
-        if (password.length > 0 && password.length < 8) {
-            setPasswordError("Min. 8 characters");
-        } else {
-            setPasswordError("");
-        }
-    }, [password]);
+    const isFormValid =
+        isEmailValid &&
+        password.length >= 6 &&
+        password === confirmPassword;
 
-    const isFirstStepValid = isEmailValid && password.length >= 8;
+    const handleCreateAccount = async () => {
+        if (!isFormValid) return;
 
-    const handleCreateAccount = () => {
-        if (isFirstStepValid) {
-            // Move to next step (Names)
-            setStep(1);
+        setIsLoading(true);
+        try {
+            // Initiate Registration (Email + Password)
+            const response = await api.post('/api/user/auth/register/initiate', {
+                email: email.trim(),
+                password: password
+            });
+
+            console.log("Registration Initiated:", response.data);
+
+            // Navigate to Verification
+            router.push({
+                pathname: "/auth/signup/VerifySignupEmailScreen",
+                params: { email: email.trim() }
+            });
+
+        } catch (error: any) {
+            console.error("Signup Error:", error.response?.data || error.message);
+            Alert.alert("Signup Failed", error.response?.data?.error || "An error occurred. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    if (step === 0) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : "height"}
-                    style={{ flex: 1 }}
-                >
-                    <ScrollView
-                        contentContainerStyle={styles.scrollContent}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        {/* Logo */}
-                        <View style={styles.logoContainer}>
-                            <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-                        </View>
-
-                        {/* Welcome Text */}
-                        <View style={styles.textContainer}>
-                            <Text style={styles.title}>Welcome to Ferify</Text>
-                            <Text style={styles.subtitle}>
-                                Find real transport fares shared by people around you.
-                            </Text>
-                        </View>
-
-                        {/* Inputs */}
-                        <View style={styles.formContainer}>
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Your email address</Text>
-                                <View style={styles.inputWrapper}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="example@gmail.com"
-                                        placeholderTextColor="#9a9a9a"
-                                        value={email}
-                                        onChangeText={setEmail}
-                                        keyboardType="email-address"
-                                        autoCapitalize="none"
-                                    />
-                                </View>
-                            </View>
-
-                            <View style={styles.inputGroup}>
-                                <Text style={styles.label}>Choose a password</Text>
-                                <View style={[
-                                    styles.inputWrapper,
-                                    passwordError ? styles.inputErrorBorder : null
-                                ]}>
-                                    <TextInput
-                                        style={styles.input}
-                                        placeholder="Min. 8 characters"
-                                        placeholderTextColor="#9a9a9a"
-                                        value={password}
-                                        onChangeText={setPassword}
-                                        secureTextEntry={!showPassword}
-                                    />
-                                    <TouchableOpacity
-                                        onPress={() => setShowPassword(!showPassword)}
-                                        style={styles.eyeIcon}
-                                    >
-                                        <Ionicons
-                                            name={showPassword ? "eye-off-outline" : "eye-outline"}
-                                            size={20}
-                                            color="#666"
-                                        />
-                                    </TouchableOpacity>
-                                </View>
-                                {passwordError ? (
-                                    <Text style={styles.errorText}>{passwordError}</Text>
-                                ) : null}
-                            </View>
-
-                            {/* Create Account Button */}
-                            <TouchableOpacity
-                                style={[
-                                    styles.createButton,
-                                    !isFirstStepValid && styles.disabledButton
-                                ]}
-                                onPress={handleCreateAccount}
-                                disabled={!isFirstStepValid}
-                            >
-                                <Text style={styles.createButtonText}>Create account</Text>
-                            </TouchableOpacity>
-
-                            {/* Forgot Password */}
-                            <TouchableOpacity style={styles.forgotPasswordContainer}>
-                                <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-                            </TouchableOpacity>
-
-                            {/* Or Separator */}
-                            <View style={styles.separatorContainer}>
-                                <View style={styles.separatorLine} />
-                                <Text style={styles.separatorText}>or</Text>
-                                <View style={styles.separatorLine} />
-                            </View>
-
-                            {/* Google Button */}
-                            <TouchableOpacity style={styles.googleButton}>
-                                <Ionicons name="logo-google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
-                                <Text style={styles.googleButtonText}>Sign up with Google</Text>
-                            </TouchableOpacity>
-
-                            {/* Terms */}
-                            <Text style={styles.termsText}>
-                                By creating an account, you agree to our{" "}
-                                <Text style={styles.termsHighlight}>Terms & Conditions</Text> and{" "}
-                                <Text style={styles.termsHighlight}>Privacy Policy</Text>.
-                            </Text>
-
-                            {/* Sign In Footer */}
-                            <TouchableOpacity
-                                style={styles.footerLink}
-                                onPress={() => router.push("/auth/login/LoginScreen")}
-                            >
-                                <Text style={styles.footerText}>
-                                    Have an account? <Text style={styles.footerHighlight}>Sign in here</Text>
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
-                    </ScrollView>
-                </KeyboardAvoidingView>
-            </SafeAreaView>
-        );
-    }
-
-    // Default return for other steps (to be updated)
     return (
         <SafeAreaView style={styles.container}>
-            <TouchableOpacity
-                onPress={() => setStep(0)}
-                style={styles.backButton}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
+                style={{ flex: 1 }}
             >
-                <Ionicons name="arrow-back" size={20} color="#61656C" />
-                <Text style={styles.backButtonText}>Back</Text>
-            </TouchableOpacity>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-                <Text>Step {step} placeholder</Text>
-                <TouchableOpacity onPress={() => setStep(0)}>
-                    <Text style={{ color: "blue", marginTop: 20 }}>Go Back</Text>
-                </TouchableOpacity>
-            </View>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Header with Back Button */}
+                    <View style={styles.header}>
+                        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                            <Ionicons name="arrow-back" size={24} color="#080808" />
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Step Badge */}
+                    <View style={styles.stepContainer}>
+                        <View style={styles.stepBadge}>
+                            <Text style={styles.stepText}>Step 1 of 3</Text>
+                        </View>
+                    </View>
+
+                    {/* Logo */}
+                    <View style={styles.logoContainer}>
+                        <Image source={LOGO} style={styles.logo} resizeMode="contain" />
+                    </View>
+
+                    {/* Welcome Text */}
+                    <View style={styles.textContainer}>
+                        <Text style={styles.title}>Welcome to Ferify</Text>
+                        <Text style={styles.subtitle}>
+                            Find real transport fares shared by people around you.
+                        </Text>
+                    </View>
+
+                    {/* Inputs */}
+                    <View style={styles.formContainer}>
+                        {/* Email */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Your email address</Text>
+                            <View style={styles.inputWrapper}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="example@gmail.com"
+                                    placeholderTextColor="#9a9a9a"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    editable={!isLoading}
+                                />
+                            </View>
+                        </View>
+
+                        {/* Password */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Password</Text>
+                            <View style={styles.inputWrapper}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Min. 6 characters"
+                                    placeholderTextColor="#9a9a9a"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    editable={!isLoading}
+                                />
+                                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                                    <Ionicons
+                                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                                        size={20}
+                                        color="#666"
+                                        style={{ marginRight: 10 }}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        {/* Confirm Password */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Confirm Password</Text>
+                            <View style={styles.inputWrapper}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Re-enter password"
+                                    placeholderTextColor="#9a9a9a"
+                                    value={confirmPassword}
+                                    onChangeText={setConfirmPassword}
+                                    secureTextEntry={!showPassword}
+                                    editable={!isLoading}
+                                />
+                            </View>
+                            {confirmPassword.length > 0 && password !== confirmPassword && (
+                                <Text style={styles.errorText}>Passwords do not match</Text>
+                            )}
+                        </View>
+
+
+                        {/* Continue Button */}
+                        <TouchableOpacity
+                            style={[
+                                styles.createButton,
+                                (!isFormValid || isLoading) && styles.disabledButton
+                            ]}
+                            onPress={handleCreateAccount}
+                            disabled={!isFormValid || isLoading}
+                        >
+                            {isLoading ? (
+                                <ActivityIndicator color="#fff" />
+                            ) : (
+                                <Text style={styles.createButtonText}>Continue</Text>
+                            )}
+                        </TouchableOpacity>
+
+                        {/* Or Separator */}
+                        <View style={styles.separatorContainer}>
+                            <View style={styles.separatorLine} />
+                            <Text style={styles.separatorText}>or</Text>
+                            <View style={styles.separatorLine} />
+                        </View>
+
+                        {/* Google Button */}
+                        <TouchableOpacity
+                            style={styles.googleButton}
+                            onPress={() => promptAsync()}
+                            disabled={!request}
+                        >
+                            <Ionicons name="logo-google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
+                            <Text style={styles.googleButtonText}>Sign up with Google</Text>
+                        </TouchableOpacity>
+
+                        {/* Terms */}
+                        <Text style={styles.termsText}>
+                            By creating an account, you agree to our{" "}
+                            <Text style={styles.termsHighlight}>Terms & Conditions</Text> and{" "}
+                            <Text style={styles.termsHighlight}>Privacy Policy</Text>.
+                        </Text>
+
+                        {/* Sign In Footer */}
+                        <TouchableOpacity
+                            style={styles.footerLink}
+                            onPress={() => router.push("/auth/login/LoginScreen")}
+                        >
+                            <Text style={styles.footerText}>
+                                Have an account? <Text style={styles.footerHighlight}>Sign in here</Text>
+                            </Text>
+                        </TouchableOpacity>
+                    </View>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
@@ -207,8 +275,32 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 24,
-        paddingTop: 40,
+        paddingTop: 10,
         paddingBottom: 20,
+    },
+    header: {
+        marginBottom: 20,
+        marginLeft: -10,
+    },
+    backButton: {
+        padding: 10,
+    },
+    stepContainer: {
+        marginBottom: 24,
+        alignItems: 'flex-start',
+    },
+    stepBadge: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        backgroundColor: '#F9F9F9',
+    },
+    stepText: {
+        fontSize: 12,
+        fontWeight: '600',
+        color: '#080808',
     },
     logoContainer: {
         alignItems: "center",
@@ -257,16 +349,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "transparent",
     },
-    inputErrorBorder: {
-        borderColor: "#FF3B30",
-    },
     input: {
         flex: 1,
         fontSize: 16,
         color: "#080808",
-    },
-    eyeIcon: {
-        padding: 4,
     },
     errorText: {
         color: "#FF3B30",
@@ -289,15 +375,6 @@ const styles = StyleSheet.create({
         color: "#fff",
         fontSize: 16,
         fontWeight: "600",
-    },
-    forgotPasswordContainer: {
-        alignItems: "flex-end",
-        marginTop: 12,
-    },
-    forgotPasswordText: {
-        color: "#080808",
-        fontSize: 14,
-        fontWeight: "500",
     },
     separatorContainer: {
         flexDirection: "row",
@@ -352,16 +429,5 @@ const styles = StyleSheet.create({
     footerHighlight: {
         color: "#080808",
         fontWeight: "700",
-    },
-    backButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 16,
-    },
-    backButtonText: {
-        marginLeft: 8,
-        fontSize: 16,
-        color: "#61656C",
-        fontWeight: "600"
     },
 });

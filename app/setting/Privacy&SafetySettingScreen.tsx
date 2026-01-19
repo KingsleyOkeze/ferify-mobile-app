@@ -194,7 +194,7 @@ function PrivacyAndSafetySettingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 20,
@@ -203,27 +203,27 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        padding: 4,
         marginBottom: 10,
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 24,
+        fontWeight: 600,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,
     },
     listContainer: {
-        // paddingHorizontal: 20, 
+        backgroundColor: '#FFFFFF',
+        borderTopWidth: 1,
+        borderTopColor: '#DADADA',
     },
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
+        height: 87,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
@@ -233,32 +233,32 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
-        fontSize: 13,
-        color: '#666',
+        fontSize: 14,
+        color: '#757575',
     },
     // Modal Styles
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
+        backgroundColor: '#FFFFFF',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
         paddingTop: 24,
         paddingBottom: 40,
         paddingHorizontal: 20,
     },
     modalTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 20,
+        fontWeight: 600,
+        color: '#080808',
         textAlign: 'center',
         marginBottom: 24,
     },
@@ -271,15 +271,17 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 16,
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
+        color: '#080808',
+        height: 64
     },
     firstOptionItem: {
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        borderTopColor: '#DADADA',
     },
     optionLabel: {
         fontSize: 16,
-        color: '#000',
+        color: '#080808',
         fontWeight: '500',
     },
     radioCircle: {
@@ -287,13 +289,13 @@ const styles = StyleSheet.create({
         height: 24,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#9C9C9C',
         justifyContent: 'center',
         alignItems: 'center',
     },
     radioCircleSelected: {
-        backgroundColor: '#000',
-        borderColor: '#000',
+        backgroundColor: '#080808',
+        borderColor: '#080808',
     },
     modalFooter: {
         flexDirection: 'row',
@@ -308,19 +310,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     cancelButton: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#CECECE',
+        borderRadius: 100,
     },
     saveButton: {
-        backgroundColor: '#000',
+        backgroundColor: '#080808',
+        borderRadius: 100,
+        // height: 50,
     },
     cancelButtonText: {
-        color: '#000',
-        fontWeight: '600',
+        color: '#080808',
+        fontWeight: 600,
         fontSize: 16,
     },
     saveButtonText: {
-        color: '#fff',
-        fontWeight: '600',
+        color: '#FBFBFB',
+        fontWeight: 600,
         fontSize: 16,
     },
 });

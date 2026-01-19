@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     View,
     Text,
@@ -17,6 +17,7 @@ import TimeSelectionModal from './TimeSelectionModal';
 import SuccessModal from './SuccessModal';
 import RewardsModal from './RewardsModal';
 import ModeOfTransportSelect from '../../components/ModeOfTransportSelect';
+import LocationInputs from '../../components/LocationInputs';
 import { useRouter } from "expo-router";
 
 const { height } = Dimensions.get('window');
@@ -45,9 +46,9 @@ const timeOptions: TimeOption[] = [
 ];
 
 const vehicleOptions: VehicleOption[] = [
-    { label: 'Bus', value: 'bus', image: require('@/assets/images/busImage.png') },
-    { label: 'Keke', value: 'keke', image: require('@/assets/images/kekeImage.png') },
-    { label: 'Bike', value: 'bike', image: require('@/assets/images/okadaImage.png') },
+    { label: 'Bus', value: 'bus', image: require('@/assets/images/transportation-icons/busImage.png') },
+    { label: 'Keke', value: 'keke', image: require('@/assets/images/transportation-icons/kekeImage.png') },
+    { label: 'Bike', value: 'bike', image: require('@/assets/images/transportation-icons/okadaImage.png') },
 ];
 
 const predefinedConditions: ConditionOption[] = [
@@ -87,6 +88,8 @@ function FareContributionScreen() {
 
     // Loading state
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const toInputRef = useRef<TextInput | null>(null);
 
     // Animation values
     // Kept for consistency if needed, though modals now handle their own animations
@@ -201,33 +204,20 @@ function FareContributionScreen() {
                 <Text style={styles.subtitle}>Help others know the correct price</Text>
 
                 {/* Location Inputs */}
-                <View style={styles.locationContainer}>
-                    <TextInput
-                        style={[styles.locationInput, fromFocused && styles.locationInputFocused]}
-                        placeholder="From where"
-                        placeholderTextColor="#999"
-                        value={fromLocation}
-                        onChangeText={setFromLocation}
-                        onFocus={() => setFromFocused(true)}
-                        onBlur={() => setFromFocused(false)}
-                    />
-
-                    <View style={styles.toInputWrapper}>
-                        <TextInput
-                            style={[styles.locationInput, styles.toLocationInput, toFocused && styles.locationInputFocused]}
-                            placeholder="To where"
-                            placeholderTextColor="#999"
-                            value={toLocation}
-                            onChangeText={setToLocation}
-                            onFocus={() => setToFocused(true)}
-                            onBlur={() => setToFocused(false)}
-                        />
-
-                        <View style={styles.connectorArrow}>
-                            <Ionicons name="arrow-down" size={18} color="#fff" />
-                        </View>
-                    </View>
-                </View>
+                <LocationInputs
+                    fromLocation={fromLocation}
+                    toLocation={toLocation}
+                    fromFocused={fromFocused}
+                    toFocused={toFocused}
+                    fromResult={fromLocation.length > 0}
+                    onFromChange={setFromLocation}
+                    onToChange={setToLocation}
+                    onFromFocus={() => setFromFocused(true)}
+                    onFromBlur={() => setFromFocused(false)}
+                    onToFocus={() => setToFocused(true)}
+                    onToBlur={() => setToFocused(false)}
+                    toInputRef={toInputRef}
+                />
 
                 {/* Fare Amount */}
                 <Text style={styles.sectionTitle}>How much did you pay?</Text>
@@ -363,7 +353,7 @@ function FareContributionScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 16,
@@ -382,77 +372,37 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     title: {
-        fontSize: 28,
-        fontWeight: '700',
-        color: '#000',
+        fontSize: 24,
+        fontWeight: 600,
+        color: '#080808',
         marginBottom: 8,
     },
     subtitle: {
-        fontSize: 15,
-        color: '#666',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#393939',
         marginBottom: 32,
-    },
-    locationContainer: {
-        position: 'relative',
-        marginBottom: 24,
-    },
-    locationInput: {
-        backgroundColor: '#F5F5F5',
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
-        color: '#000',
-        marginBottom: 8,
-        borderWidth: 2,
-        borderColor: 'transparent',
-    },
-    locationInputFocused: {
-        borderColor: '#000',
-    },
-    toInputWrapper: {
-        position: 'relative',
-    },
-    toLocationInput: {
-        marginBottom: 0,
-    },
-    connectorArrow: {
-        position: 'absolute',
-        right: 12,
-        top: '-5%',
-        marginTop: -16,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#000',
-        marginBottom: 12,
-        marginTop: 8,
+        fontWeight: 400,
+        color: '#080808',
+        paddingTop: 35,
+        paddingBottom: 16,
     },
     fareInputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 12,
+        backgroundColor: '#F0F0F0',
+        borderRadius: 100,
         paddingHorizontal: 16,
         paddingVertical: 14,
         marginBottom: 16,
     },
     nairaSign: {
-        fontSize: 20,
-        fontWeight: '700',
-        color: '#000',
+        fontSize: 16,
+        fontWeight: 400,
+        color: '#080808',
         marginRight: 8,
     },
     fareInput: {
@@ -464,92 +414,89 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 10,
-        marginBottom: 24,
     },
     quickSelectChip: {
         paddingHorizontal: 20,
         paddingVertical: 10,
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#EBEDEF',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#EBEDEF',
     },
     quickSelectText: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#000',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#080808',
     },
     selectInput: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 12,
+        backgroundColor: '#F0F0F0',
+        borderRadius: 100,
+        borderColor: '#EDEDED',
         paddingHorizontal: 16,
         paddingVertical: 14,
-        marginBottom: 16,
+        height: 50
     },
     selectInputText: {
         fontSize: 16,
-        color: '#000',
+        color: '#757575',
         flex: 1,
     },
     placeholderText: {
-        color: '#999',
+        color: '#757575',
     },
     conditionsChipsContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 10,
-        marginBottom: 20,
     },
     conditionChip: {
         paddingHorizontal: 16,
         paddingVertical: 10,
-        backgroundColor: '#F5F5F5',
         borderRadius: 20,
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#DADADA',
     },
     conditionChipSelected: {
-        backgroundColor: '#fff',
-        borderColor: '#000',
+        borderColor: '#6B6B6B',
     },
     conditionChipText: {
         fontSize: 14,
-        color: '#000',
+        color: '#080808',
     },
     conditionChipTextSelected: {
         fontWeight: '600',
     },
     notesInput: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#F2F3F4',
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
         fontSize: 16,
         color: '#000',
-        minHeight: 100,
+        minHeight: 97,
         marginBottom: 32,
     },
     submitButton: {
         backgroundColor: '#000',
-        borderRadius: 12,
+        borderRadius: 100,
         paddingVertical: 16,
         alignItems: 'center',
         marginTop: 8,
         marginBottom: 40,
     },
     submitButtonDisabled: {
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#CECECE',
     },
     submitButtonText: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#fff',
+        fontWeight: 600,
+        color: '#FBFBFB',
     },
     submitButtonTextDisabled: {
-        color: '#999',
+        color: '#979797',
     },
     // Loading Overlay Styles (only thing kept here as it's simple)
     loadingOverlay: {
@@ -558,7 +505,7 @@ const styles = StyleSheet.create({
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 9999,

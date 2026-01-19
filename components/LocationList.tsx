@@ -1,55 +1,101 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {
+    ScrollView,
+    View,
+    TouchableOpacity,
+    Text,
+    ActivityIndicator,
+    StyleSheet,
+} from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-const LocationList = () => {
-    const listData = [
-        { id: 1, name: 'Add Home', icon: 'home-outline', bgColor: '#21A351' },
-        { id: 2, name: 'Add Work', icon: 'briefcase-outline', bgColor: '#21A351' },
-        { id: 3, name: 'Saved Routes', icon: 'bookmark-outline', bgColor: '#21A351' },
-    ];
+interface Recommendation {
+    name: string;
+    place_id: string;
+}
 
+interface LocationListProps {
+    isSearching: boolean;
+    recommendations: Recommendation[];
+    onSelect: (item: Recommendation) => void;
+}
+
+export default function LocationList({
+    isSearching,
+    recommendations,
+    onSelect,
+}: LocationListProps) {
     return (
-        <View style={styles.container}>
-            {listData.map((item) => (
-                <View key={item.id} style={styles.listItem}>
-                    <View style={[styles.iconContainer, { backgroundColor: item.bgColor }]}>
-                        <Ionicons name={item.icon} size={20} color="#fff" />
-                    </View>
-                    <Text style={styles.text}>{item.name}</Text>
+        <>
+            {isSearching && (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="small" color="#000" />
                 </View>
-            ))}
-        </View>
+            )}
+
+            <ScrollView
+                contentContainerStyle={styles.resultsList}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+            >
+                {recommendations.map((item) => (
+                    <TouchableOpacity
+                        key={item.place_id}
+                        style={styles.resultCard}
+                        onPress={() => onSelect(item)}
+                    >
+                        <View style={styles.iconContainer}>
+                            <Ionicons name="location-sharp" size={20} color="#000" />
+                        </View>
+
+                        <View style={styles.resultDetails}>
+                            <Text style={styles.resultTitle}>{item.name}</Text>
+                            <Text style={styles.resultAddress}>{item.name}</Text>
+                        </View>
+                    </TouchableOpacity>
+                ))}
+            </ScrollView>
+        </>
     );
-};
+}
 
 const styles = StyleSheet.create({
-    container: {
-        // padding: 16,
-        backgroundColor: "#FFFFFF",
-        height: 151
+    loadingContainer: {
+        padding: 20,
+        alignItems: 'center',
     },
-    listItem: {
+    resultsList: {
+        paddingHorizontal: 20,
+        paddingBottom: 40,
+    },
+    resultCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 12,
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#eee',
-        // height: 37
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
     iconContainer: {
         width: 40,
         height: 40,
         borderRadius: 20,
+        backgroundColor: '#F5F5F5',
         justifyContent: 'center',
         alignItems: 'center',
+        marginRight: 16,
+    },
+    resultDetails: {
+        flex: 1,
         marginRight: 12,
     },
-    text: {
+    resultTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
+        marginBottom: 4,
+    },
+    resultAddress: {
         fontSize: 14,
-        fontWeight: 600,
-        color: '#080808',
+        color: '#666',
     },
 });
-
-export default LocationList;

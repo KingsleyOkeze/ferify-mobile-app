@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api from '@/services/api';
+import api, { setToken } from '@/services/api';
 
 // Logo
 import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
@@ -31,7 +31,7 @@ export default function VerifySignupEmailScreen() {
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: any;
         if (timer > 0) {
             interval = setInterval(() => {
                 setTimer((prev) => prev - 1);
@@ -73,9 +73,18 @@ export default function VerifySignupEmailScreen() {
 
             console.log("OTP verified:", verifyResponse.data);
 
-            Alert.alert('Success', 'Email verified successfully!', [
-                { text: 'Continue', onPress: () => router.replace('/tabs/HomeScreen') }
-            ]);
+            // 2. Login User (Backend returns tokens)
+            if (verifyResponse.data.accessToken) {
+                await setToken(verifyResponse.data.accessToken);
+                // 3. Navigate to Profile Setup
+                router.replace('/auth/signup/ProfileSetupScreen');
+            } else {
+                // Fallback if no token (shouldn't happen with new flow)
+                Alert.alert('Success', 'Email verified successfully!', [
+                    { text: 'Continue', onPress: () => router.replace('/auth/signup/ProfileSetupScreen') }
+                ]);
+            }
+
         } catch (error: any) {
             console.error('Verify OTP error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
@@ -141,7 +150,7 @@ export default function VerifySignupEmailScreen() {
                         {otp.map((digit, index) => (
                             <TextInput
                                 key={index}
-                                ref={(ref) => (inputRefs.current[index] = ref)}
+                                ref={(ref) => { inputRefs.current[index] = ref; }}
                                 style={[
                                     styles.otpInput,
                                     digit !== '' && styles.otpInputFilled

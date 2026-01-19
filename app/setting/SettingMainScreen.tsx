@@ -8,6 +8,7 @@ import {
     ScrollView,
     Modal,
     Pressable,
+    Image
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -21,7 +22,7 @@ function SettingMainScreen() {
             id: 'appearance',
             title: 'App appearance',
             description: 'Dark mode, light mode, system default',
-            icon: 'moon-outline',
+            image: require('../../assets/images/settings-icons/app_appearance_icon.png'),
             onPress: () => {
                 // Future implementation
             }
@@ -30,25 +31,26 @@ function SettingMainScreen() {
             id: 'notifications',
             title: 'Notifications',
             description: 'Manage your notification preferences',
-            icon: 'notifications-outline',
+            image: require('../../assets/images/settings-icons/notification_icon.png'),
             onPress: () => {
-                // Future implementation
+                router.push('./NotificationSettingScreen')
             }
         },
         {
             id: 'privacy',
             title: 'Privacy & safety',
             description: 'Control who sees what',
-            icon: 'lock-closed-outline',
+            image: require('../../assets/images/settings-icons/privacy_and_setting_icon.png'),
             onPress: () => {
-                // Future implementation
+                router.push('./Privacy&SafetySettingScreen')
             }
         },
+
         {
             id: 'logout',
             title: 'Logout',
             description: 'Sign out of your account',
-            icon: 'log-out-outline',
+            image: require('../../assets/images/settings-icons/logout_icon.png'),
             isDestructive: true,
             onPress: () => setIsLogoutModalVisible(true)
         },
@@ -78,16 +80,14 @@ function SettingMainScreen() {
                             key={item.id}
                             style={[
                                 styles.listItem,
-                                index === 0 && styles.firstListItem // Border top for first item
+                                // index === 0 && styles.firstListItem // Border top for first item
                             ]}
                             onPress={item.onPress}
                         >
                             <View style={styles.itemLeft}>
-                                <Ionicons
-                                    name={item.icon as any}
-                                    size={24}
-                                    color={item.isDestructive ? 'red' : '#333'}
-                                    style={styles.itemIcon}
+                                <Image
+                                    source={item.image}
+                                    style={styles.itemImage}
                                 />
                                 <View style={styles.textContainer}>
                                     <Text style={[
@@ -117,9 +117,9 @@ function SettingMainScreen() {
                     onPress={() => setIsLogoutModalVisible(false)}
                 >
                     <Pressable style={styles.modalContent}>
-                        <Text style={styles.modalTitle}>Confirm Logout</Text>
+                        {/* <Text style={styles.modalTitle}>Confirm Logout</Text> */}
                         <Text style={styles.modalDescription}>
-                            Are you sure you want to logout? You'll need to sign in again to access your account.
+                            Are you sure you want to logout?
                         </Text>
 
                         <View style={styles.modalButtonRow}>
@@ -127,7 +127,7 @@ function SettingMainScreen() {
                                 style={[styles.modalButton, styles.confirmLogoutButton]}
                                 onPress={handleLogout}
                             >
-                                <Text style={styles.confirmLogoutButtonText}>yes i do</Text>
+                                <Text style={styles.confirmLogoutButtonText}>Yes I do</Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity
@@ -147,7 +147,8 @@ function SettingMainScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
+        padding: 4,
     },
     header: {
         paddingHorizontal: 20,
@@ -156,18 +157,20 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        padding: 4,
         marginBottom: 10,
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 24,
+        fontWeight: 600,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,
     },
     listContainer: {
+        backgroundColor: '#FFFFFF',
+        borderTopWidth: 1,
+        borderTopColor: '#DADADA',
         // paddingHorizontal: 20, // Optional: keeping it flush or padded
     },
     listItem: {
@@ -176,34 +179,33 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 16,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
-    },
-    firstListItem: {
-        borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
     },
     itemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
         flex: 1,
     },
-    itemIcon: {
+    itemImage: {
         marginRight: 16,
+        width: 36,
+        height: 36,
+        borderRadius: 56.25
     },
     textContainer: {
         flex: 1,
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
-        fontSize: 13,
-        color: '#666',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#757575',
     },
     destructiveText: {
         color: 'red',
@@ -211,29 +213,30 @@ const styles = StyleSheet.create({
     // Modal Styles
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: '#fff',
-        borderRadius: 24,
+        backgroundColor: '#FBFBFB',
+        borderRadius: 20,
         paddingHorizontal: 24,
         paddingTop: 32,
         paddingBottom: 32,
         alignItems: 'center',
-        width: '85%',
-        maxWidth: 400,
+        width: '80%',
+        maxWidth: 256,
     },
-    modalTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: '#080808',
-        marginBottom: 12,
-    },
+    // modalTitle: {
+    //     fontSize: 16,
+    //     fontWeight: 400,
+    //     color: '#080808',
+    //     marginBottom: 12,
+    // },
     modalDescription: {
         fontSize: 16,
-        color: '#757575',
+        fontWeight: 400,
+        color: '#080808',
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 32,
@@ -252,20 +255,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cancelModalButton: {
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#F0F0F0',
+        width: 98,
+        height: 45
     },
     confirmLogoutButton: {
-        backgroundColor: '#FF3B30', // Red background as requested
+        backgroundColor: '#EF4444',
+        width: 98,
+        height: 45
     },
     cancelModalButtonText: {
         color: '#080808',
-        fontSize: 16,
-        fontWeight: '700',
+        fontSize: 14,
+        fontWeight: 600,
     },
     confirmLogoutButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '700',
+        color: '#FBFBFB',
+        fontSize: 14,
+        fontWeight: 600,
     },
 });
 

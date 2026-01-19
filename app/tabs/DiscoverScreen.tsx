@@ -10,6 +10,11 @@ import {
     Dimensions,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import mapImage from '../../assets/images/popular-search-icons/map_icon.png'
+import shareLocationHand from '../../assets/images/popular-search-icons/share_location_hand_icon.png'
+import alertIcon from '../../assets/images/popular-search-icons/alert_icon.png'
+import shineIcon from '../../assets/images/popular-search-icons/shine_icon.png'
+
 
 const { width } = Dimensions.get('window');
 
@@ -17,7 +22,7 @@ const { width } = Dimensions.get('window');
 const recentlyUpdated = [
     {
         id: '1',
-        image: require('@/assets/images/busImage.png'),
+        image: require('@/assets/images/transportation-icons/busImage.png'),
         route: 'Oshodi - Iyana Ipaja',
         timeAgo: '18 min ago',
         contributors: 12,
@@ -25,7 +30,7 @@ const recentlyUpdated = [
     },
     {
         id: '2',
-        image: require('@/assets/images/okadaImage.png'),
+        image: require('@/assets/images/transportation-icons/okadaImage.png'),
         route: 'Ikeja - Ogba',
         timeAgo: '25 min ago',
         contributors: 8,
@@ -33,7 +38,7 @@ const recentlyUpdated = [
     },
     {
         id: '3',
-        image: require('@/assets/images/kekeImage.png'),
+        image: require('@/assets/images/transportation-icons/kekeImage.png'),
         route: 'Yaba - Surulere',
         timeAgo: '10 min ago',
         contributors: 15,
@@ -44,7 +49,7 @@ const recentlyUpdated = [
 const popularRoutesToday = [
     {
         id: '1',
-        image: require('@/assets/images/busImage.png'),
+        image: require('@/assets/images/transportation-icons/busImage.png'),
         route: 'Lekki - Ajah',
         priceRange: '₦500 - ₦700',
         time: '3:55pm',
@@ -52,7 +57,7 @@ const popularRoutesToday = [
     },
     {
         id: '2',
-        image: require('@/assets/images/kekeImage.png'),
+        image: require('@/assets/images/transportation-icons/kekeImage.png'),
         route: 'Victoria Island - Ikoyi',
         priceRange: '₦300 - ₦400',
         time: '4:15pm',
@@ -60,7 +65,7 @@ const popularRoutesToday = [
     },
     {
         id: '3',
-        image: require('@/assets/images/okadaImage.png'),
+        image: require('@/assets/images/transportation-icons/okadaImage.png'),
         route: 'Maryland - Ojota',
         priceRange: '₦200 - ₦250',
         time: '4:30pm',
@@ -68,7 +73,7 @@ const popularRoutesToday = [
     },
     {
         id: '4',
-        image: require('@/assets/images/busImage.png'),
+        image: require('@/assets/images/transportation-icons/okadaImage.png'),
         route: 'CMS - Obalende',
         priceRange: '₦300 - ₦400',
         time: '4:45pm',
@@ -81,22 +86,19 @@ const tipsAndInsights = [
         id: '1',
         title: 'Peak Hour Alert',
         body: 'Expect heavy traffic on 3rd Mainland Bridge',
-        icon: 'time-outline',
-        color: '#FF9800',
+        image: require('@/assets/images/popular-search-icons/alert_icon.png'),
     },
     {
         id: '2',
         title: 'Fast Route',
         body: 'Take Ikorodu Road for faster commute',
-        icon: 'flash-outline',
-        color: '#4CAF50',
+        image: require('@/assets/images/popular-search-icons/alert_icon.png'),
     },
     {
         id: '3',
         title: 'Traffic Update',
         body: 'Gridlock cleared at Berger',
-        icon: 'car-outline',
-        color: '#2196F3',
+        image: require('@/assets/images/popular-search-icons/alert_icon.png'),
     },
 ];
 
@@ -117,8 +119,14 @@ function DiscoverScreen() {
                         <Text style={styles.sectionTitle}>Recently updated</Text>
                     </View>
                     <View style={styles.verticalList}>
-                        {recentlyUpdated.map((item) => (
-                            <TouchableOpacity key={item.id} style={styles.recentCard}>
+                        {recentlyUpdated.map((item, index) => (
+                            <TouchableOpacity
+                                key={item.id}
+                                style={[
+                                    styles.recentCard,
+                                    index === recentlyUpdated.length - 1 && { borderBottomWidth: 0 }
+                                ]}
+                            >
                                 {/* 1. Image View */}
                                 <Image source={item.image} style={styles.recentImage} />
 
@@ -156,11 +164,11 @@ function DiscoverScreen() {
                     </View>
 
                     <TouchableOpacity style={styles.popularSearchCard}>
-                        <Image source={require('@/assets/images/estimate.png')} style={styles.searchImage} />
+                        <Image source={shareLocationHand} style={styles.searchImage} />
                         <View style={styles.searchContent}>
                             <Text style={styles.searchMessage}>Check fare estimates for your next trip</Text>
                         </View>
-                        <Image source={require('@/assets/images/travel.png')} style={styles.searchMapImage} />
+                        <Image source={mapImage} style={styles.searchMapImage} />
                     </TouchableOpacity>
                 </View>
 
@@ -168,8 +176,14 @@ function DiscoverScreen() {
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>Popular route today</Text>
                     <View style={styles.verticalList}>
-                        {popularRoutesToday.map((item) => (
-                            <TouchableOpacity key={item.id} style={styles.popularRouteCard}>
+                        {popularRoutesToday.map((item, index) => (
+                            <TouchableOpacity
+                                key={item.id}
+                                style={[
+                                    styles.popularRouteCard,
+                                    index === popularRoutesToday.length - 1 && { borderBottomWidth: 0 }
+                                ]}
+                            >
                                 {/* Left: Image */}
                                 <Image source={item.image} style={styles.popularRouteImage} />
 
@@ -195,8 +209,8 @@ function DiscoverScreen() {
                     <View style={styles.verticalList}>
                         {tipsAndInsights.map((item) => (
                             <TouchableOpacity key={item.id} style={styles.tipCard}>
-                                <View style={[styles.tipIconContainer, { backgroundColor: item.color + '20' }]}>
-                                    <Ionicons name={item.icon as any} size={24} color={item.color} />
+                                <View style={styles.tipIconContainer}>
+                                    <Image source={item.image as any} style={styles.tipIcon} />
                                 </View>
                                 <View style={styles.tipContent}>
                                     <Text style={styles.tipTitle}>{item.title}</Text>
@@ -210,7 +224,7 @@ function DiscoverScreen() {
                 {/* Promo / Broken Border Card */}
                 <TouchableOpacity style={styles.promoCard}>
                     <View style={styles.promoImageContainer}>
-                        <Image source={require('@/assets/images/contributeAndEarnImage.png')} style={styles.promoImage} />
+                        <Image source={shineIcon} style={styles.promoImage} />
                     </View>
                     <View style={styles.promoContent}>
                         <Text style={styles.promoTitle}>Contribution Leaderboard</Text>
@@ -226,7 +240,7 @@ function DiscoverScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: "#FBFBFB",
     },
     scrollContent: {
         paddingBottom: 40,
@@ -237,56 +251,61 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: '800', // Extra bold
-        color: '#000',
+        fontSize: 24,
+        fontWeight: 600,
+        // fontFamily: 'Britti Sans Trial',
+        color: '#080808',
         marginBottom: 4,
     },
     headerSubtitle: {
-        fontSize: 15,
-        color: '#666',
+        fontSize: 14,
+        fontWeight: 400,
+        // fontFamily: 'Britti Sans Trial',
+        color: '#393939',
     },
     section: {
         marginBottom: 24,
+        // flexDirection: 'column',
+        // justifyContent: 'space-between'
     },
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: 20,
         marginBottom: 12,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontWeight: '700',
-        color: '#000',
+        fontSize: 16,
+        fontWeight: 600,
+        color: '#000000',
         marginRight: 10,
-        paddingHorizontal: 20, // Add padding for non-header usage
+        paddingHorizontal: 20,
+        marginBottom: 16,
     },
-    // sectionHeader > sectionTitle block removed as it is invalid syntax
 
     horizontalScroll: {
         paddingHorizontal: 20,
-        paddingRight: 10, // Account for last item margin
+        paddingRight: 10,
     },
 
+    recentCardContainer: {
+        backgroundColor: '#FFFFFF',
 
+    },
 
-    // Recent Updated Styles
     recentCard: {
         flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 16,
+        alignItems: 'flex-start',
         padding: 12,
-        marginBottom: 12,
+        // marginBottom: 12,
         width: '100%',
-        borderWidth: 1,
-        borderColor: '#F0F0F0',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 8,
-        elevation: 2,
+        height: 127,
+        borderBottomWidth: 1,
+        borderBottomColor: '#DADADA',
+        // shadowColor: '#000',
+        // shadowOffset: { width: 0, height: 2 },
+        // shadowOpacity: 0.05,
+        // shadowRadius: 8,
+        // elevation: 2,
     },
     recentImage: {
         width: 60,
@@ -294,16 +313,15 @@ const styles = StyleSheet.create({
         resizeMode: 'contain',
         marginRight: 12,
         backgroundColor: '#F5F5F5',
-        borderRadius: 8,
+        borderRadius: 3.56,
     },
     recentDetails: {
         flex: 1,
-        justifyContent: 'center',
     },
     recentRoute: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#000',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 6,
     },
     recentMetaRow: {
@@ -316,42 +334,46 @@ const styles = StyleSheet.create({
     },
     recentMetaText: {
         fontSize: 12,
-        color: '#666',
+        color: '#757575',
     },
     recentPriceContainer: {
-        justifyContent: 'center',
         paddingLeft: 8,
     },
     recentPrice: {
         fontSize: 14,
-        fontWeight: '700',
-        color: '#000',
+        fontWeight: 600,
+        color: '#080808',
     },
 
     // Popular Searches Styles
     hotBadge: {
-        backgroundColor: '#E3F2FD',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
+        backgroundColor: '#2A7FFF',
+        width: 63,
+        height: 26,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 30,
     },
     hotBadgeText: {
         fontSize: 12,
-        fontWeight: 'bold',
-        color: '#2196F3',
+        fontWeight: 600,
+        fontFamily: 'Britti Sans Trial',
+        color: '#FBFBFB',
     },
     popularSearchCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F8F9FA',
+        backgroundColor: '#FAFAFA',
         marginHorizontal: 20,
         borderRadius: 16,
         padding: 16,
-        height: 100,
+        borderWidth: 1,
+        borderColor: '#DADADA'
+        // height: 65,
     },
     searchImage: {
-        width: 50,
-        height: 50,
+        width: 24,
+        height: 24,
         resizeMode: 'contain',
     },
     searchContent: {
@@ -359,9 +381,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
     },
     searchMessage: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: '#000',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#080808',
         lineHeight: 20,
     },
     searchMapImage: {
@@ -373,16 +395,25 @@ const styles = StyleSheet.create({
 
     // Popular Routes Styles
     verticalList: {
-        paddingHorizontal: 20,
+        paddingVertical: 16,
+        paddingHorizontal: 10,
+        backgroundColor: '#FFFFFF',
+        // backgroundColor: 'red',
+        // borderTopWidth: 1,
+        // borderTopColor: '#DADADA',
+        borderBottomWidth: 1,
+        borderBottomColor: '#DADADA',
+        gap: 16,
     },
     popularRouteCard: {
         flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-        backgroundColor: '#fff',
+        alignItems: 'flex-start',
+        backgroundColor: '#FFFFFF',
+        width: '100%',
+        height: 113,
         borderRadius: 12,
         padding: 12,
-        borderWidth: 1,
+        borderBottomWidth: 1,
         borderColor: '#F0F0F0',
     },
     popularRouteImage: {
@@ -427,13 +458,13 @@ const styles = StyleSheet.create({
     tipCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#F3F3F3',
         borderRadius: 16,
         padding: 16,
-        marginBottom: 12,
-        width: '100%',
+        minHeight: 91,
         borderWidth: 1,
         borderColor: '#F0F0F0',
+        // marginHorizontal: 10,
     },
     tipIconContainer: {
         width: 48,
@@ -442,6 +473,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
+    },
+    tipIcon: {
+        width: 32,
+        height: 32,
+        borderRadius: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     tipContent: {
         flex: 1,
@@ -462,21 +500,23 @@ const styles = StyleSheet.create({
     promoCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 20,
+        marginHorizontal: 10,
         padding: 20,
         borderRadius: 16,
-        borderWidth: 2,
-        borderColor: '#000',
+        borderWidth: 1,
+        borderColor: '#B69A0DCC',
         borderStyle: 'dashed',
-        backgroundColor: '#FAFAFA',
+        backgroundColor: '#F08D2512',
         marginBottom: 20,
+        height: 106
     },
     promoImageContainer: {
         marginRight: 16,
+        height: '100%'
     },
     promoImage: {
-        width: 60,
-        height: 60,
+        width: 20,
+        height: 24,
         resizeMode: 'contain',
     },
     promoContent: {
@@ -484,13 +524,14 @@ const styles = StyleSheet.create({
     },
     promoTitle: {
         fontSize: 18,
-        fontWeight: '800',
-        color: '#000',
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 4,
     },
     promoBody: {
         fontSize: 14,
-        color: '#444',
+        fontWeight: 400,
+        color: '#080808',
     },
 });
 

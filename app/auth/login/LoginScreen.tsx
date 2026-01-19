@@ -15,7 +15,11 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import api from "@/services/api";
+import api, { setToken } from "@/services/api";
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+
+WebBrowser.maybeCompleteAuthSession();
 
 // Logo
 import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
@@ -25,6 +29,41 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    // Google Auth Request
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        androidClientId: "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com",
+        iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
+        webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+    });
+
+    useEffect(() => {
+        if (response?.type === 'success') {
+            const { idToken } = response.authentication || {};
+
+            if (idToken) {
+                setLoading(true);
+                api.post('/api/user/auth/google-login', { idToken })
+                    .then(async (res) => {
+                        console.log("Google Login Backend Success:", res.data);
+                        if (res.data.accessToken) {
+                            await setToken(res.data.accessToken);
+                            // Wait, I updated api.ts to export setToken, but LoginScreen imports default api. 
+                            // I need to update import or use api.setToken if I attached it? 
+                            // In VerifyLoginScreen I imported { setToken }. I should do same here.
+                            router.replace('/tabs/HomeScreen');
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Google Backend Error:", error.response?.data || error.message);
+                        Alert.alert("Google Sign-In Failed", "Could not verify with server.");
+                    })
+                    .finally(() => setLoading(false));
+            } else {
+                Alert.alert("Error", "No ID token received from Google");
+            }
+        }
+    }, [response]);
 
     // Validation
     useEffect(() => {
@@ -134,7 +173,11 @@ export default function LoginScreen() {
                         </View>
 
                         {/* Google Button */}
-                        <TouchableOpacity style={styles.googleButton}>
+                        <TouchableOpacity
+                            style={styles.googleButton}
+                            onPress={() => promptAsync()}
+                            disabled={!request}
+                        >
                             <Ionicons name="logo-google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
                             <Text style={styles.googleButtonText}>Sign in with Google</Text>
                         </TouchableOpacity>
@@ -227,6 +270,9 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         color: "#080808",
+    },
+    eyeIcon: {
+        padding: 4,
     },
     signInButton: {
         backgroundColor: "#080808",

@@ -6,10 +6,10 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
-    Switch,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import CustomSwitch from '@/components/CustomSwitch';
 
 function NotificationSettingScreen() {
     const router = useRouter();
@@ -69,12 +69,11 @@ function NotificationSettingScreen() {
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                                 <Text style={styles.itemDescription}>{item.description}</Text>
                             </View>
-                            <Switch
-                                trackColor={{ false: '#E0E0E0', true: '#000' }} // Black accent for premium feel
-                                thumbColor={'#fff'}
-                                ios_backgroundColor="#E0E0E0"
-                                onValueChange={item.onValueChange}
+                            <CustomSwitch
                                 value={item.value}
+                                onValueChange={item.onValueChange}
+                                trackColor={{ false: '#E3E3E3', true: '#080808' }}
+                                thumbColor={'#FFFFFF'}
                             />
                         </View>
                     ))}
@@ -87,7 +86,7 @@ function NotificationSettingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 20,
@@ -96,29 +95,31 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        padding: 4,
         marginBottom: 10,
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 24,
+        fontWeight: 600,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,
     },
     listContainer: {
-        // paddingHorizontal: 20, 
+        backgroundColor: '#FFFFFF',
+        borderTopWidth: 1,
+        borderTopColor: '#DADADA',
     },
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 20,
-        paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        // paddingVertical: 20,
+        // paddingHorizontal: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
+        height: 87,
+        paddingHorizontal: 20,
     },
     textContainer: {
         flex: 1,
@@ -126,14 +127,18 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
-        fontSize: 13,
-        color: '#666',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#757575',
     },
+    switch: {
+        height: 40
+    }
 });
 
 export default NotificationSettingScreen;

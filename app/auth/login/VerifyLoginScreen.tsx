@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api from '@/services/api';
+import api, { setToken } from '@/services/api';
 
 // Logo
 import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
@@ -31,7 +31,7 @@ export default function VerifyLoginScreen() {
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: any;
         if (timer > 0) {
             interval = setInterval(() => {
                 setTimer((prev) => prev - 1);
@@ -72,6 +72,11 @@ export default function VerifyLoginScreen() {
             });
 
             console.log("Login verified:", response.data);
+
+            // Save Token
+            if (response.data.accessToken) {
+                await setToken(response.data.accessToken);
+            }
 
             // On success, redirect to home
             router.replace('/tabs/HomeScreen');
@@ -140,7 +145,7 @@ export default function VerifyLoginScreen() {
                         {otp.map((digit, index) => (
                             <TextInput
                                 key={index}
-                                ref={(ref) => (inputRefs.current[index] = ref)}
+                                ref={(ref) => { inputRefs.current[index] = ref; }}
                                 style={[
                                     styles.otpInput,
                                     digit !== '' && styles.otpInputFilled

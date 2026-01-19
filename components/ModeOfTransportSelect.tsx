@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import okadaImage from '../assets/images/okadaImage.png';
-import kekeImage from '../assets/images/kekeImage.png';
-import busImage from '../assets/images/busImage.png';
+import okadaImage from '../assets/images/transportation-icons/okadaImage.png';
+import kekeImage from '../assets/images/transportation-icons/kekeImage.png';
+import busImage from '../assets/images/transportation-icons/busImage.png';
 
 interface ModeOfTransportSelectProps {
     selectedMode?: string | null;
