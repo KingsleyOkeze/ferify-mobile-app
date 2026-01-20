@@ -18,7 +18,7 @@ function AccountSecurityScreen() {
             id: 'password',
             title: 'Change password',
             icon: 'key-outline',
-            onPress: () => { router.push('../setting/account/PasswordResetScreen') },
+            onPress: () => { router.push('../setting/PasswordResetScreen') },
         },
         {
             id: '2fa',

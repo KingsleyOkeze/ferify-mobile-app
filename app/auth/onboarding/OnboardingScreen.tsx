@@ -9,9 +9,9 @@ import {
     SafeAreaView,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { fetchAndCacheLocation } from "@/services/locationService";
 
 const { width } = Dimensions.get("window");
-
 
 
 const slides = [
@@ -20,17 +20,17 @@ const slides = [
         title: "Verify Any Fare",
         subtitle: "Check accurate fare estimates before you ever step out.",
         images: [
-            require("../../assets/images/onboarding/handFareCheckImage.png"),
-            require("../../assets/images/onboarding/busAndConductorImage.png"),
-            require("../../assets/images/onboarding/busConductorWordsImage.png"),
-            require("../../assets/images/onboarding/baricadeImage.png"),
+            require("../../../assets/images/onboarding/handFareCheckImage.png"),
+            require("../../../assets/images/onboarding/busAndConductorImage.png"),
+            require("../../../assets/images/onboarding/busConductorWordsImage.png"),
+            require("../../../assets/images/onboarding/baricadeImage.png"),
         ],
     },
     {
         id: 1, // IDs should remain sequential for simplicity if needed
         title: "Earn Rewards",
         subtitle: "Get rewarded for submitting accurate fare. Your contributing help others",
-        images: require("../../assets/images/onboarding/rewardImage.png"),
+        images: require("../../../assets/images/onboarding/rewardImage.png"),
     },
 ];
 
@@ -149,18 +149,27 @@ export default function OnboardingScreen() {
                 <Text style={styles.title}>{slides[step].title}</Text>
                 <Text style={styles.subtitle}>{slides[step].subtitle}</Text>
 
+
                 {/* Bottom Buttons Row */}
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
                         style={[styles.btn, styles.loginBtn]}
-                        onPress={() => router.push("/auth/login/LoginScreen")}
+                        onPress={async () => {
+                            console.log('Login clicked - triggering location fetch');
+                            fetchAndCacheLocation(); // Non-blocking
+                            router.push("/auth/login/LoginScreen");
+                        }}
                     >
                         <Text style={styles.loginBtnText}>Login</Text>
                     </TouchableOpacity>
 
                     <TouchableOpacity
                         style={[styles.btn, styles.getStartedBtn]}
-                        onPress={() => router.push("/auth/signup/SignupScreen")}
+                        onPress={async () => {
+                            console.log('Get Started clicked - triggering location fetch');
+                            fetchAndCacheLocation(); // Non-blocking
+                            router.push("/auth/signup/SignupScreen");
+                        }}
                     >
                         <Text style={styles.getStartedBtnText}>Get Started</Text>
                     </TouchableOpacity>

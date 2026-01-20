@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    Image
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -18,14 +19,14 @@ function DataAndPrivacyScreen() {
             id: 'visibility',
             title: 'Contribution visibility',
             description: 'Manage who can see your contribution',
-            icon: 'eye-outline',
+            image: require('@/assets/images/data-and-privacy-icons/contribution_visibility_icon.png'),
             onPress: () => { router.push('../setting/ContributionVisibilitySettingScreen') },
         },
         {
             id: 'download',
             title: 'Download your data',
-            description: null, // No description requested
-            icon: 'download-outline',
+            description: null, 
+            image: require('@/assets/images/data-and-privacy-icons/download_your_data_icon.png'),
             onPress: () => { },
         },
     ];
@@ -52,7 +53,7 @@ function DataAndPrivacyScreen() {
                             onPress={item.onPress}
                         >
                             <View style={styles.itemLeft}>
-                                <Ionicons name={item.icon as any} size={24} color="#333" style={styles.itemIcon} />
+                                <Image source={item.image} style={styles.itemIcon} />
                                 <View style={styles.textContainer}>
                                     <Text style={styles.itemTitle}>{item.title}</Text>
                                     {item.description && (
@@ -73,7 +74,7 @@ function DataAndPrivacyScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 20,
@@ -102,13 +103,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 18,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
     },
     firstMenuItem: {
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        borderTopColor: '#DADADA',
     },
     itemLeft: {
         flexDirection: 'row',
@@ -117,6 +118,9 @@ const styles = StyleSheet.create({
     },
     itemIcon: {
         marginRight: 16,
+        height: 36,
+        width: 36,
+        borderRadius: 56.25
     },
     textContainer: {
         flex: 1,

@@ -212,7 +212,7 @@ function AccountDetailsScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
@@ -226,17 +226,18 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 20,
+        fontWeight: 400,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 24,
+        fontWeight: 600,
+        color: '#080808',
+        marginTop: 15,
         marginLeft: 20,
         marginBottom: 20,
     },
@@ -248,20 +249,20 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     avatarImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 72,
+        height: 72,
+        borderRadius: 100,
     },
     avatarPlaceholder: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
+        width: 72,
+        height: 72,
+        borderRadius: 100,
         backgroundColor: '#F0F0F0', // Light grey placeholder
         justifyContent: 'center',
         alignItems: 'center',
     },
     avatarInitials: {
-        fontSize: 36,
+        fontSize: 30,
         fontWeight: 'bold',
         color: '#333',
     },
@@ -288,31 +289,33 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 16,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#E3E3E3',
+        height: 87
     },
     firstListItem: {
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        borderTopColor: '#E3E3E3',
     },
     itemTextContainer: {
         flex: 1,
         marginRight: 10,
     },
     itemTitle: {
-        fontSize: 14,
-        color: '#666',
+        fontSize: 16,
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 4,
     },
     itemValue: {
         fontSize: 16,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: 400,
+        color: '#757575',
     },
     footerStatement: {
         fontSize: 12,
-        color: '#999',
+        color: '#393939',
         textAlign: 'right',
         marginRight: 20,
         marginTop: 8,
@@ -332,17 +335,17 @@ const styles = StyleSheet.create({
     // Modal Styles
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'flex-end',
     },
     centeredModalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalContent: {
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         paddingBottom: 40,
@@ -412,12 +415,14 @@ const styles = StyleSheet.create({
         paddingVertical: 18,
         paddingHorizontal: 20,
         borderBottomWidth: 1,
-        borderBottomColor: '#F5F5F5',
+        borderBottomColor: '#DADADA',
+        alignItems: 'center',
+        height: 72
     },
     modalOptionText: {
         fontSize: 16,
-        color: '#000',
-        fontWeight: '500',
+        color: '#080808',
+        fontWeight: 600,
     },
     cancelOption: {
         marginTop: 10,

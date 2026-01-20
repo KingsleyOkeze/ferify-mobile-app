@@ -7,7 +7,7 @@ function SplashScreen() {
             {/* Logo in the middle */}
             <View style={styles.centerContainer}>
                 <Image
-                    source={require("../../assets/images/logo/WHITE-LOGO.png")}
+                    source={require("../../../assets/images/logo/WHITE-LOGO.png")}
                     style={styles.logoImage}
                     resizeMode="contain"
                 />

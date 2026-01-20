@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
-import api, { setToken } from "@/services/api";
+import api, { setToken, getUserData, setUserData } from "@/services/api";
 import * as WebBrowser from 'expo-web-browser';
 import * as Google from 'expo-auth-session/providers/google';
 
@@ -29,6 +29,19 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const [firstName, setFirstName] = useState<string>("");
+    const [focusedField, setFocusedField] = useState<string | null>(null);
+
+    useEffect(() => {
+        const loadProfile = async () => {
+            const userData = await getUserData();
+            if (userData?.firstName) {
+                setFirstName(userData.firstName);
+            }
+        };
+        loadProfile();
+    }, []);
 
     // Google Auth Request
     const [request, response, promptAsync] = Google.useAuthRequest({
@@ -48,9 +61,12 @@ export default function LoginScreen() {
                         console.log("Google Login Backend Success:", res.data);
                         if (res.data.accessToken) {
                             await setToken(res.data.accessToken);
-                            // Wait, I updated api.ts to export setToken, but LoginScreen imports default api. 
-                            // I need to update import or use api.setToken if I attached it? 
-                            // In VerifyLoginScreen I imported { setToken }. I should do same here.
+
+                            // Save User Data for Caching
+                            if (res.data.user) {
+                                await setUserData(res.data.user);
+                            }
+
                             router.replace('/tabs/HomeScreen');
                         }
                     })
@@ -102,92 +118,106 @@ export default function LoginScreen() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={{ flex: 1 }}
             >
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                        <Ionicons name="arrow-back" size={24} color="#080808" />
+                    </TouchableOpacity>
+                </View>
+
                 <ScrollView
                     contentContainerStyle={styles.scrollContent}
                     showsVerticalScrollIndicator={false}
                     keyboardShouldPersistTaps="handled"
                 >
-                    {/* Logo */}
-                    <View style={styles.logoContainer}>
-                        <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-                    </View>
+                    <View style={styles.topContent}>
+                        {/* Welcome Text */}
+                        <View style={styles.textContainer}>
+                            <Text style={styles.title}>Welcome back{firstName ? `, ${firstName}` : ''}</Text>
+                            <Text style={styles.subtitle}>
+                                Check fares, confirm routes and move faster.
+                            </Text>
+                        </View>
 
-                    {/* Welcome Text */}
-                    <View style={styles.textContainer}>
-                        <Text style={styles.title}>Welcome back</Text>
-                        <Text style={styles.subtitle}>
-                            Sign in to your account to continue sharing and finding real fares.
-                        </Text>
-                    </View>
-
-                    {/* Form */}
-                    <View style={styles.formContainer}>
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Your email address</Text>
-                            <View style={[
-                                styles.inputWrapper,
-                                email.length > 0 && !isEmailValid ? styles.inputErrorBorder : null
-                            ]}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="example@gmail.com"
-                                    placeholderTextColor="#9a9a9a"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    editable={!loading}
-                                />
+                        {/* Form */}
+                        <View style={styles.formContainer}>
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.label}>Your email address</Text>
+                                <View style={[
+                                    styles.inputWrapper,
+                                    focusedField === 'email' && styles.focusedInput,
+                                    email.length > 0 && !isEmailValid ? styles.inputErrorBorder : null
+                                ]}>
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Enter your email here"
+                                        placeholderTextColor="#9a9a9a"
+                                        value={email}
+                                        onChangeText={setEmail}
+                                        onFocus={() => setFocusedField('email')}
+                                        onBlur={() => setFocusedField(null)}
+                                        keyboardType="email-address"
+                                        autoCapitalize="none"
+                                        editable={!loading}
+                                    />
+                                </View>
                             </View>
+
+                            {/* Sign In Button */}
+                            <TouchableOpacity
+                                style={[
+                                    styles.signInButton,
+                                    !isEmailValid && styles.disabledButton
+                                ]}
+                                onPress={handleContinue}
+                                disabled={!isEmailValid || loading}
+                            >
+                                {loading ? (
+                                    <ActivityIndicator color="#fff" />
+                                ) : (
+                                    <Text style={[
+                                        styles.signInButtonText,
+                                        !isEmailValid && { color: '#979797' }
+                                    ]}>Sign in</Text>
+                                )}
+                            </TouchableOpacity>
+
+                            {/* Forgot Password */}
+                            <TouchableOpacity
+                                style={styles.forgotPasswordContainer}
+                                onPress={() => router.push("/auth/ForgotPasswordScreen")}
+                            >
+                                <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+                            </TouchableOpacity>
+
+                            {/* Or Separator */}
+                            <View style={styles.separatorContainer}>
+                                <View style={styles.separatorLine} />
+                                <Text style={styles.separatorText}>or</Text>
+                                <View style={styles.separatorLine} />
+                            </View>
+
+                            {/* Google Button */}
+                            <TouchableOpacity
+                                style={styles.googleButton}
+                                onPress={() => promptAsync()}
+                                disabled={!request}
+                            >
+                                <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
+                                <Text style={styles.googleButtonText}>Sign in with Google</Text>
+                            </TouchableOpacity>
+
+                            {/* Terms */}
+                            <Text style={styles.termsText}>
+                                By signing in, you agree to our{" "}
+                                <Text style={styles.termsHighlight}>Terms & Conditions</Text> and acknowledge our{" "}
+                                <Text style={styles.termsHighlight}>Privacy Policy</Text>.
+                            </Text>
+
                         </View>
+                    </View>
 
-                        {/* Sign In Button */}
-                        <TouchableOpacity
-                            style={[
-                                styles.signInButton,
-                                !isEmailValid && styles.disabledButton
-                            ]}
-                            onPress={handleContinue}
-                            disabled={!isEmailValid || loading}
-                        >
-                            {loading ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <Text style={styles.signInButtonText}>Sign in</Text>
-                            )}
-                        </TouchableOpacity>
-
-                        {/* Forgot Password */}
-                        <TouchableOpacity
-                            style={styles.forgotPasswordContainer}
-                            onPress={() => router.push("/auth/ForgotPasswordScreen")}
-                        >
-                            <Text style={styles.forgotPasswordText}>Forgot password?</Text>
-                        </TouchableOpacity>
-
-                        {/* Or Separator */}
-                        <View style={styles.separatorContainer}>
-                            <View style={styles.separatorLine} />
-                            <Text style={styles.separatorText}>or</Text>
-                            <View style={styles.separatorLine} />
-                        </View>
-
-                        {/* Google Button */}
-                        <TouchableOpacity
-                            style={styles.googleButton}
-                            onPress={() => promptAsync()}
-                            disabled={!request}
-                        >
-                            <Ionicons name="logo-google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
-                            <Text style={styles.googleButtonText}>Sign in with Google</Text>
-                        </TouchableOpacity>
-
-                        {/* Terms */}
-                        <Text style={styles.termsText}>
-                            By signing in, you agree to our{" "}
-                            <Text style={styles.termsHighlight}>Terms & Conditions</Text> and{" "}
-                            <Text style={styles.termsHighlight}>Privacy Policy</Text>.
-                        </Text>
+                    {/* Footer - Pushed to bottom */}
+                    <View style={styles.footerContainer}>
 
                         {/* Sign Up Footer */}
                         <TouchableOpacity
@@ -208,24 +238,27 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: '#FBFBFB',
     },
     scrollContent: {
         flexGrow: 1,
         paddingHorizontal: 24,
-        paddingTop: 40,
+        paddingTop: 10,
         paddingBottom: 20,
     },
-    logoContainer: {
-        alignItems: "center",
-        marginBottom: 24,
+    header: {
+        marginBottom: 10,
+        marginLeft: -10,
+        paddingHorizontal: 24,
     },
-    logo: {
-        width: 80,
-        height: 80,
+    backButton: {
+        padding: 10,
+    },
+    topContent: {
+        flex: 1,
     },
     textContainer: {
-        alignItems: "center",
+        alignItems: "flex-start",
         marginBottom: 32,
     },
     title: {
@@ -235,9 +268,10 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     subtitle: {
-        fontSize: 16,
-        color: "#666",
-        textAlign: "center",
+        fontSize: 14,
+        fontWeight: 400,
+        color: "#393939",
+        textAlign: "left",
         lineHeight: 22,
     },
     formContainer: {
@@ -250,18 +284,22 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: "500",
         color: "#080808",
-        marginBottom: 8,
+        marginTop: 5,
+        marginBottom: 10,
         marginLeft: 4,
     },
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#F5F7F9",
-        borderRadius: 12,
+        backgroundColor: "#F0F0F0",
+        borderRadius: 100,
         paddingHorizontal: 16,
-        height: 56,
+        height: 50,
         borderWidth: 1,
         borderColor: "transparent",
+    },
+    focusedInput: {
+        borderColor: "#080808",
     },
     inputErrorBorder: {
         borderColor: "#FF3B30",
@@ -277,13 +315,13 @@ const styles = StyleSheet.create({
     signInButton: {
         backgroundColor: "#080808",
         height: 56,
-        borderRadius: 12,
+        borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
         marginTop: 10,
     },
     disabledButton: {
-        backgroundColor: "#E0E0E0",
+        backgroundColor: "#CECECE",
     },
     signInButtonText: {
         color: "#fff",
@@ -295,9 +333,9 @@ const styles = StyleSheet.create({
         marginTop: 12,
     },
     forgotPasswordText: {
-        color: "#080808",
+        color: "#393939",
         fontSize: 14,
-        fontWeight: "500",
+        fontWeight: 400,
     },
     separatorContainer: {
         flexDirection: "row",
@@ -307,22 +345,28 @@ const styles = StyleSheet.create({
     separatorLine: {
         flex: 1,
         height: 1,
-        backgroundColor: "#E0E0E0",
+        backgroundColor: "#F0F0F0",
     },
     separatorText: {
         marginHorizontal: 16,
-        color: "#9a9a9a",
-        fontSize: 14,
+        color: "#757575",
+        fontSize: 12,
+        fontWeight: 400,
     },
     googleButton: {
         flexDirection: "row",
-        backgroundColor: "#F5F7F9",
+        backgroundColor: "#F2F3F4",
         height: 56,
-        borderRadius: 12,
+        borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
         borderWidth: 1,
-        borderColor: "#E0E0E0",
+        borderColor: "#EDEDED",
+    },
+    googleLogo: {
+        width: 24,
+        height: 24,
+        marginRight: 10,
     },
     googleButtonText: {
         color: "#080808",
@@ -330,15 +374,19 @@ const styles = StyleSheet.create({
         fontWeight: "500",
     },
     termsText: {
-        fontSize: 13,
-        color: "#9a9a9a",
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#6B6B6B",
         textAlign: "center",
         marginTop: 24,
         lineHeight: 18,
+        width: '90%',
+        alignSelf: 'center'
     },
     termsHighlight: {
         color: "#080808",
-        fontWeight: "500",
+        fontWeight: 600,
+        fontSize: 12,
     },
     footerLink: {
         marginTop: 32,
@@ -346,11 +394,17 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     footerText: {
-        fontSize: 15,
-        color: "#666",
+        fontSize: 12,
+        fontWeight: 400,
+        color: "#393939",
     },
     footerHighlight: {
         color: "#080808",
         fontWeight: "700",
+        textDecorationLine: "underline",
+    },
+    footerContainer: {
+        marginTop: 20,
+        paddingBottom: 10,
     },
 });

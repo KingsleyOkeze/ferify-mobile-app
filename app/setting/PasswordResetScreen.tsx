@@ -11,6 +11,7 @@ import {
     Platform,
     ActivityIndicator,
     Alert,
+    Image
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -38,7 +39,7 @@ function PasswordResetScreen() {
             if (response.status === 200) {
                 // Navigate to verification screen with the new password
                 router.push({
-                    pathname: '/setting/account/VerifyPasswordResetScreen',
+                    pathname: './setting/account/VerifyPasswordResetScreen',
                     params: { newPassword }
                 });
             }
@@ -68,6 +69,12 @@ function PasswordResetScreen() {
                 style={styles.keyboardView}
             >
                 <ScrollView contentContainerStyle={styles.scrollContent}>
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={require('../../assets/images/settings-icons/reset_password_icon.png')}
+                            style={styles.resetPasswordIcon}
+                        />
+                    </View>
                     <Text style={styles.screenTitle}>Password reset</Text>
                     <Text style={styles.instructionText}>
                         Your new password must be at least 8 characters long and match the confirmation.
@@ -156,9 +163,9 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     headerTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 20,
+        fontWeight: 400,
+        color: '#080808',
     },
     keyboardView: {
         flex: 1,
@@ -168,15 +175,26 @@ const styles = StyleSheet.create({
         paddingTop: 30,
         paddingBottom: 40,
     },
+    imageContainer: {
+        alignItems: 'center',
+        marginTop: 20,
+        marginBottom: 20,
+    },
+    resetPasswordIcon: {
+        width: 150,
+        height: 108,
+        marginBottom: 20,
+    },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 'bold',
-        color: '#000',
+        fontWeight: 600,
+        color: '#080808',
         marginBottom: 10,
     },
     instructionText: {
         fontSize: 14,
-        color: '#666',
+        fontWeight: 400,
+        color: '#393939',
         lineHeight: 20,
         marginBottom: 30,
     },
@@ -185,23 +203,23 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#000',
+        fontWeight: 400,
+        color: '#080808',
         marginBottom: 8,
     },
     input: {
         height: 50,
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: '#F0F0F0',
-        borderRadius: 8,
+        borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 16,
-        color: '#000',
-        backgroundColor: '#F9F9F9',
+        color: '#080808',
+        backgroundColor: '#EDEDED',
     },
     inputFocused: {
-        borderColor: '#000',
-        backgroundColor: '#fff',
+        borderColor: '#6B6B6B',
+        backgroundColor: '#F0F0F0',
     },
     footer: {
         padding: 20,
@@ -210,21 +228,22 @@ const styles = StyleSheet.create({
     },
     updateButton: {
         height: 50,
-        backgroundColor: '#000',
+        backgroundColor: '#080808',
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
     },
     updateButtonDisabled: {
-        backgroundColor: '#F0F0F0', // Grey background
+        backgroundColor: '#CECECE', // Grey background
     },
     updateButtonText: {
         fontSize: 16,
-        fontWeight: 'bold',
-        color: '#fff',
+        fontWeight: 600,
+        color: '#FFFFFF',
     },
     updateButtonTextDisabled: {
-        color: '#999', // Grey text
+        color: '#979797', 
+        fontWeight: 600,
     },
 });
 

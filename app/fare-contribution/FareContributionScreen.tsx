@@ -19,6 +19,7 @@ import RewardsModal from './RewardsModal';
 import ModeOfTransportSelect from '../../components/ModeOfTransportSelect';
 import LocationInputs from '../../components/LocationInputs';
 import { useRouter } from "expo-router";
+import { getCachedLocation } from '@/services/locationService';
 
 const { height } = Dimensions.get('window');
 
@@ -66,6 +67,16 @@ function FareContributionScreen() {
     // Form state
     const [fromLocation, setFromLocation] = useState('');
     const [toLocation, setToLocation] = useState('');
+
+    useEffect(() => {
+        const loadInitialLocation = async () => {
+            const cached = await getCachedLocation();
+            if (cached && cached.address) {
+                setFromLocation(cached.address);
+            }
+        };
+        loadInitialLocation();
+    }, []);
     const [fareAmount, setFareAmount] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [selectedTimeLabel, setSelectedTimeLabel] = useState('');

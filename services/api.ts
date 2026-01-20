@@ -40,6 +40,42 @@ export const removeToken = async () => {
     }
 };
 
+// User Data Caching Helpers
+export interface UserData {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    username?: string;
+    profilePhoto?: string;
+}
+
+export const setUserData = async (userData: UserData) => {
+    try {
+        await AsyncStorage.setItem('auth_user_data', JSON.stringify(userData));
+    } catch (error) {
+        console.error('Error saving user data:', error);
+    }
+};
+
+export const getUserData = async (): Promise<UserData | null> => {
+    try {
+        const data = await AsyncStorage.getItem('auth_user_data');
+        return data ? JSON.parse(data) : null;
+    } catch (error) {
+        console.error('Error getting user data:', error);
+        return null;
+    }
+};
+
+export const removeUserData = async () => {
+    try {
+        await AsyncStorage.removeItem('auth_user_data');
+    } catch (error) {
+        console.error('Error removing user data:', error);
+    }
+};
+
 // Request Interceptor
 api.interceptors.request.use(
     async (config) => {

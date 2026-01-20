@@ -16,6 +16,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import ModeOfTransportSelect from '@/components/ModeOfTransportSelect';
 import LocationInputs from '@/components/LocationInputs';
 import LocationList from '@/components/LocationList';
+import { getCachedLocation } from '@/services/locationService';
 
 import api from '@/services/api';
 
@@ -31,6 +32,21 @@ export default function RouteSelect() {
     // Inputs
     const [fromLocation, setFromLocation] = useState('');
     const [toLocation, setToLocation] = useState('');
+
+    useEffect(() => {
+        const loadInitialLocation = async () => {
+            const cached = await getCachedLocation();
+            if (cached && cached.address) {
+                setFromLocation(cached.address);
+                // Create a dummy recommendation to enable the "To" field
+                setFromResult({
+                    name: cached.address,
+                    place_id: 'cached-current-location'
+                });
+            }
+        };
+        loadInitialLocation();
+    }, []);
     const [fromFocused, setFromFocused] = useState(false);
     const [toFocused, setToFocused] = useState(false);
 

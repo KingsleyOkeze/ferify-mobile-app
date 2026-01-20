@@ -9,6 +9,7 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Image,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -75,6 +76,12 @@ function UpdateUserEmailScreen() {
                 style={styles.content}
             >
                 <ScrollView contentContainerStyle={styles.formContainer}>
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={require('../../assets/images/settings-icons/email_icon.png')}
+                            style={styles.emailIcon}
+                        />
+                    </View>
                     <Text style={styles.screenTitle}>Update your email</Text>
                     <Text style={styles.descriptionText}>
                         Changing your email address will require you to verify the new one before it becomes active.
@@ -172,21 +179,35 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 30,
         paddingBottom: 40,
+        alignItems: 'center',
+    },
+    imageContainer: {
+        marginBottom: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    emailIcon: {
+        width: 104.22,
+        height: 100,
+        resizeMode: 'contain',
     },
     screenTitle: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#000',
         marginBottom: 10,
+        textAlign: 'center',
     },
     descriptionText: {
         fontSize: 14,
         color: '#666',
         lineHeight: 20,
         marginBottom: 30,
+        textAlign: 'center',
     },
     infoGroup: {
         marginBottom: 30,
+        width: '100%',
     },
     label: {
         fontSize: 14,
@@ -201,6 +222,7 @@ const styles = StyleSheet.create({
     },
     inputGroup: {
         marginBottom: 20,
+        width: '100%',
     },
     inputWrapper: {
         position: 'relative',

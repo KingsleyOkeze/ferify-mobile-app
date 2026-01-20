@@ -8,6 +8,7 @@ import {
     ScrollView,
     Modal,
     Pressable,
+    Image
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -36,7 +37,7 @@ export default function DeleteAccountScreen() {
                 <View style={styles.titleSection}>
                     <Text style={styles.title}>Delete account</Text>
                     <Text style={styles.subtitle}>
-                        Deleting your account is permanent and cannot be undone. All your data will be removed.
+                        We're sorry to see you go 😢 Deleting your Ferify account will permanently remove your profile activity.
                     </Text>
                 </View>
 
@@ -53,8 +54,8 @@ export default function DeleteAccountScreen() {
                                     styles.itemBorderBottom
                                 ]}
                             >
-                                <View style={styles.radioButton}>
-                                    <View style={styles.radioButtonInner} />
+                                <View style={[styles.radioButton, { backgroundColor: '#080808' }]}>
+                                    <Ionicons name="checkmark" size={14} color="#FFFFFF" />
                                 </View>
                                 <Text style={styles.listItemText}>{item}</Text>
                             </View>
@@ -67,7 +68,7 @@ export default function DeleteAccountScreen() {
                     <Text style={styles.whatStaysTitle}>What stays</Text>
                     <View style={styles.whatStaysContent}>
                         <Text style={styles.whatStaysDescription}>
-                            Public contributions that don't reveal your identity, like fare reports and route suggestions, may remain visible but will be anonymized.
+                            Annoymous, aggregated route data may still be used to improve transport estimates for others.
                         </Text>
                     </View>
                 </View>
@@ -96,21 +97,16 @@ export default function DeleteAccountScreen() {
                         <View style={styles.modalHandle} />
 
                         <View style={styles.modalIconContainer}>
-                            <Ionicons name="trash-outline" size={40} color="#FF3B30" />
+                            <Image source={require('@/assets/images/account-and-personal-icons/delete_account_icon.png')} style={styles.deleteIcon} />
                         </View>
+
+                        <Text style={styles.modalTitle}>Delete account?</Text>
 
                         <Text style={styles.modalDescription}>
                             Are you sure you want to delete your account? This action is permanent and cannot be reversed.
                         </Text>
 
                         <View style={styles.modalButtonRow}>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelModalButton]}
-                                onPress={() => setIsModalVisible(false)}
-                            >
-                                <Text style={styles.cancelModalButtonText}>Don't delete</Text>
-                            </TouchableOpacity>
-
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.confirmDeleteButton]}
                                 onPress={() => {
@@ -120,6 +116,12 @@ export default function DeleteAccountScreen() {
                                 }}
                             >
                                 <Text style={styles.confirmDeleteButtonText}>Delete account</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[styles.modalButton, styles.cancelModalButton]}
+                                onPress={() => setIsModalVisible(false)}
+                            >
+                                <Text style={styles.cancelModalButtonText}>Don't delete</Text>
                             </TouchableOpacity>
                         </View>
                     </Pressable>
@@ -132,7 +134,7 @@ export default function DeleteAccountScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 16,
@@ -146,7 +148,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     scrollContent: {
-        paddingHorizontal: 24,
         paddingTop: 8,
         paddingBottom: 40,
     },
@@ -158,11 +159,13 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         color: '#080808',
         marginBottom: 12,
+        paddingHorizontal: 24,
     },
     subtitle: {
         fontSize: 16,
-        color: '#757575',
+        color: '#393939',
         lineHeight: 24,
+        paddingHorizontal: 24,
     },
     listSection: {
         marginBottom: 32,
@@ -172,6 +175,7 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#080808',
         marginBottom: 20,
+        paddingHorizontal: 24,
     },
     listContainer: {
         width: '100%',
@@ -179,31 +183,26 @@ const styles = StyleSheet.create({
     listItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 18,
+        height: 61,
+        backgroundColor: '#FFFFFF',
+        paddingHorizontal: 24,
     },
     firstListItem: {
         borderTopWidth: 1.5,
-        borderTopColor: '#F2F2F2',
+        borderTopColor: '#DADADA',
     },
     itemBorderBottom: {
         borderBottomWidth: 1.5,
-        borderBottomColor: '#F2F2F2',
+        borderBottomColor: '#DADADA',
     },
     radioButton: {
         width: 22,
         height: 22,
         borderRadius: 11,
-        borderWidth: 2,
-        borderColor: '#080808',
+        backgroundColor: '#080808',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
-    },
-    radioButtonInner: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        backgroundColor: '#080808',
     },
     listItemText: {
         fontSize: 16,
@@ -220,44 +219,51 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         color: '#080808',
         marginBottom: 16,
+        paddingHorizontal: 24,
     },
     whatStaysContent: {
         borderTopWidth: 1.5,
         borderBottomWidth: 1.5,
-        borderColor: '#F2F2F2',
+        borderColor: '#DADADA',
+        backgroundColor: '#FFFFFF',
+        height: 82,
         paddingVertical: 20,
+        paddingHorizontal: 24,
     },
     whatStaysDescription: {
         fontSize: 14,
-        color: '#757575',
+        color: '#080808',
+        fontWeight: 400,
         lineHeight: 22,
     },
     deleteButton: {
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#FF3B30',
         height: 56,
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 20,
+        marginHorizontal: 24,
     },
     deleteButtonText: {
-        color: '#FF3B30',
+        color: '#FBFBFB',
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: 600,
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 32,
-        borderTopRightRadius: 32,
+        backgroundColor: '#FBFBFB',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
         paddingHorizontal: 24,
         paddingTop: 12,
         paddingBottom: 40,
         alignItems: 'center',
+        height: 347
     },
     modalHandle: {
         width: 40,
@@ -275,9 +281,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 24,
     },
+    deleteIcon: {
+        width: 85.49,
+        height: 64,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 600,
+        color: '#080808',
+        marginBottom: 12,
+    },
     modalDescription: {
-        fontSize: 16,
-        color: '#757575',
+        fontSize: 14,
+        color: '#080808',
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 32,
@@ -294,21 +310,24 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
+        // marginBottom: 20
     },
     cancelModalButton: {
-        backgroundColor: '#F2F2F2',
+        backgroundColor: '#F0F0F0',
+        height: 50
     },
     confirmDeleteButton: {
-        backgroundColor: '#080808',
+        backgroundColor: '#EF4444',
+        height: 50
     },
     cancelModalButtonText: {
-        color: '#080808',
+        color: '#212121',
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: 600,
     },
     confirmDeleteButtonText: {
-        color: '#FFFFFF',
+        color: '#FBFBFB',
         fontSize: 16,
-        fontWeight: '700',
+        fontWeight: 600,
     },
 });

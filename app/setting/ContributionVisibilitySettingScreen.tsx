@@ -69,21 +69,18 @@ function ContributionVisibilitySettingScreen() {
     const visibilityOptions = [
         {
             id: 'everyone',
-            title: 'Everyone',
-            description: 'Visible to all commuters',
-            icon: 'globe-outline',
+            title: 'Show my name',
+            description: 'Chiamaka @amakaoddy',
         },
         {
             id: 'community',
-            title: 'Community',
-            description: 'Visible to verified users',
-            icon: 'people-outline',
+            title: 'Show badge only',
+            description: 'Trusted contributor',
         },
         {
             id: 'private',
-            title: 'Private',
-            description: 'Only visible to you',
-            icon: 'lock-closed-outline',
+            title: 'Show anonymously',
+            description: 'Private contributor',
         },
     ];
 
@@ -112,7 +109,6 @@ function ContributionVisibilitySettingScreen() {
                                 onPress={() => updateVisibility(option.id)}
                             >
                                 <View style={styles.itemLeft}>
-                                    <Ionicons name={option.icon as any} size={24} color="#333" style={styles.itemIcon} />
                                     <View style={styles.textContainer}>
                                         <Text style={styles.itemTitle}>{option.title}</Text>
                                         <Text style={styles.itemDescription}>{option.description}</Text>
@@ -144,7 +140,7 @@ function ContributionVisibilitySettingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 20,
@@ -157,9 +153,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     headerTitle: {
-        fontSize: 28, // Matches other screens
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 24, 
+        fontWeight: 600,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,
@@ -171,15 +167,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
+        height: 87,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        // backgroundColor: '#fff',
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
     },
     firstListItem: {
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        borderTopColor: '#DADADA',
     },
     itemLeft: {
         flexDirection: 'row',
@@ -223,8 +219,9 @@ const styles = StyleSheet.create({
     },
     footerText: {
         textAlign: 'right',
-        fontSize: 13,
-        color: '#666',
+        fontSize: 12,
+        fontWeight: 400,
+        color: '#393939',
         lineHeight: 18,
     },
 });

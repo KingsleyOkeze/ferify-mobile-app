@@ -37,7 +37,7 @@ export default function SignUpScreen() {
     // Form State
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [focusedField, setFocusedField] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
     // Validation State
@@ -81,8 +81,7 @@ export default function SignUpScreen() {
 
     const isFormValid =
         isEmailValid &&
-        password.length >= 6 &&
-        password === confirmPassword;
+        password.length >= 6;
 
     const handleCreateAccount = async () => {
         if (!isFormValid) return;
@@ -135,11 +134,6 @@ export default function SignUpScreen() {
                         </View>
                     </View>
 
-                    {/* Logo */}
-                    <View style={styles.logoContainer}>
-                        <Image source={LOGO} style={styles.logo} resizeMode="contain" />
-                    </View>
-
                     {/* Welcome Text */}
                     <View style={styles.textContainer}>
                         <Text style={styles.title}>Welcome to Ferify</Text>
@@ -153,13 +147,18 @@ export default function SignUpScreen() {
                         {/* Email */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.label}>Your email address</Text>
-                            <View style={styles.inputWrapper}>
+                            <View style={[
+                                styles.inputWrapper,
+                                focusedField === 'email' && { borderColor: '#080808' }
+                            ]}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="example@gmail.com"
-                                    placeholderTextColor="#9a9a9a"
+                                    placeholder="Enter email here"
+                                    placeholderTextColor="#757575"
                                     value={email}
                                     onChangeText={setEmail}
+                                    onFocus={() => setFocusedField('email')}
+                                    onBlur={() => setFocusedField(null)}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
                                     editable={!isLoading}
@@ -170,13 +169,19 @@ export default function SignUpScreen() {
                         {/* Password */}
                         <View style={styles.inputGroup}>
                             <Text style={styles.label}>Password</Text>
-                            <View style={styles.inputWrapper}>
+                            <View style={[
+                                styles.inputWrapper,
+                                focusedField === 'password' && { borderColor: '#080808' },
+                                (password.length > 0 && password.length < 6) && { borderColor: '#EF4444' }
+                            ]}>
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Min. 6 characters"
-                                    placeholderTextColor="#9a9a9a"
+                                    placeholderTextColor="#757575"
                                     value={password}
                                     onChangeText={setPassword}
+                                    onFocus={() => setFocusedField('password')}
+                                    onBlur={() => setFocusedField(null)}
                                     secureTextEntry={!showPassword}
                                     editable={!isLoading}
                                 />
@@ -189,28 +194,10 @@ export default function SignUpScreen() {
                                     />
                                 </TouchableOpacity>
                             </View>
-                        </View>
-
-                        {/* Confirm Password */}
-                        <View style={styles.inputGroup}>
-                            <Text style={styles.label}>Confirm Password</Text>
-                            <View style={styles.inputWrapper}>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="Re-enter password"
-                                    placeholderTextColor="#9a9a9a"
-                                    value={confirmPassword}
-                                    onChangeText={setConfirmPassword}
-                                    secureTextEntry={!showPassword}
-                                    editable={!isLoading}
-                                />
-                            </View>
-                            {confirmPassword.length > 0 && password !== confirmPassword && (
-                                <Text style={styles.errorText}>Passwords do not match</Text>
+                            {password.length > 0 && password.length < 6 && (
+                                <Text style={styles.errorText}>Password must be at least 6 characters</Text>
                             )}
                         </View>
-
-
                         {/* Continue Button */}
                         <TouchableOpacity
                             style={[
@@ -240,7 +227,7 @@ export default function SignUpScreen() {
                             onPress={() => promptAsync()}
                             disabled={!request}
                         >
-                            <Ionicons name="logo-google" size={20} color="#EA4335" style={{ marginRight: 10 }} />
+                            <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
                             <Text style={styles.googleButtonText}>Sign up with Google</Text>
                         </TouchableOpacity>
 
@@ -270,7 +257,7 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: '#FBFBFB',
     },
     scrollContent: {
         flexGrow: 1,
@@ -288,6 +275,11 @@ const styles = StyleSheet.create({
     stepContainer: {
         marginBottom: 24,
         alignItems: 'flex-start',
+        width: 96,
+        height: 33,
+        borderRadius: 50,
+        borderWidth: 1,
+        borderColor: '#DADADA',
     },
     stepBadge: {
         paddingHorizontal: 12,
@@ -295,23 +287,18 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#E0E0E0',
-        backgroundColor: '#F9F9F9',
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     stepText: {
         fontSize: 12,
-        fontWeight: '600',
+        fontFamily: 'Britti Sans',
+        fontWeight: 400,
         color: '#080808',
     },
-    logoContainer: {
-        alignItems: "center",
-        marginBottom: 24,
-    },
-    logo: {
-        width: 80,
-        height: 80,
-    },
     textContainer: {
-        alignItems: "center",
         marginBottom: 32,
     },
     title: {
@@ -319,11 +306,13 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#080808",
         marginBottom: 8,
+        alignSelf: "flex-start",
+        fontFamily: 'Britti Sans'
     },
     subtitle: {
-        fontSize: 16,
-        color: "#666",
-        textAlign: "center",
+        fontSize: 14,
+        fontWeight: 400,
+        color: "#393939",
         lineHeight: 22,
     },
     formContainer: {
@@ -333,8 +322,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     label: {
-        fontSize: 14,
-        fontWeight: "500",
+        fontSize: 16,
+        fontWeight: 400,
         color: "#080808",
         marginBottom: 8,
         marginLeft: 4,
@@ -342,8 +331,8 @@ const styles = StyleSheet.create({
     inputWrapper: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#F5F7F9",
-        borderRadius: 12,
+        backgroundColor: "#F0F0F0",
+        borderRadius: 100,
         paddingHorizontal: 16,
         height: 56,
         borderWidth: 1,
@@ -355,21 +344,21 @@ const styles = StyleSheet.create({
         color: "#080808",
     },
     errorText: {
-        color: "#FF3B30",
+        color: "#EF4444",
         fontSize: 12,
         marginTop: 4,
         textAlign: "right",
     },
     createButton: {
         backgroundColor: "#080808",
-        height: 56,
-        borderRadius: 12,
+        height: 50,
+        borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
         marginTop: 10,
     },
     disabledButton: {
-        backgroundColor: "#E0E0E0",
+        backgroundColor: "#CECECE",
     },
     createButtonText: {
         color: "#fff",
@@ -384,38 +373,43 @@ const styles = StyleSheet.create({
     separatorLine: {
         flex: 1,
         height: 1,
-        backgroundColor: "#E0E0E0",
+        borderWidth: 1,
+        borderColor: "#F0F0F0",
     },
     separatorText: {
         marginHorizontal: 16,
-        color: "#9a9a9a",
+        color: "#757575",
         fontSize: 14,
     },
     googleButton: {
         flexDirection: "row",
         backgroundColor: "#F5F7F9",
-        height: 56,
-        borderRadius: 12,
+        height: 50,
+        borderRadius: 50,
         justifyContent: "center",
         alignItems: "center",
-        borderWidth: 1,
-        borderColor: "#E0E0E0",
+    },
+    googleLogo: {
+        marginRight: 10,
+        height: 18,
+        width: 18
     },
     googleButtonText: {
         color: "#080808",
         fontSize: 16,
-        fontWeight: "500",
+        fontWeight: 400,
     },
     termsText: {
-        fontSize: 13,
-        color: "#9a9a9a",
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#6B6B6B",
         textAlign: "center",
         marginTop: 24,
         lineHeight: 18,
     },
     termsHighlight: {
         color: "#080808",
-        fontWeight: "500",
+        fontWeight: 600,
     },
     footerLink: {
         marginTop: 32,
@@ -424,10 +418,11 @@ const styles = StyleSheet.create({
     },
     footerText: {
         fontSize: 15,
-        color: "#666",
+        color: "#393939",
     },
     footerHighlight: {
         color: "#080808",
-        fontWeight: "700",
+        fontWeight: 400,
+        textDecorationLine: "underline",
     },
 });
