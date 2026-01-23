@@ -12,10 +12,13 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import { logout } from '@/services/api';
+import { Alert } from 'react-native';
 
 function SettingMainScreen() {
     const router = useRouter();
     const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const settingsItems = [
         {
@@ -33,7 +36,7 @@ function SettingMainScreen() {
             description: 'Manage your notification preferences',
             image: require('../../assets/images/settings-icons/notification_icon.png'),
             onPress: () => {
-                router.push('./NotificationSettingScreen')
+                router.push('/setting/NotificationSettingScreen')
             }
         },
         {
@@ -42,7 +45,7 @@ function SettingMainScreen() {
             description: 'Control who sees what',
             image: require('../../assets/images/settings-icons/privacy_and_setting_icon.png'),
             onPress: () => {
-                router.push('./Privacy&SafetySettingScreen')
+                router.push('/setting/Privacy&SafetySettingScreen')
             }
         },
 
@@ -56,10 +59,18 @@ function SettingMainScreen() {
         },
     ];
 
-    const handleLogout = () => {
-        setIsLogoutModalVisible(false);
-        // Add actual logout logic here (e.g., clear tokens)
-        router.replace('/auth/login/LoginScreen');
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout();
+            setIsLogoutModalVisible(false);
+            router.replace('/auth/login/LoginScreen');
+        } catch (error) {
+            console.error('Logout failed:', error);
+            Alert.alert('Logout Error', 'There was a problem signing you out. Please try again.');
+        } finally {
+            setIsLoggingOut(false);
+        }
     };
 
     return (
@@ -124,10 +135,13 @@ function SettingMainScreen() {
 
                         <View style={styles.modalButtonRow}>
                             <TouchableOpacity
-                                style={[styles.modalButton, styles.confirmLogoutButton]}
+                                style={[styles.modalButton, styles.confirmLogoutButton, isLoggingOut && { opacity: 0.7 }]}
                                 onPress={handleLogout}
+                                disabled={isLoggingOut}
                             >
-                                <Text style={styles.confirmLogoutButtonText}>Yes I do</Text>
+                                <Text style={styles.confirmLogoutButtonText}>
+                                    {isLoggingOut ? 'Logging out...' : 'Yes I do'}
+                                </Text>
                             </TouchableOpacity>
 
                             <TouchableOpacity

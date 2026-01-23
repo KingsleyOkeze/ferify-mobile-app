@@ -16,6 +16,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '@/services/api';
 
 function VerifyForgotPasswordOtpScreen() {
+    // const ref = useRef();
     const router = useRouter();
     const { email } = useLocalSearchParams<{ email: string }>();
 
@@ -66,7 +67,7 @@ function VerifyForgotPasswordOtpScreen() {
                 // Navigate to a final reset screen (can reuse PasswordResetScreen logic if it handles token)
                 // For cleanlyness, we'll use a specific screen or pass special params
                 router.push({
-                    pathname: '/auth/CompleteForgotPasswordScreen',
+                    pathname: './CompleteForgotPasswordScreen',
                     params: { token, email }
                 });
             }

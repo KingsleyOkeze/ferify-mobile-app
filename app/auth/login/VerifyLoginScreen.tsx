@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api, { setToken, setUserData } from '@/services/api';
+import api, { setToken, setUserData, setRefreshToken } from '@/services/api';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 
 export default function VerifyLoginScreen() {
@@ -80,6 +80,9 @@ export default function VerifyLoginScreen() {
             if (response.data.accessToken) {
                 await setToken(response.data.accessToken);
             }
+            if (response.data.refreshToken) {
+                await setRefreshToken(response.data.refreshToken);
+            }
 
             // Save User Data
             if (response.data.user) {
@@ -87,7 +90,7 @@ export default function VerifyLoginScreen() {
             }
 
             // On success, redirect to home
-            router.replace('/tabs/HomeScreen');
+            router.replace('/(tabs)/HomeScreen');
         } catch (error: any) {
             console.error('Verify Login error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');

@@ -26,9 +26,9 @@ import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
 WebBrowser.maybeCompleteAuthSession();
 
 // Placeholder Client IDs - REPLACE THESE WITH YOUR ACTUAL GOOGLE CLOUD CONSOLE IDS
-const ANDROID_CLIENT_ID = "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com";
-const IOS_CLIENT_ID = "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com";
-const WEB_CLIENT_ID = "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com";
+const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -61,7 +61,7 @@ export default function SignUpScreen() {
                         console.log("Google Signup Backend Success:", res.data);
                         if (res.data.accessToken) {
                             await setToken(res.data.accessToken);
-                            router.replace('/tabs/HomeScreen');
+                            router.replace('/(tabs)/HomeScreen');
                         }
                     })
                     .catch((error) => {
@@ -81,7 +81,7 @@ export default function SignUpScreen() {
 
     const isFormValid =
         isEmailValid &&
-        password.length >= 6;
+        password.length >= 8;
 
     const handleCreateAccount = async () => {
         if (!isFormValid) return;
@@ -103,6 +103,7 @@ export default function SignUpScreen() {
             });
 
         } catch (error: any) {
+            console.error('error sigining up', error)
             console.error("Signup Error:", error.response?.data || error.message);
             Alert.alert("Signup Failed", error.response?.data?.error || "An error occurred. Please try again.");
         } finally {
@@ -172,11 +173,11 @@ export default function SignUpScreen() {
                             <View style={[
                                 styles.inputWrapper,
                                 focusedField === 'password' && { borderColor: '#080808' },
-                                (password.length > 0 && password.length < 6) && { borderColor: '#EF4444' }
+                                (password.length > 0 && password.length < 8) && { borderColor: '#EF4444' }
                             ]}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Min. 6 characters"
+                                    placeholder="Min. 8 characters"
                                     placeholderTextColor="#757575"
                                     value={password}
                                     onChangeText={setPassword}
@@ -194,8 +195,8 @@ export default function SignUpScreen() {
                                     />
                                 </TouchableOpacity>
                             </View>
-                            {password.length > 0 && password.length < 6 && (
-                                <Text style={styles.errorText}>Password must be at least 6 characters</Text>
+                            {password.length > 0 && password.length < 8 && (
+                                <Text style={styles.errorText}>Password must be at least 8 characters</Text>
                             )}
                         </View>
                         {/* Continue Button */}
@@ -341,6 +342,8 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: 16,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: "#080808",
     },
     errorText: {

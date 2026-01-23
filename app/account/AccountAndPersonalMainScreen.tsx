@@ -20,28 +20,28 @@ function AccountAndPersonalMainScreen() {
             title: 'Account details',
             description: 'Update name, email, phone',
             image: require('../../assets/images/account-and-personal-icons/account_details_icon.png'),
-            onPress: () => { router.push('./AccountDetailsScreen') },
+            onPress: () => { router.push('/account/AccountDetailsScreen') },
         },
         {
             id: 'transport',
             title: 'Transport preference',
             description: 'Manage saved routes and modes',
             image: require('../../assets/images/account-and-personal-icons/transport_preferences_icon.png'),
-            onPress: () => { router.push('./TransportPreferenceScreen') },
+            onPress: () => { router.push('/account/TransportPreferenceScreen') },
         },
         {
             id: 'privacy',
             title: 'Data & privacy',
             description: 'Control data usage and visibility',
             image: require('../../assets/images/account-and-personal-icons/data_and_privacy_icon.png'),
-            onPress: () => { router.push('./DataAndPrivacyScreen') },
+            onPress: () => { router.push('/account/DataAndPrivacyScreen') },
         },
         {
             id: 'security',
             title: 'Security',
             description: 'Password and authentication',
             image: require('../../assets/images/account-and-personal-icons/account_security_icon.png'),
-            onPress: () => { router.push('./AccountSecurityScreen') },
+            onPress: () => { router.push('/account/AccountSecurityScreen') },
         },
     ];
 

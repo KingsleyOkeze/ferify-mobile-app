@@ -111,7 +111,7 @@ function HomeScreen() {
     const handleSearchPress = () => {
         // Navigate to RouteSelect modal, passing the selected mode if any
         router.push({
-            pathname: "/route/RouteSelect",
+            pathname: "/route/RouteSelectScreen",
             params: selectedMode ? { mode: selectedMode } : {}
         });
     };
@@ -322,14 +322,13 @@ const styles = StyleSheet.create({
         paddingVertical: 6,
         alignSelf: "flex-start",
         height: 37,
-        width: 92
+        width: 92,
+        justifyContent: 'center',    
+        alignItems: 'center'
     },
     shareButtonText: {
         color: "#080808",
         fontWeight: 600,
-        alignSelf: 'center',
-        alignItems: 'center',
-        justifyContent: 'center'
     },
     cardImage: {
         width: 88.71,

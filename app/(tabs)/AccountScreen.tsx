@@ -19,7 +19,7 @@ function MainAccountProfileScreen() {
             id: 'community',
             title: 'Community & Contributions',
             icon: 'people-outline',
-            onPress: () => { router.push('../contribution/MyContributionOverviewScreen') },
+            onPress: () => { router.push('/contribution/MyContributionOverviewScreen') },
         },
         {
             id: 'account',
@@ -31,7 +31,7 @@ function MainAccountProfileScreen() {
             id: 'settings',
             title: 'Settings',
             icon: 'settings-outline',
-            onPress: () => { router.push('../setting/SettingMainScreen') },
+            onPress: () => { router.push('/setting/SettingMainScreen') },
         },
         {
             id: 'help',
@@ -69,7 +69,7 @@ function MainAccountProfileScreen() {
 
                     <TouchableOpacity
                         style={styles.viewProfileButton}
-                        onPress={() => router.push('../account/ProfileLandingScreen')}
+                        onPress={() => router.push('/account/ProfileLandingScreen')}
                     >
                         <Text style={styles.viewProfileText}>View Profile</Text>
                     </TouchableOpacity>

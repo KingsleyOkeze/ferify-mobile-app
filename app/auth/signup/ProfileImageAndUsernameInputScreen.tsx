@@ -78,7 +78,7 @@ export default function ProfileImageAndUsernameInputScreen() {
             }
 
             // 4. Move to Home
-            router.replace('/tabs/HomeScreen');
+            router.replace('/(tabs)/HomeScreen');
 
         } catch (error: any) {
             console.error("Profile Setup Error:", error.response?.data || error.message);

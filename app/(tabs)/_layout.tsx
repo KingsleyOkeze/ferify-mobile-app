@@ -1,4 +1,3 @@
-// (tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
 import {Ionicons, MaterialIcons, Feather, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
@@ -25,7 +24,7 @@ function TabsLayout() {
                     name="HomeScreen"
                     options={{
                         tabBarIcon: ({ color }) => (
-                            <Ionicons name="home" size={24} color={color} />
+                            <MaterialIcons name="home" size={24} color={color} />
                         ),
                         tabBarLabel: 'Home',
                     }}
@@ -35,26 +34,17 @@ function TabsLayout() {
                     options={{
                         tabBarIcon: ({ color }) => (
                             <View>
-                                <Ionicons name="compass-outline" size={24} color={color} />
+                                <MaterialIcons name="explore" size={24} color={color} />
                             </View>
                         ),
                         tabBarLabel: 'Discover',
                     }}
                 />
                 <Tabs.Screen
-                    name="SavedScreen"
-                    options={{
-                        tabBarIcon: ({ color }) => (
-                            <Ionicons name="heart-outline" size={24} color={color} />
-                        ),
-                        tabBarLabel: 'Saved',
-                    }}
-                />
-                <Tabs.Screen
                     name="AccountScreen"
                     options={{
                         tabBarIcon: ({ color }) => (
-                            <Ionicons name="person-outline" size={24} color={color} />
+                            <MaterialIcons name="account-circle" size={24} color={color} />
                         ),
                         tabBarLabel: 'Account',
                     }}

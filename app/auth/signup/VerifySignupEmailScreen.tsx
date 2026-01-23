@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api, { setToken } from '@/services/api';
+import api, { setToken, setRefreshToken } from '@/services/api';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 
 
@@ -22,7 +22,13 @@ export default function VerifySignupEmailScreen() {
     const email = params.email as string || "your email";
 
     const [otp, setOtp] = useState(['', '', '', '']);
-    const [timer, setTimer] = useState(30);
+
+    // If 'autoSend' is in the URL, start at 0 so handleResend can fire.
+    // Otherwise, start at 30 because the email was already sent during signup.
+    const [timer, setTimer] = useState(params.autoSend === 'true' ? 0 : 30);
+    
+    const hasAttemptedSend = useRef(false);
+
     const [isLoading, setIsLoading] = useState(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -36,6 +42,23 @@ export default function VerifySignupEmailScreen() {
         }
         return () => clearInterval(interval);
     }, [timer]);
+
+    useEffect(() => {
+        // Only run if we have an email AND we haven't tried yet
+        if (params.email && !hasAttemptedSend.current) {
+            
+            // If the timer is 0, it means we came from the Login flow
+            if (timer === 0) {
+                console.log("Auto-sending OTP for Login flow...");
+                handleResend();
+            } else {
+                console.log("Email already sent via Signup, starting countdown.");
+            }
+
+            // Mark as attempted so this NEVER runs again for this mount
+            hasAttemptedSend.current = true;
+        }
+    }, [params.email]);
 
     const handleOtpPress = (digit: string) => {
         if (activeIndex > 3 || isLoading) return;
@@ -80,13 +103,11 @@ export default function VerifySignupEmailScreen() {
             // 2. Login User (Backend returns tokens)
             if (verifyResponse.data.accessToken) {
                 await setToken(verifyResponse.data.accessToken);
+                if (verifyResponse.data.refreshToken) {
+                    await setRefreshToken(verifyResponse.data.refreshToken);
+                }
                 // 3. Navigate to Profile Setup
                 router.replace('/auth/signup/FullNameInputScreen');
-            } else {
-                // Fallback if no token (shouldn't happen with new flow)
-                Alert.alert('Success', 'Email verified successfully!', [
-                    { text: 'Continue', onPress: () => router.replace('/auth/signup/ProfileSetupScreen') }
-                ]);
             }
 
         } catch (error: any) {

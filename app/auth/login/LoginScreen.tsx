@@ -21,8 +21,9 @@ import * as Google from 'expo-auth-session/providers/google';
 
 WebBrowser.maybeCompleteAuthSession();
 
-// Logo
-import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
+const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -45,9 +46,14 @@ export default function LoginScreen() {
 
     // Google Auth Request
     const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: "YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com",
-        iosClientId: "YOUR_IOS_CLIENT_ID.apps.googleusercontent.com",
-        webClientId: "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com",
+        androidClientId: ANDROID_CLIENT_ID,
+        iosClientId: IOS_CLIENT_ID,
+        webClientId: WEB_CLIENT_ID,
+        scopes: ['openid', 'profile', 'email', 'offline_access'], 
+        extraParams: {
+            access_type: 'offline', // This is the Google-specific way to request a refresh token
+            prompt: 'consent',     // Forces the consent screen to ensure refresh token is sent
+        },
     });
 
     useEffect(() => {
@@ -67,7 +73,7 @@ export default function LoginScreen() {
                                 await setUserData(res.data.user);
                             }
 
-                            router.replace('/tabs/HomeScreen');
+                            router.replace('/(tabs)/HomeScreen');
                         }
                     })
                     .catch((error) => {
@@ -105,8 +111,18 @@ export default function LoginScreen() {
                 params: { email: email.trim() }
             });
         } catch (error: any) {
+            if (error?.response?.status === 403) {
+                // Navigate to Verification
+                router.push({
+                    pathname: "/auth/signup/VerifySignupEmailScreen",
+                    params: { 
+                        email: error.response.data.email.trim(),
+                        autoSend: 'true'
+                    }
+                });
+            }
             console.error("Login initiation error:", error.response?.data || error.message);
-            Alert.alert("Error", error.response?.data?.error || "Failed to start sign in. Please try again.");
+            // Alert.alert("Error", error.response?.data?.error || "Failed to start sign in. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -184,7 +200,7 @@ export default function LoginScreen() {
                             {/* Forgot Password */}
                             <TouchableOpacity
                                 style={styles.forgotPasswordContainer}
-                                onPress={() => router.push("/auth/ForgotPasswordScreen")}
+                                onPress={() => router.push("/auth/forgot-password/ForgotPasswordScreen")}
                             >
                                 <Text style={styles.forgotPasswordText}>Forgot password?</Text>
                             </TouchableOpacity>
