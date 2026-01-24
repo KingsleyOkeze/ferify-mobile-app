@@ -28,6 +28,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="ferifymobileapp"/>
+        <data android:scheme="exp+ferify-mobile-app"/>
       </intent-filter>
     </activity>
   </application>

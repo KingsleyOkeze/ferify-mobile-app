@@ -3,22 +3,24 @@ import {
     View,
     Text,
     StyleSheet,
-    TextInput,
-    TouchableOpacity,
     SafeAreaView,
-    ScrollView,
     Dimensions,
     Keyboard,
     TouchableWithoutFeedback,
     ActivityIndicator,
     Alert,
     Platform,
-    Pressable
+    Pressable,
+    TextInput,
+    TouchableOpacity
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import ModeOfTransportSelect from '@/components/ModeOfTransportSelect';
 import api from '@/services/api';
+
+import LocationInputs from '@/components/LocationInputs';     // ← added
+import LocationList from '@/components/LocationList';         // ← added
 
 const { width } = Dimensions.get('window');
 
@@ -141,7 +143,7 @@ function RouteSelectScreen() {
         <Wrapper style={styles.container}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <View style={styles.content}>
-                    
+
                     {/* Top Gap - Adjust height here, and everything below will move with it */}
                     {isAndroid && (
                         <Pressable style={styles.topGap} onPress={() => router.back()} />
@@ -149,7 +151,7 @@ function RouteSelectScreen() {
 
                     {/* THE CARD GROUP: Everything inside here moves as one unit */}
                     <View style={styles.cardGroup}>
-                        
+
                         {/* The Back Card - Now anchored to the Group, not the Screen */}
                         <View style={styles.backCard} />
 
@@ -167,51 +169,29 @@ function RouteSelectScreen() {
                                 </TouchableOpacity>
                             </View>
 
-                            <View style={styles.inputsSection}>
-                                <View style={styles.locationContainer}>
-                                    <TextInput
-                                        style={[styles.locationInput, fromFocused && styles.locationInputFocused]}
-                                        placeholder="From where"
-                                        placeholderTextColor="#999"
-                                        value={fromLocation}
-                                        onChangeText={(text) => handleSearch(text, 'from')}
-                                        onFocus={() => {
-                                            setFromFocused(true);
-                                            setActiveInput('from');
-                                        }}
-                                        onBlur={() => setFromFocused(false)}
-                                    />
-
-                                    <View style={styles.toInputWrapper}>
-                                        <TextInput
-                                            ref={toInputRef}
-                                            style={[
-                                                styles.locationInput,
-                                                styles.toLocationInput,
-                                                toFocused && styles.locationInputFocused,
-                                                !fromResult && { opacity: 0.5 }
-                                            ]}
-                                            placeholder="To where"
-                                            placeholderTextColor="#999"
-                                            value={toLocation}
-                                            editable={!!fromResult}
-                                            onChangeText={(text) => handleSearch(text, 'to')}
-                                            onFocus={() => {
-                                                if (!fromResult) {
-                                                    Alert.alert("Information", "Please select a starting point first.");
-                                                    return;
-                                                }
-                                                setToFocused(true);
-                                                setActiveInput('to');
-                                            }}
-                                            onBlur={() => setToFocused(false)}
-                                        />
-                                        <View style={[styles.connectorArrow, !fromResult && { backgroundColor: '#999' }]}>
-                                            <Ionicons name="arrow-down" size={18} color="#fff" />
-                                        </View>
-                                    </View>
-                                </View>
-                            </View>
+                            {/* ──────────────────────────────────────────────── */}
+                            {/* Replaced input section with LocationInputs component */}
+                            <LocationInputs
+                                fromLocation={fromLocation}
+                                toLocation={toLocation}
+                                fromFocused={fromFocused}
+                                toFocused={toFocused}
+                                fromResult={!!fromResult}           // boolean
+                                onFromChange={(text) => handleSearch(text, 'from')}
+                                onToChange={(text) => handleSearch(text, 'to')}
+                                onFromFocus={() => {
+                                    setFromFocused(true);
+                                    setActiveInput('from');
+                                }}
+                                onToFocus={() => {
+                                    setToFocused(true);
+                                    setActiveInput('to');
+                                }}
+                                onFromBlur={() => setFromFocused(false)}
+                                onToBlur={() => setToFocused(false)}
+                                toInputRef={toInputRef}
+                            />
+                            {/* ──────────────────────────────────────────────── */}
 
                             {showTransportSelector && (
                                 <View style={styles.modeSection}>
@@ -223,29 +203,21 @@ function RouteSelectScreen() {
                                 </View>
                             )}
 
-                            {isSearching && (
+                            {isSearching && !recommendations.length && (
                                 <View style={{ padding: 20, alignItems: 'center' }}>
                                     <ActivityIndicator size="small" color="#000" />
                                 </View>
                             )}
 
-                            <ScrollView contentContainerStyle={styles.resultsList} showsVerticalScrollIndicator={false}>
-                                {recommendations.map((item) => (
-                                    <TouchableOpacity
-                                        key={item.place_id}
-                                        style={styles.resultCard}
-                                        onPress={() => handleSelectRecommendation(item)}
-                                    >
-                                        <View style={styles.iconContainer}>
-                                            <Ionicons name="location-sharp" size={20} color="#000" />
-                                        </View>
-                                        <View style={styles.resultDetails}>
-                                            <Text style={styles.resultTitle}>{item.name}</Text>
-                                            <Text style={styles.resultAddress}>{item.name}</Text>
-                                        </View>
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
+                            {/* ──────────────────────────────────────────────── */}
+                            {/* Replaced results list with LocationList component */}
+                            <LocationList
+                                isSearching={isSearching}
+                                recommendations={recommendations}
+                                onSelect={handleSelectRecommendation}
+                            />
+                            {/* ──────────────────────────────────────────────── */}
+
                         </View>
                     </View>
                 </View>
@@ -263,7 +235,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     topGap: {
-        height: Platform.OS === 'android' ? 20 : 0, 
+        height: Platform.OS === 'android' ? 20 : 0,
     },
     cardGroup: {
         flex: 1,
@@ -271,14 +243,14 @@ const styles = StyleSheet.create({
     },
     backCard: {
         position: 'absolute',
-        top: -10, // Anchor it relative to the main card's top
+        top: -10,
         left: 16,
         right: 16,
-        height: 40, // Height of the peek
+        height: 40,
         backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
-        zIndex: -1, // Sits behind main content
+        zIndex: -1,
     },
     modalContent: {
         flex: 1,
@@ -309,57 +281,8 @@ const styles = StyleSheet.create({
     headerSpacer: { width: 24 },
     headerTitle: { fontSize: 18, fontWeight: '700', color: '#000' },
     closeButton: { padding: 4 },
-    inputsSection: { paddingHorizontal: 20, marginBottom: 24 },
-    locationContainer: { position: 'relative' },
-    locationInput: {
-        backgroundColor: '#F5F5F5',
-        borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
-        fontSize: 16,
-        color: '#000',
-        marginBottom: 8,
-        borderWidth: 2,
-        borderColor: 'transparent',
-    },
-    locationInputFocused: { borderColor: '#000' },
-    toInputWrapper: { position: 'relative' },
-    toLocationInput: { marginBottom: 0 },
-    connectorArrow: {
-        position: 'absolute',
-        right: 12,
-        top: '-5%',
-        marginTop: -16,
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 3,
-    },
     modeSection: { paddingHorizontal: 20, marginBottom: 24 },
     sectionTitle: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 12 },
-    resultsList: { paddingHorizontal: 20, paddingBottom: 40 },
-    resultCard: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 16,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
-    },
-    iconContainer: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: '#F5F5F5',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginRight: 16,
-    },
-    resultDetails: { flex: 1, marginRight: 12 },
-    resultTitle: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 4 },
-    resultAddress: { fontSize: 14, color: '#666' },
 });
 
 export default RouteSelectScreen;

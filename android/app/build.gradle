@@ -94,6 +94,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0.0"
+
+        externalNativeBuild {
+            cmake {
+                arguments "-DCMAKE_OBJECT_PATH_MAX=1024"
+            }
+        }
     }
     signingConfigs {
         debug {
@@ -120,6 +126,12 @@ android {
     packagingOptions {
         jniLibs {
             useLegacyPackaging (findProperty('expo.useLegacyPackaging')?.toBoolean() ?: false)
+        }
+        // ADD THESE LINES BELOW:
+        resources {
+            pickFirsts += "META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version"
+            pickFirsts += "META-INF/androidx.core_core.version"
+            pickFirsts += "META-INF/androidx.versionedparcelable_versionedparcelable.version"
         }
     }
     androidResources {
@@ -173,5 +185,15 @@ dependencies {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
+    }
+}
+
+
+
+configurations.all {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:2.0.21"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.0.21"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.0.21"
     }
 }
