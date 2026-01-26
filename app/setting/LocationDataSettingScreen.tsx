@@ -153,9 +153,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: 'bold',
-        color: '#000',
+        fontSize: 24,
+        fontFamily: 'BrittiSemibold',
+        fontWeight: 600,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,

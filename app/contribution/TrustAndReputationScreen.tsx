@@ -136,17 +136,19 @@ const styles = StyleSheet.create({
     backButton: {
         alignSelf: 'flex-start',
         padding: 4,
-        marginBottom: 10,
+        marginBottom: 20,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
         color: '#080808',
+        fontFamily: 'BrittiSemibold',
         marginBottom: 4,
     },
     headerSubtitle: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#393939',
     },
     scrollContent: {
@@ -186,6 +188,7 @@ const styles = StyleSheet.create({
     scoreValue: {
         fontSize: 32,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 12,
     },
@@ -193,6 +196,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 12,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         lineHeight: 20
     },
@@ -202,6 +206,7 @@ const styles = StyleSheet.create({
     listTitle: {
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 16,
     },
@@ -233,6 +238,7 @@ const styles = StyleSheet.create({
     itemText: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#393939',
         flex: 1,
     },

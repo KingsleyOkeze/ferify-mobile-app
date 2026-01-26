@@ -130,24 +130,28 @@ const styles = StyleSheet.create({
     },
     avatarText: {
         fontSize: 28,
-        fontWeight: '600',
-        color: '#333',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
+        color: '#080808',
     },
     userName: {
         fontSize: 20,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000000',
         marginBottom: 5,
     },
     userHandle: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 9,
     },
     userBadge: {
         fontSize: 15,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#646464',
         marginBottom: 16,
     },
@@ -160,6 +164,7 @@ const styles = StyleSheet.create({
     viewProfileText: {
         fontSize: 14,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     menuContainer: {
@@ -185,7 +190,8 @@ const styles = StyleSheet.create({
     },
     menuTitle: {
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#000',
     },
 });

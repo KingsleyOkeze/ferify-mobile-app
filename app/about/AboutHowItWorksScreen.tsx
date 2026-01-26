@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     scrollContent: {
@@ -93,6 +94,7 @@ const styles = StyleSheet.create({
     pageTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginTop: 10,
         marginBottom: 20,
@@ -108,12 +110,14 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 8,
     },
     cardDescription: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
         lineHeight: 20,
     },

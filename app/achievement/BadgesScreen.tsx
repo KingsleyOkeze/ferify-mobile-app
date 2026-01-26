@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
     },
     backButton: {
-        marginBottom: 16,
+        marginBottom: 20,
         width: 24,
         height: 24,
         justifyContent: 'center',
@@ -292,6 +292,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 10,
     },
@@ -299,6 +300,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#393939',
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         lineHeight: 20,
     },
     scrollContent: {
@@ -323,11 +325,12 @@ const styles = StyleSheet.create({
     badgeImage: {
         width: COLUMN_WIDTH - 20,
         height: COLUMN_WIDTH - 20,
-        marginBottom: 8,
+        marginBottom: 20,
     },
     badgeTitle: {
         fontSize: 12,
         fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         textAlign: 'center',
         textTransform: 'capitalize',
@@ -377,11 +380,13 @@ const styles = StyleSheet.create({
     requirementText: {
         fontSize: 18,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     modalDescription: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         textAlign: 'center',
         lineHeight: 24,
@@ -410,6 +415,7 @@ const styles = StyleSheet.create({
     progressText: {
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
  

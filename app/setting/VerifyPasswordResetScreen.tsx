@@ -193,7 +193,8 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
         color: '#000',
     },
     content: {
@@ -206,12 +207,14 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 10,
     },
     instructionText: {
         fontSize: 14,
+        fontFamily: 'BrittiRegular',
         color: '#666',
         lineHeight: 20,
     },
@@ -238,16 +241,18 @@ const styles = StyleSheet.create({
     },
     timerText: {
         fontSize: 14,
+        fontFamily: 'BrittiRegular',
         color: '#666',
         marginBottom: 8,
     },
     timerBold: {
-        fontWeight: '700',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000',
     },
     resendLink: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: 600,
         color: '#000',
         textDecorationLine: 'underline',
     },

@@ -187,7 +187,8 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
         color: '#000',
     },
     content: {
@@ -200,12 +201,15 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 10,
     },
     descriptionText: {
         fontSize: 14,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#666',
         lineHeight: 20,
         marginBottom: 30,
@@ -215,7 +219,8 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
         color: '#000',
         marginBottom: 8,
     },
@@ -223,10 +228,11 @@ const styles = StyleSheet.create({
         height: 56,
         borderWidth: 1.5,
         borderColor: '#F0F0F0',
-        borderRadius: 12,
+        borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 20,
-        fontWeight: '600',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#000',
         backgroundColor: '#F9F9F9',
     },
@@ -240,6 +246,8 @@ const styles = StyleSheet.create({
     },
     statementText: {
         fontSize: 12,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#999',
         fontStyle: 'italic',
     },
@@ -255,7 +263,8 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#fff',
     },
     updateButtonTextDisabled: {

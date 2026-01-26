@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     headerTitle: {
-        fontFamily: 'Britti Sans Trial',
+        fontFamily: 'BrittiSemibold',
         fontSize: 24, 
         fontWeight: 600,
         color: '#080808',
@@ -112,7 +112,8 @@ const styles = StyleSheet.create({
     // },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
         color: '#000',
     },
 });

@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
     },
     backButton: {
-        marginBottom: 16,
+        marginBottom: 20,
         width: 24,
         height: 24,
         justifyContent: 'center',
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     toggleOuterContainer: {
@@ -179,7 +180,8 @@ const styles = StyleSheet.create({
     },
     toggleText: {
         fontSize: 15,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
     activeText: {
         color: '#FFFFFF',
@@ -196,6 +198,7 @@ const styles = StyleSheet.create({
     rankingTitle: {
         fontSize: 14,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollView: {
@@ -234,12 +237,14 @@ const styles = StyleSheet.create({
     },
     rankingName: {
         fontSize: 15,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     rankingCount: {
         fontSize: 14,
         color: '#1B9E4B',
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
     },
 });

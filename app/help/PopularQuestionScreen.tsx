@@ -80,11 +80,12 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 16,
+        marginBottom: 20,
     },
     headerTitle: {
-        fontSize: 28,
-        fontWeight: '700',
+        fontSize: 24,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -106,7 +107,8 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         flex: 1, // Ensure text takes available space
         marginRight: 16,

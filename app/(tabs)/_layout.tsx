@@ -11,7 +11,13 @@ function TabsLayout() {
                     tabBarShowLabel: true,
                     tabBarLabelPosition: 'below-icon',
                     tabBarActiveTintColor: '#080808',
-                    tabBarInactiveTintColor: 'gray',
+                    tabBarInactiveTintColor: '#646464',
+                    tabBarLabelStyle: { 
+                        fontFamily: 'BrittiSemibold',
+                        fontSize: 12,
+                        fontWeight: 600,
+                        // color: '#646464',
+                    }, 
                     tabBarStyle: {
                         height: 90,
                         paddingBottom: 4,
@@ -69,7 +75,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 4,
     },
     badgeText: {
-        color: '#fff',
+        color: '#646464',
         fontSize: 10,
         fontWeight: 'bold',
     },

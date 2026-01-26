@@ -203,11 +203,12 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -234,11 +235,14 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 14,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
     },
     // Modal Styles
@@ -258,6 +262,7 @@ const styles = StyleSheet.create({
     modalTitle: {
         fontSize: 20,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         textAlign: 'center',
         marginBottom: 24,
@@ -281,6 +286,7 @@ const styles = StyleSheet.create({
     },
     optionLabel: {
         fontSize: 16,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         fontWeight: '500',
     },
@@ -322,11 +328,13 @@ const styles = StyleSheet.create({
         color: '#080808',
         fontWeight: 600,
         fontSize: 16,
+        fontFamily: 'BrittiSemibold',
     },
     saveButtonText: {
         color: '#FBFBFB',
         fontWeight: 600,
         fontSize: 16,
+        fontFamily: 'BrittiSemibold',
     },
 });
 

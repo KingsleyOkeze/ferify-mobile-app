@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 400,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -109,17 +110,20 @@ const styles = StyleSheet.create({
     appName: {
         fontSize: 24,
         fontWeight: 700,
+        fontFamily: 'BrittiBold',
         color: '#080808',
         marginBottom: 8,
     },
     versionText: {
         fontSize: 16,
-        color: '#666',
+        fontFamily: 'BrittiRegular',
+        color: '#080808',
         marginBottom: 5,
     },
     buildText: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     explanationSection: {
@@ -130,7 +134,8 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 12,
     },
@@ -141,9 +146,10 @@ const styles = StyleSheet.create({
     },
     detailsText: {
         fontSize: 14,
+        fontFamily: 'BrittiRegular',
         color: '#393939',
         lineHeight: 22,
-        fontWeight: '400'
+        fontWeight: 400
     },
 });
 

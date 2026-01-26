@@ -45,7 +45,7 @@ function UpdateUserEmailScreen() {
             const response = await api.post('/api/user/account/update-email/initiate', { newEmail });
             if (response.status === 200) {
                 router.push({
-                    pathname: '/setting/account/VerifyUpdateUserEmailScreen',
+                    pathname: './setting/account/VerifyUpdateUserEmailScreen',
                     params: { email: newEmail }
                 });
             }
@@ -169,7 +169,8 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
         color: '#000',
     },
     content: {
@@ -179,7 +180,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 30,
         paddingBottom: 40,
-        alignItems: 'center',
+        // alignItems: 'center',
     },
     imageContainer: {
         marginBottom: 24,
@@ -193,17 +194,20 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 10,
-        textAlign: 'center',
+        textAlign: 'left',
     },
     descriptionText: {
         fontSize: 14,
-        color: '#666',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
+        color: '#393939',
         lineHeight: 20,
         marginBottom: 30,
-        textAlign: 'center',
+        textAlign: 'left',
     },
     infoGroup: {
         marginBottom: 30,
@@ -211,13 +215,15 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
         color: '#000',
         marginBottom: 8,
     },
     currentValue: {
-        fontSize: 18,
-        fontWeight: '500',
+        fontSize: 14,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#666',
     },
     inputGroup: {
@@ -232,9 +238,11 @@ const styles = StyleSheet.create({
         height: 50,
         borderWidth: 1,
         borderColor: '#F0F0F0',
-        borderRadius: 8,
+        borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 16,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#000',
         backgroundColor: '#F9F9F9',
     },
@@ -248,6 +256,8 @@ const styles = StyleSheet.create({
     },
     verificationNotice: {
         fontSize: 12,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#999',
         textAlign: 'right',
         marginTop: 8,
@@ -269,7 +279,8 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#fff',
     },
     updateButtonTextDisabled: {

@@ -6,9 +6,10 @@ import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-cont
 
 function StackLayout() {
     const insets = useSafeAreaInsets();
-
+  
     useEffect(() => {
         GoogleSignin.configure({
+            // webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
             webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
             offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
             forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.

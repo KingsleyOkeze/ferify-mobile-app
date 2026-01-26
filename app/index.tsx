@@ -14,9 +14,14 @@ axios.defaults.baseURL = process.env.EXPO_PUBLIC_SERVER_URL;
 
 export default function Index() {
   const [fontsLoaded, fontError] = useFonts({
-    BrittiRegular: require('../assets/fonts/BrittiSansTrial-Regular.ttf'),
-    BrittiMedium: require('../assets/fonts/BrittiSansTrial-Medium.ttf'),
-    BrittiBold: require('../assets/fonts/BrittiSansTrial-Bold.ttf'),
+    BrittiBold: require('../assets/fonts/BrittiSansTrial-Bold-BF6757bfd4a96ed.otf'),
+    BrittiBoldItalic: require('../assets/fonts/BrittiSansTrial-BoldItalic-BF6757bfd4a2285.otf'),
+    BrittiLight: require('../assets/fonts/BrittiSansTrial-Light-BF6757bfd494951.otf'),
+    BrittiLightItalic: require('../assets/fonts/BrittiSansTrial-LightItalic-BF6757bfd48c7c7.otf'),
+    BrittiRegular: require('../assets/fonts/BrittiSansTrial-Regular-BF6757bfd47ffbf.otf'),
+    BrittiRegularItalic: require('../assets/fonts/BrittiSansTrial-RegularItalic-BF6757bfd44e013.otf'),
+    BrittiSemibold: require('../assets/fonts/BrittiSansTrial-Semibold-BF6757bfd443a8a.otf'),
+    BrittiSemiboldItalic: require('../assets/fonts/BrittiSansTrial-SemiboldItalic-BF6757bfd411c3a.otf'),
   });
 
   const [isReady, setIsReady] = useState(false);

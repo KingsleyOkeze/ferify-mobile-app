@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 14,
         fontSize: 16,
+        fontFamily: 'BrittiRegular',
         color: '#000',
         marginBottom: 8,
         borderWidth: 2,

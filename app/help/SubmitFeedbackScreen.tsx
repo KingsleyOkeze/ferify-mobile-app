@@ -119,11 +119,12 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -131,6 +132,7 @@ const styles = StyleSheet.create({
     },
     description: {
         fontSize: 16,
+        fontFamily: 'BrittiRegular',
         color: '#393939',
         marginBottom: 32,
         lineHeight: 24,
@@ -140,7 +142,8 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 8,
     },
@@ -152,6 +155,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 14, // Consistent padding
         fontSize: 16,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     textArea: {
@@ -178,6 +182,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
 });
 

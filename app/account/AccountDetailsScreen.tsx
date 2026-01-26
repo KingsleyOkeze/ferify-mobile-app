@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     scrollContent: {
@@ -236,6 +237,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginTop: 15,
         marginLeft: 20,
@@ -263,7 +265,8 @@ const styles = StyleSheet.create({
     },
     avatarInitials: {
         fontSize: 30,
-        fontWeight: 'bold',
+        fontFamily: 'BrittiSemibold',
+        fontWeight: 600,
         color: '#333',
     },
     editIconContainer: {
@@ -305,16 +308,19 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 4,
     },
     itemValue: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
     },
     footerStatement: {
         fontSize: 12,
+        fontFamily: 'BrittiRegular',
         color: '#393939',
         textAlign: 'right',
         marginRight: 20,
@@ -326,7 +332,8 @@ const styles = StyleSheet.create({
     },
     actionText: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000',
     },
     deleteText: {
@@ -369,7 +376,8 @@ const styles = StyleSheet.create({
     },
     confirmModalDescription: {
         fontSize: 16,
-        color: '#757575',
+        fontFamily: 'BrittiRegular',
+        color: '#080808',
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 32,
@@ -391,12 +399,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#E53935',
     },
     confirmLogoutButtonText: {
-        color: '#fff',
+        color: '#FBFBFB',
         fontSize: 16,
-        fontWeight: '700',
+        fontFamily: 'BrittiSemibold',
+        fontWeight: 600,
     },
     cancelModalButton: {
         backgroundColor: '#F5F5F5',
+        fontFamily: 'BrittiSemibold',
     },
     cancelModalButtonText: {
         color: '#000',

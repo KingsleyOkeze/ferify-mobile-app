@@ -155,6 +155,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24, 
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -192,11 +193,14 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: '600',
+        fontFamily: 'BrittiRegular',
         color: '#000',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 13,
+        fontWeight: '400',
+        fontFamily: 'BrittiRegular',
         color: '#666',
     },
     radioCircle: {

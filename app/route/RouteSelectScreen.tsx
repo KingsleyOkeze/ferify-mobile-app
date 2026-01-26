@@ -277,7 +277,12 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     headerSpacer: { width: 24 },
-    headerTitle: { fontSize: 18, fontWeight: '700', color: '#000' },
+    headerTitle: { 
+        fontSize: 18, 
+        fontWeight: '700', 
+        fontFamily: 'BrittiSemibold',
+        color: '#000000' 
+    },
     closeButton: { padding: 4 },
     modeSection: { paddingHorizontal: 20, marginBottom: 24 },
     sectionTitle: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 12 },

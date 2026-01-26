@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 14,
         fontWeight: '500',
+        fontFamily: 'BrittiRegular',
     },
 });
 

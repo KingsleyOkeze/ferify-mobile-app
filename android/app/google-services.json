@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "83364908021-8b87m5anhkmuvfm7a11suf6u4qe15628.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ferify.app",
+            "certificate_hash": "5c747a008c1e4b1f524d52d13c3aef3aa8b56126"
+          }
+        },
+        {
           "client_id": "83364908021-2cm07fnnrs5mckc3sqvff8gdplbj640u.apps.googleusercontent.com",
           "client_type": 3
         }

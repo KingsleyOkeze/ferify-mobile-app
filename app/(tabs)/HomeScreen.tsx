@@ -261,10 +261,11 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: "#f2f2f2",
-        borderRadius: 12,
+        borderRadius: 100,
         paddingHorizontal: 10,
         paddingVertical: 6,
         marginBottom: 10,
+        height: 52
     },
     searchIcon: {
         marginRight: 6,
@@ -277,6 +278,7 @@ const styles = StyleSheet.create({
     searchInput: {
         flex: 1,
         fontSize: 15,
+        fontFamily: 'BrittiSemibold',
         color: "#000",
     },
     sectionTitle: {
@@ -331,6 +333,7 @@ const styles = StyleSheet.create({
     shareButtonText: {
         color: "#080808",
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
     cardImage: {
         width: 88.71,
@@ -373,11 +376,13 @@ const styles = StyleSheet.create({
     },
     routeEntryText: {
         fontSize: 14,
+        fontFamily: 'BrittiRegular',
         color: '#666',
         marginBottom: 10,
     },
     routeDestinationText: {
         fontWeight: '600',
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     feedMetaRow: {
@@ -387,6 +392,7 @@ const styles = StyleSheet.create({
     },
     feedMetaText: {
         fontSize: 12,
+        fontFamily: 'BrittiRegular',
         color: '#666',
         marginLeft: 4,
     },
@@ -396,7 +402,8 @@ const styles = StyleSheet.create({
     },
     feedPriceText: {
         fontSize: 14,
-        fontWeight: 600,
+        fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     fab: {

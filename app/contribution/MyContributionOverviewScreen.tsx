@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginTop: 10,
         marginBottom: 5,
@@ -201,6 +202,7 @@ const styles = StyleSheet.create({
     headerSubtitle: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#393939',
     },
     scrollContent: {
@@ -237,12 +239,14 @@ const styles = StyleSheet.create({
     cardTitle: {
         fontSize: 12,
         fontWeight: '600',
-        color: '#333',
+        fontFamily: 'BrittiRegular',
+        color: '#080808',
         flex: 1, // Allow text to wrap if needed
     },
     cardValue: {
         fontSize: 20,
-        fontWeight: 400,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         alignSelf: 'flex-end', // Align number to right end
     },
@@ -281,12 +285,14 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#000000',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
     },
 });

@@ -82,6 +82,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     scrollContent: {
@@ -90,6 +91,7 @@ const styles = StyleSheet.create({
     questionTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 24,
         lineHeight: 32,
@@ -101,7 +103,8 @@ const styles = StyleSheet.create({
     },
     answerText: {
         fontSize: 16,
-        fontWeight: '400',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#333',
         lineHeight: 24,
     },

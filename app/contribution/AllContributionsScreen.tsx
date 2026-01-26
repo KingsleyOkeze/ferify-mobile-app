@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     tabContainer: {
@@ -250,12 +251,14 @@ const styles = StyleSheet.create({
     },
     tabLabel: {
         fontSize: 16,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
         fontWeight: 400,
     },
     activeTabLabel: {
         color: '#080808',
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         fontSize: 16
     },
     activeTabIndicator: {
@@ -276,6 +279,7 @@ const styles = StyleSheet.create({
     dateHeader: {
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginLeft: 20,
         marginTop: 5,
@@ -313,12 +317,14 @@ const styles = StyleSheet.create({
     },
     cardMainText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#000',
         marginBottom: 2,
     },
     reportIssueText: {
         color: '#080808',
+        fontFamily: 'BrittiSemibold',
         fontWeight: 600,
         fontSize: 14
     },
@@ -332,6 +338,7 @@ const styles = StyleSheet.create({
     cardTimeText: {
         fontSize: 12,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
     },
     spacer: {
@@ -348,6 +355,7 @@ const styles = StyleSheet.create({
     pointsText: {
         fontSize: 12,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#1B9E4B',
     },
 });

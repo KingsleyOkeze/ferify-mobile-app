@@ -253,14 +253,14 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
-        // fontFamily: 'Britti Sans Trial',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 4,
     },
     headerSubtitle: {
         fontSize: 14,
         fontWeight: 400,
-        // fontFamily: 'Britti Sans Trial',
+        fontFamily: 'BrittiRegular',
         color: '#393939',
     },
     section: {
@@ -276,6 +276,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000000',
         marginRight: 10,
         paddingHorizontal: 20,
@@ -321,6 +322,7 @@ const styles = StyleSheet.create({
     recentRoute: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 6,
     },
@@ -334,6 +336,8 @@ const styles = StyleSheet.create({
     },
     recentMetaText: {
         fontSize: 12,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
     },
     recentPriceContainer: {
@@ -342,6 +346,7 @@ const styles = StyleSheet.create({
     recentPrice: {
         fontSize: 14,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
 
@@ -357,7 +362,7 @@ const styles = StyleSheet.create({
     hotBadgeText: {
         fontSize: 12,
         fontWeight: 600,
-        fontFamily: 'Britti Sans Trial',
+        fontFamily: 'BrittiSemibold',
         color: '#FBFBFB',
     },
     popularSearchCard: {
@@ -384,6 +389,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 400,
         color: '#080808',
+        fontFamily: 'BrittiRegular',
         lineHeight: 20,
     },
     searchMapImage: {
@@ -429,18 +435,23 @@ const styles = StyleSheet.create({
     },
     popularRouteText: {
         fontSize: 16,
-        fontWeight: '700',
-        color: '#000',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
+        color: '#080808',
         marginBottom: 4,
     },
     popularRoutePrice: {
         fontSize: 14,
-        color: '#444',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
+        color: '#080808',
         marginBottom: 2,
     },
     popularRouteTime: {
         fontSize: 12,
-        color: '#888',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
+        color: '#757575',
     },
     pointsBadge: {
         backgroundColor: '#E8F5E9',
@@ -449,8 +460,9 @@ const styles = StyleSheet.create({
         borderRadius: 20,
     },
     pointsText: {
-        fontSize: 12,
-        fontWeight: '700',
+        fontSize: 14,
+        fontFamily: 'BrittiRegular',
+        fontWeight: 400,
         color: '#2E7D32',
     },
 
@@ -485,14 +497,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     tipTitle: {
-        fontSize: 16,
-        fontWeight: '700',
-        color: '#000',
+        fontSize: 14,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
+        color: '#080808',
         marginBottom: 4,
     },
     tipBody: {
-        fontSize: 13,
-        color: '#666',
+        fontSize: 14,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
+        color: '#757575',
         lineHeight: 18,
     },
 
@@ -523,7 +538,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     promoTitle: {
-        fontSize: 18,
+        fontSize: 16,
+        fontFamily: 'BrittiRegular',
         fontWeight: 400,
         color: '#080808',
         marginBottom: 4,
@@ -531,7 +547,8 @@ const styles = StyleSheet.create({
     promoBody: {
         fontSize: 14,
         fontWeight: 400,
-        color: '#080808',
+        fontFamily: 'BrittiRegular',
+        color: '#757575',
     },
 });
 

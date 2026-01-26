@@ -131,6 +131,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         paddingTop: 10,
         paddingBottom: 3
@@ -165,24 +166,28 @@ const styles = StyleSheet.create({
     },
     avatarInitials: {
         fontSize: 30,
+        fontFamily: 'BrittiSemibold',
         fontWeight: 'bold',
         color: '#333',
     },
     pointsLabel: {
         fontSize: 12,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         textTransform: 'lowercase',
     },
     pointsValue: {
         fontSize: 28,
         fontWeight: 700,
+        fontFamily: 'BrittiBold',
         color: '#080808',
         marginVertical: 4,
     },
     username: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 8,
     },
@@ -199,6 +204,7 @@ const styles = StyleSheet.create({
     memberSinceText: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     menuContainer: {
@@ -234,12 +240,14 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
     },
 });

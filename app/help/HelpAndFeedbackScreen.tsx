@@ -99,7 +99,8 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 28, // Prominent title
-        fontWeight: '700',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -141,7 +142,8 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: '500',
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     itemDescription: {
