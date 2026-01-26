@@ -14,7 +14,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import RouteFromAndTo from '@/components/RouteFromAndTo';
-import busImage from '@/assets/images/busImage.png';
+import busImage from '../../assets/images/transportation-icons/busImage.png';
 
 // Enable LayoutAnimation for Android
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {

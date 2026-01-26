@@ -1,29 +1,25 @@
-import React, { useState, useEffect } from "react";
+import api, { getUserData, setToken, setUserData } from "@/services/api";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useRouter } from "expo-router";
+import * as WebBrowser from 'expo-web-browser';
+import { useEffect, useState } from "react";
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    SafeAreaView,
-    TextInput,
+    ActivityIndicator,
+    Alert,
     Image,
     KeyboardAvoidingView,
     Platform,
+    SafeAreaView,
     ScrollView,
-    ActivityIndicator,
-    Alert,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
-import api, { setToken, getUserData, setUserData } from "@/services/api";
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
 
 WebBrowser.maybeCompleteAuthSession();
-
-const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
-const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
-const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 export default function LoginScreen() {
     const router = useRouter();
@@ -44,24 +40,15 @@ export default function LoginScreen() {
         loadProfile();
     }, []);
 
-    // Google Auth Request
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: ANDROID_CLIENT_ID,
-        iosClientId: IOS_CLIENT_ID,
-        webClientId: WEB_CLIENT_ID,
-        scopes: ['openid', 'profile', 'email', 'offline_access'], 
-        extraParams: {
-            access_type: 'offline', // This is the Google-specific way to request a refresh token
-            prompt: 'consent',     // Forces the consent screen to ensure refresh token is sent
-        },
-    });
-
-    useEffect(() => {
-        if (response?.type === 'success') {
-            const { idToken } = response.authentication || {};
+    // Google Sign-In
+    const signInWithGoogle = async () => {
+        setLoading(true);
+        try {
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            const idToken = userInfo.data?.idToken;
 
             if (idToken) {
-                setLoading(true);
                 api.post('/api/user/auth/google-login', { idToken })
                     .then(async (res) => {
                         console.log("Google Login Backend Success:", res.data);
@@ -83,9 +70,24 @@ export default function LoginScreen() {
                     .finally(() => setLoading(false));
             } else {
                 Alert.alert("Error", "No ID token received from Google");
+                setLoading(false);
             }
+        } catch (error: any) {
+            console.error("Google Sign-In Error", error);
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+                Alert.alert("Error", "Google Play Services not available");
+            } else {
+                // some other error happened
+                Alert.alert("Error", "An unexpected error occurred during Google Sign-In");
+            }
+            setLoading(false);
         }
-    }, [response]);
+    };
 
     // Validation
     useEffect(() => {
@@ -115,7 +117,7 @@ export default function LoginScreen() {
                 // Navigate to Verification
                 router.push({
                     pathname: "/auth/signup/VerifySignupEmailScreen",
-                    params: { 
+                    params: {
                         email: error.response.data.email.trim(),
                         autoSend: 'true'
                     }
@@ -215,8 +217,8 @@ export default function LoginScreen() {
                             {/* Google Button */}
                             <TouchableOpacity
                                 style={styles.googleButton}
-                                onPress={() => promptAsync()}
-                                disabled={!request}
+                                onPress={signInWithGoogle}
+                                disabled={loading}
                             >
                                 <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
                                 <Text style={styles.googleButtonText}>Sign in with Google</Text>
@@ -268,7 +270,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
     },
     backButton: {
-        padding: 10,
+        padding: 5,
     },
     topContent: {
         flex: 1,
@@ -279,7 +281,8 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: "bold",
+        fontWeight: 700,
+        fontFamily: "BrittiBold",
         color: "#080808",
         marginBottom: 8,
     },

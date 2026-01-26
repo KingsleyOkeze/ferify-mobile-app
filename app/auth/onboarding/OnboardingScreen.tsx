@@ -212,14 +212,17 @@ const styles = StyleSheet.create({
         borderRadius: 5,
     },
     title: {
+        fontFamily: "BrittiBold",
         fontSize: 24,
-        fontWeight: "800",
+        fontWeight: 700,
         textAlign: "center",
         marginBottom: 12,
         color: "#080808",
     },
     subtitle: {
+        fontFamily: "BrittiRegular",
         fontSize: 16,
+        fontWeight: 400,
         color: "#757575",
         textAlign: "center",
         lineHeight: 22,
@@ -248,12 +251,14 @@ const styles = StyleSheet.create({
     loginBtnText: {
         color: "#080808",
         fontSize: 16,
-        fontWeight: "700",
+        fontWeight: 600,
+        fontFamily: "BrittiBold",
     },
     getStartedBtnText: {
         color: "#FFFFFF",
         fontSize: 16,
-        fontWeight: "700",
+        fontWeight: 600,
+        fontFamily: "BrittiBold",
     },
     skipBtn: {
         paddingHorizontal: 16,
@@ -265,6 +270,7 @@ const styles = StyleSheet.create({
     skipText: {
         color: "#757575",
         fontSize: 14,
-        fontWeight: "700",
+        fontWeight: 600,
+        fontFamily: "BrittiBold",
     },
 });

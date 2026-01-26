@@ -1,64 +1,75 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
 import axios from 'axios';
-import { View, ActivityIndicator } from "react-native";
 import { getToken } from "@/services/api";
-import SplashScreen from "./auth/onboarding/SplashScreen";
 import { fetchAndCacheLocation } from "@/services/locationService";
 import { useFonts } from 'expo-font';
-// import * as SplashScreen from 'expo-splash-screen';
+import * as SplashScreen from 'expo-splash-screen';
+// Import your custom design directly
+import MyCustomSplashScreen from "./auth/onboarding/SplashScreen"; 
 
+SplashScreen.preventAutoHideAsync();
 
-// SplashScreen.preventAutoHideAsync();
 axios.defaults.baseURL = process.env.EXPO_PUBLIC_SERVER_URL;
 
 export default function Index() {
-  const [fontsLoaded] = useFonts({
-        BrittiRegular: require('../assets/fonts/BrittiSansTrial-Regular.ttf'),
-        BrittiMedium: require('../assets/fonts/BrittiSansTrial-Medium.ttf'),
-        BrittiBold: require('../assets/fonts/BrittiSansTrial-Bold.ttf'),
+  const [fontsLoaded, fontError] = useFonts({
+    BrittiRegular: require('../assets/fonts/BrittiSansTrial-Regular.ttf'),
+    BrittiMedium: require('../assets/fonts/BrittiSansTrial-Medium.ttf'),
+    BrittiBold: require('../assets/fonts/BrittiSansTrial-Bold.ttf'),
   });
 
-  // if (!fontsLoaded) {
-  //     SplashScreen.hideAsync();
-  // }
+  const [isReady, setIsReady] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  useEffect(() => {
+    async function loadApp() {
+      try {
+        const token = await getToken();
+        setIsAuthenticated(!!token);
 
-  // const [isChecking, setIsChecking] = useState(true);
-  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+        if (token) {
+          await fetchAndCacheLocation();
+        }
 
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     try {
-  //       // 1. Initial auth check
-  //       const token = await getToken();
-  //       setIsAuthenticated(!!token);
+        // Keep the custom splash visible for 2 seconds
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+      } catch (e) {
+        console.error("Initialization Error:", e);
+      } finally {
+        setIsReady(true);
+        // Hide the NATIVE splash (image from app.json)
+        if (fontsLoaded || fontError) {
+          await SplashScreen.hideAsync();
+        }
+      }
+    }
 
-  //       // 2. Parallelize minimum splash time and situational location fetch
-  //       await Promise.all([
-  //         token ? fetchAndCacheLocation() : Promise.resolve(), // Silent refresh if authenticated
-  //         new Promise((resolve) => setTimeout(resolve, 2000))
-  //       ]);
+    loadApp();
+  }, [fontsLoaded, fontError]);
 
-  //     } catch (error) {
-  //       setIsAuthenticated(false);
-  //     } finally {
-  //       setIsChecking(false);
-  //     }
-  //   };
-  //   checkAuth();
-  // }, []);
+  // Stage 1: Native Splash (shows while fonts are loading)
+  if (!fontsLoaded && !fontError) return null;
 
-  // if (isChecking) {
-  //   return <SplashScreen />;
-  // }
+  // Stage 2: Custom Splash (shows while auth/location is being checked)
+  if (!isReady) {
+    return <MyCustomSplashScreen />;
+  }
 
+  // Stage 3: Final Destination
   // return (
-  //   <Redirect href={isAuthenticated ? "/tabs/HomeScreen" : "/auth/onboarding/OnboardingScreen"} />
+  //   <Redirect 
+  //     href={isAuthenticated ? "/(tabs)/HomeScreen" : "/auth/onboarding/OnboardingScreen"} 
+  //   />
   // );
 
-
   return (
-    <Redirect href="/auth/signup/SignupScreen" />
+    // <Redirect href="./auth/signup/SignupScreen" />
+    <Redirect href="./(tabs)/HomeScreen" />
   );
 }
+
+
+
+        

@@ -149,7 +149,7 @@ function HomeScreen() {
                 />
 
                 {/* Mode Selector */}
-                <Text style={styles.sectionTitle}>Mode Selector</Text>
+                <Text style={styles.sectionTitle}>Transport Mode</Text>
                 <ModeOfTransportSelect
                     selectedMode={selectedMode}
                     onSelect={(mode) => setSelectedMode(mode)}
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
         paddingTop: 10,
     },
     logo: {
+        fontFamily: "BrittiBold",
         fontSize: 26,
         fontWeight: 700,
         color: "#080808",
@@ -281,6 +282,7 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiBold',
         marginBottom: 10,
         color: "#080808",
         marginTop: 25,

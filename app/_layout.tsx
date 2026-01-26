@@ -1,17 +1,28 @@
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Stack } from "expo-router";
+import { useEffect } from "react";
+import { Platform, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, Platform } from "react-native";
 
 function StackLayout() {
     const insets = useSafeAreaInsets();
 
+    useEffect(() => {
+        GoogleSignin.configure({
+            webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+            offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+            forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+            iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID, // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+        });
+    }, []);
+
     return (
-        <View 
-            style={{ 
-                flex: 1, 
-                backgroundColor: "#FBFBFB", 
+        <View
+            style={{
+                flex: 1,
+                backgroundColor: "#FBFBFB",
                 paddingTop: insets.top,
-                paddingBottom: insets.bottom 
+                paddingBottom: insets.bottom
             }}
         >
             <Stack
@@ -30,19 +41,19 @@ function StackLayout() {
                     options={{
                         // On iOS, this gives you the "lower card" + "shrink" automatically
                         // Android: 'transparentModal' (allows us to see the home screen through the gap)
-                        presentation: Platform.OS === 'ios' ? 'modal' : 'transparentModal', 
+                        presentation: Platform.OS === 'ios' ? 'modal' : 'transparentModal',
                         animation: "slide_from_bottom",
                         gestureEnabled: true,
                         // This property ensures the background color of the stack (black) 
                         // is visible during the animation
-                        contentStyle: { 
-                            backgroundColor: Platform.OS === 'android' ? 'transparent' : '#fff' 
+                        contentStyle: {
+                            backgroundColor: Platform.OS === 'android' ? 'transparent' : '#fff'
                         },
                     }}
                 />
 
                 {/* Standard Modals */}
-                <Stack.Screen name="contribution/MyContributionOverviewScreen" 
+                <Stack.Screen name="contribution/MyContributionOverviewScreen"
                     options={{
                         presentation: "modal",
                         animation: "slide_from_bottom",
@@ -51,7 +62,7 @@ function StackLayout() {
                         fullScreenGestureEnabled: true,
                     }}
                 />
-                <Stack.Screen name="account/AccountAndPersonalMainScreen" 
+                <Stack.Screen name="account/AccountAndPersonalMainScreen"
                     options={{
                         presentation: "modal",
                         animation: "slide_from_bottom",
@@ -60,7 +71,7 @@ function StackLayout() {
                         fullScreenGestureEnabled: true,
                     }}
                 />
-                <Stack.Screen name="setting/SettingMainScreen" 
+                <Stack.Screen name="setting/SettingMainScreen"
                     options={{
                         presentation: "modal",
                         animation: "slide_from_bottom",
@@ -69,7 +80,7 @@ function StackLayout() {
                         fullScreenGestureEnabled: true,
                     }}
                 />
-                <Stack.Screen name="help/HelpAndFeedbackScreen" 
+                <Stack.Screen name="help/HelpAndFeedbackScreen"
                     options={{
                         presentation: "modal",
                         animation: "slide_from_bottom",
@@ -78,7 +89,7 @@ function StackLayout() {
                         fullScreenGestureEnabled: true,
                     }}
                 />
-                <Stack.Screen name="about/AboutMainScreen" 
+                <Stack.Screen name="about/AboutMainScreen"
                     options={{
                         presentation: "modal",
                         animation: "slide_from_bottom",
@@ -89,141 +100,141 @@ function StackLayout() {
                 />
 
                 {/* Horizontal Modals */}
-                <Stack.Screen name="contribution/AllContributionsScreen" 
-                    options={{ 
+                <Stack.Screen name="contribution/AllContributionsScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="contribution/TrustAndReputationScreen" 
-                    options={{ 
+                <Stack.Screen name="contribution/TrustAndReputationScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
-                 />
-                <Stack.Screen name="account/ProfileLandingScreen" 
-                    options={{ 
-                        presentation: "modal",
-                        animation: "slide_from_right",
-                        gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="account/AccountDetailsScreen" 
-                    options={{ 
+                <Stack.Screen name="account/ProfileLandingScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="account/TransportPreferenceScreen" 
-                    options={{ 
+                <Stack.Screen name="account/AccountDetailsScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="account/AccountSecurityScreen" 
-                    options={{ 
+                <Stack.Screen name="account/TransportPreferenceScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="setting/SecurityMainScreen" 
-                    options={{ 
+                <Stack.Screen name="account/AccountSecurityScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="setting/NotificationSettingScreen" 
-                    options={{ 
+                <Stack.Screen name="setting/SecurityMainScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="setting/Privacy&SafetySettingScreen" 
-                    options={{ 
+                <Stack.Screen name="setting/NotificationSettingScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="help/PopularQuestionScreen" 
-                    options={{ 
+                <Stack.Screen name="setting/Privacy&SafetySettingScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="help/AnswerToQuestionScreen" 
-                    options={{ 
+                <Stack.Screen name="help/PopularQuestionScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="help/SubmitFeedbackScreen" 
-                    options={{ 
+                <Stack.Screen name="help/AnswerToQuestionScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="about/AboutAppScreen" 
-                    options={{ 
+                <Stack.Screen name="help/SubmitFeedbackScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="about/AboutHowItWorksScreen" 
-                    options={{ 
+                <Stack.Screen name="about/AboutAppScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="achievement/AchievementsScreen" 
-                    options={{ 
+                <Stack.Screen name="about/AboutHowItWorksScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="achievement/BadgesScreen" 
-                    options={{ 
+                <Stack.Screen name="achievement/AchievementsScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
                 />
-                <Stack.Screen name="achievement/LeadershipBoardScreen" 
-                    options={{ 
+                <Stack.Screen name="achievement/BadgesScreen"
+                    options={{
                         presentation: "modal",
                         animation: "slide_from_right",
                         gestureEnabled: true,
-                        gestureDirection: "horizontal", 
-                    }} 
+                        gestureDirection: "horizontal",
+                    }}
+                />
+                <Stack.Screen name="achievement/LeadershipBoardScreen"
+                    options={{
+                        presentation: "modal",
+                        animation: "slide_from_right",
+                        gestureEnabled: true,
+                        gestureDirection: "horizontal",
+                    }}
                 />
             </Stack>
         </View>

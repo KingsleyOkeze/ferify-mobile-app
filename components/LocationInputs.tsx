@@ -94,10 +94,10 @@ const styles = StyleSheet.create({
     },
     locationContainer: {
         position: 'relative',
+        paddingHorizontal: 20
     },
     locationInput: {
         backgroundColor: '#F0F0F0',
-        borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
         fontSize: 16,
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         borderWidth: 2,
         borderColor: 'transparent',
+        borderRadius: 100,
     },
     locationInputFocused: {
         borderColor: '#000',

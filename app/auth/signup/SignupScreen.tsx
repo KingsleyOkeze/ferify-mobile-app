@@ -1,34 +1,24 @@
-import React, { useState, useEffect } from "react";
+import api, { setToken } from '@/services/api';
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
 import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    SafeAreaView,
-    TextInput,
+    ActivityIndicator,
+    Alert,
     Image,
     KeyboardAvoidingView,
     Platform,
+    SafeAreaView,
     ScrollView,
-    Alert,
-    ActivityIndicator
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
-import api, { setToken } from '@/services/api';
 
 // Logo
-import LOGO from "@/assets/images/logo/BLACK-LOGO.png";
-
-// Determine redirects for auth
-WebBrowser.maybeCompleteAuthSession();
-
-// Placeholder Client IDs - REPLACE THESE WITH YOUR ACTUAL GOOGLE CLOUD CONSOLE IDS
-const ANDROID_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
-const IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
-const WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
 
 export default function SignUpScreen() {
     const router = useRouter();
@@ -43,19 +33,15 @@ export default function SignUpScreen() {
     // Validation State
     const [isEmailValid, setIsEmailValid] = useState(false);
 
-    // Google Auth Request
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: ANDROID_CLIENT_ID,
-        iosClientId: IOS_CLIENT_ID,
-        webClientId: WEB_CLIENT_ID,
-    });
-
-    useEffect(() => {
-        if (response?.type === 'success') {
-            const { idToken } = response.authentication || {};
+    // Google Sign-In
+    const signInWithGoogle = async () => {
+        setIsLoading(true);
+        try {
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            const idToken = userInfo.data?.idToken;
 
             if (idToken) {
-                setIsLoading(true);
                 api.post('/api/user/auth/google-login', { idToken })
                     .then(async (res) => {
                         console.log("Google Signup Backend Success:", res.data);
@@ -65,13 +51,30 @@ export default function SignUpScreen() {
                         }
                     })
                     .catch((error) => {
-                        console.error("Google Backend Error:", error.response?.data || error.message);
+                        console.error("Google Backend Error:", error, error.response?.data || error.message);
                         Alert.alert("Google Sign-Up Failed", "Could not verify with server.");
                     })
                     .finally(() => setIsLoading(false));
+            } else {
+                Alert.alert("Error", "No ID token received from Google");
+                setIsLoading(false);
             }
+        } catch (error: any) {
+            console.error("Google Sign-In Error", error);
+            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+                // user cancelled the login flow
+            } else if (error.code === statusCodes.IN_PROGRESS) {
+                // operation (e.g. sign in) is in progress already
+            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+                // play services not available or outdated
+                Alert.alert("Error", "Google Play Services not available");
+            } else {
+                // some other error happened
+                Alert.alert("Error", "An unexpected error occurred during Google Sign-In");
+            }
+            setIsLoading(false);
         }
-    }, [response]);
+    };
 
     // Validation
     useEffect(() => {
@@ -225,8 +228,8 @@ export default function SignUpScreen() {
                         {/* Google Button */}
                         <TouchableOpacity
                             style={styles.googleButton}
-                            onPress={() => promptAsync()}
-                            disabled={!request}
+                            onPress={signInWithGoogle}
+                            disabled={isLoading}
                         >
                             <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
                             <Text style={styles.googleButtonText}>Sign up with Google</Text>
@@ -295,7 +298,7 @@ const styles = StyleSheet.create({
     },
     stepText: {
         fontSize: 12,
-        fontFamily: 'Britti Sans',
+        fontFamily: "BrittiRegular",
         fontWeight: 400,
         color: '#080808',
     },
@@ -304,15 +307,16 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: "bold",
+        fontWeight: 700,
         color: "#080808",
         marginBottom: 8,
         alignSelf: "flex-start",
-        fontFamily: 'Britti Sans'
+        fontFamily: "BrittiBold",
     },
     subtitle: {
         fontSize: 14,
         fontWeight: 400,
+        fontFamily: "BrittiRegular",
         color: "#393939",
         lineHeight: 22,
     },
@@ -325,6 +329,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: "BrittiRegular",
         color: "#080808",
         marginBottom: 8,
         marginLeft: 4,
@@ -343,12 +348,13 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         fontWeight: 400,
-        fontFamily: 'BrittiRegular',
+        fontFamily: "BrittiRegular",
         color: "#080808",
     },
     errorText: {
         color: "#EF4444",
         fontSize: 12,
+        fontFamily: "BrittiRegular",
         marginTop: 4,
         textAlign: "right",
     },
@@ -366,7 +372,8 @@ const styles = StyleSheet.create({
     createButtonText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "600",
+        fontWeight: 600,
+        fontFamily: "BrittiBold",
     },
     separatorContainer: {
         flexDirection: "row",
@@ -401,10 +408,12 @@ const styles = StyleSheet.create({
         color: "#080808",
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: "BrittiRegular",
     },
     termsText: {
         fontSize: 12,
-        fontWeight: 600,
+        fontWeight: 400,
+        fontFamily: "BrittiRegular",
         color: "#6B6B6B",
         textAlign: "center",
         marginTop: 24,
@@ -420,7 +429,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     footerText: {
-        fontSize: 15,
+        fontSize: 14,
+        fontWeight: 400,
+        fontFamily: "BrittiRegular",
         color: "#393939",
     },
     footerHighlight: {

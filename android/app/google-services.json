@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "83364908021",
+    "project_id": "ferify-app",
+    "storage_bucket": "ferify-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83364908021:android:ac0620d15bf0a4e2bfeebc",
+        "android_client_info": {
+          "package_name": "com.ferify.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "83364908021-2cm07fnnrs5mckc3sqvff8gdplbj640u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALkH5QSXahP_7508TuW8GiHmfzD123cFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "83364908021-2cm07fnnrs5mckc3sqvff8gdplbj640u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "83364908021-vvtrd2orck921dat6eo6ib5nrjjv2o8a.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ferify.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

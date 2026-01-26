@@ -9,6 +9,7 @@ buildscript {
     classpath('com.android.tools.build:gradle')
     classpath('com.facebook.react:react-native-gradle-plugin')
     classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+    classpath('com.google.gms:google-services:4.4.2')
   }
 }
 
@@ -32,20 +33,6 @@ allprojects {
     maven { url 'https://www.jitpack.io' }
   }
 }
-
-
-subprojects {
-    project.configurations.all {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group == 'org.jetbrains.kotlin') {
-                details.useVersion "2.0.21"
-            }
-        }
-        // This is often required for modern React Native duplicate class errors
-        exclude group: 'com.google.guava', module: 'listenablefuture'
-    }
-}
-
 
 apply plugin: "expo-root-project"
 apply plugin: "com.facebook.react.rootproject"

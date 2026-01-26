@@ -169,7 +169,6 @@ function RouteSelectScreen() {
                                 </TouchableOpacity>
                             </View>
 
-                            {/* ──────────────────────────────────────────────── */}
                             {/* Replaced input section with LocationInputs component */}
                             <LocationInputs
                                 fromLocation={fromLocation}
@@ -191,32 +190,31 @@ function RouteSelectScreen() {
                                 onToBlur={() => setToFocused(false)}
                                 toInputRef={toInputRef}
                             />
-                            {/* ──────────────────────────────────────────────── */}
 
-                            {showTransportSelector && (
-                                <View style={styles.modeSection}>
-                                    <Text style={styles.sectionTitle}>Select transport mode</Text>
-                                    <ModeOfTransportSelect
-                                        selectedMode={selectedMode}
-                                        onSelect={setSelectedMode}
-                                    />
-                                </View>
-                            )}
+                            <View style={styles.modeOfTransportContainer}>
+                                {showTransportSelector && (
+                                    <View style={styles.modeSection}>
+                                        <Text style={styles.sectionTitle}>Select transport mode</Text>
+                                        <ModeOfTransportSelect
+                                            selectedMode={selectedMode}
+                                            onSelect={setSelectedMode}
+                                        />
+                                    </View>
+                                )}
 
-                            {isSearching && !recommendations.length && (
-                                <View style={{ padding: 20, alignItems: 'center' }}>
-                                    <ActivityIndicator size="small" color="#000" />
-                                </View>
-                            )}
+                                {isSearching && !recommendations.length && (
+                                    <View style={{ padding: 20, alignItems: 'center' }}>
+                                        <ActivityIndicator size="small" color="#000" />
+                                    </View>
+                                )}
+                            </View>
 
-                            {/* ──────────────────────────────────────────────── */}
                             {/* Replaced results list with LocationList component */}
                             <LocationList
                                 isSearching={isSearching}
                                 recommendations={recommendations}
                                 onSelect={handleSelectRecommendation}
                             />
-                            {/* ──────────────────────────────────────────────── */}
 
                         </View>
                     </View>
@@ -283,6 +281,10 @@ const styles = StyleSheet.create({
     closeButton: { padding: 4 },
     modeSection: { paddingHorizontal: 20, marginBottom: 24 },
     sectionTitle: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 12 },
+
+    modeOfTransportContainer: {
+        marginVertical: 20,
+    }
 });
 
 export default RouteSelectScreen;

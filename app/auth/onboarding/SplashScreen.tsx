@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     logoText: {
+        fontFamily: "BrittiBold",
         fontSize: 32,
         fontWeight: "bold",
         color: "#FFFFFF",
