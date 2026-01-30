@@ -12,23 +12,167 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Alert, ActivityIndicator } from 'react-native';
 
-// Dummy user data
-const USER_DATA = {
-    firstName: 'John',
-    lastName: 'Doe',
-    fullName: 'John Doe',
-    username: 'johndoe',
-    email: 'john.doe@example.com',
-    phone: '+234 801 222 3333',
-    location: 'Lagos, Nigeria',
-    image: null,
+import api, { getUserData, setUserData, UserData } from '@/services/api';
+
+// Fallback user data
+const DEFAULT_USER_DATA = {
+    firstName: '',
+    lastName: '',
+    fullName: 'Set your name',
+    username: 'username',
+    email: 'email@example.com',
+    phone: 'Add phone number',
+    location: 'Set location',
+    profilePhoto: null,
 };
+
+const DEFAULT_AVATAR_COLORS = [
+    '#2E7D32', // Green
+    '#1565C0', // Blue
+    '#C62828', // Red
+    '#6A1B9A', // Purple
+    '#EF6C00', // Orange
+    '#00838F', // Cyan
+];
 
 function AccountDetailsScreen() {
     const router = useRouter();
     const [showAvatarModal, setShowAvatarModal] = useState(false);
+    const [showColorPicker, setShowColorPicker] = useState(false);
     const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
+    const [userData, setUserDataState] = useState<UserData | typeof DEFAULT_USER_DATA>(DEFAULT_USER_DATA);
+    const [uploading, setUploading] = useState(false);
+
+    React.useEffect(() => {
+        loadUserProfile();
+    }, []);
+
+    const loadUserProfile = async () => {
+        try {
+            // 1. Check cache
+            const cachedData = await getUserData();
+            if (cachedData) {
+                setUserDataState(prev => ({ ...prev, ...cachedData }));
+            }
+
+            // 2. Fetch from backend
+            const response = await api.get('/api/user/account/profile');
+            if (response.data) {
+                const fetchedData = response.data;
+                const updatedData = {
+                    ...fetchedData,
+                    fullName: fetchedData.firstName && fetchedData.lastName
+                        ? `${fetchedData.firstName} ${fetchedData.lastName}`
+                        : (fetchedData.firstName || fetchedData.lastName || 'Set your name')
+                };
+                setUserDataState(updatedData);
+                // 3. Update cache
+                await setUserData(updatedData);
+            }
+        } catch (error) {
+            console.error('Error loading user profile:', error);
+        } finally {
+            // No loading spinner for initial load as we show cache/placeholders
+        }
+    };
+
+    const handleTakePhoto = async () => {
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'Camera access is required to take photos.');
+            return;
+        }
+
+        const result = await ImagePicker.launchCameraAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            uploadImage(result.assets[0].uri);
+        }
+        setShowAvatarModal(false);
+    };
+
+    const handlePickImage = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Permission Denied', 'Gallery access is required to pick photos.');
+            return;
+        }
+
+        const result = await ImagePicker.launchImageLibraryAsync({
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+        });
+
+        if (!result.canceled) {
+            uploadImage(result.assets[0].uri);
+        }
+        setShowAvatarModal(false);
+    };
+
+    const uploadImage = async (uri: string) => {
+        setUploading(true);
+        try {
+            const formData = new FormData();
+            const filename = uri.split('/').pop() || 'photo.jpg';
+            const match = /\.(\w+)$/.exec(filename);
+            const type = match ? `image/${match[1] === 'jpg' ? 'jpeg' : match[1]}` : `image/jpeg`;
+
+            // @ts-ignore - FormData expects a different structure than web in React Native
+            formData.append('profilePhoto', { uri, name: filename, type });
+
+            const response = await api.put('/api/user/account/update-profile-photo', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            if (response.data.profilePhoto) {
+                const updatedData = { ...userData, profilePhoto: response.data.profilePhoto };
+                setUserDataState(updatedData);
+                await setUserData(updatedData);
+                Alert.alert('Success', 'Profile photo updated successfully');
+            }
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            Alert.alert('Error', 'Failed to upload image. Please try again.');
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleSelectColor = async (color: string) => {
+        setUploading(true);
+        try {
+            // For "Choose your avatar", we'll store the color as a special string or update a color field
+            // Since the backend handles 'profilePhoto', we could potentially send a color code or just clear the photo
+            // and let the frontend handle the background color if it's not a URL.
+            // For now, let's assume we set a 'placeholderColor' in the profile.
+
+            const response = await api.put('/api/user/account/update-profile', {
+                profilePhoto: null, // Clear photo
+                avatarColor: color  // Custom field
+            });
+
+            if (response.status === 200) {
+                const updatedData = { ...userData, profilePhoto: null, avatarColor: color };
+                setUserDataState(updatedData);
+                await setUserData(updatedData);
+            }
+        } catch (error) {
+            console.error('Error updating avatar color:', error);
+        } finally {
+            setUploading(false);
+            setShowColorPicker(false);
+        }
+    };
 
     const handleLogout = () => {
         setIsLogoutModalVisible(false);
@@ -37,11 +181,11 @@ function AccountDetailsScreen() {
     };
 
     const personalInfoItems = [
-        { id: 'username', title: 'Username', value: `@${USER_DATA.username}`, onPress: () => router.push('../setting/UpdateUsernameScreen') },
-        { id: 'name', title: 'Full name', value: USER_DATA.fullName, onPress: () => router.push('../setting/UpdateUserFullNameScreen') },
-        { id: 'phone', title: 'Phone number', value: USER_DATA.phone, onPress: () => router.push('../setting/UpdateUserPhoneNumberScreen') },
-        { id: 'email', title: 'Email address', value: USER_DATA.email, onPress: () => router.push('../setting/UpdateUserEmailScreen') },
-        { id: 'location', title: 'Location', value: USER_DATA.location, onPress: () => { } },
+        { id: 'username', title: 'Username', value: userData.username ? `@${userData.username}` : 'Set username', onPress: () => router.push('../setting/UpdateUsernameScreen') },
+        { id: 'name', title: 'Full name', value: userData.fullName || 'Set your name', onPress: () => router.push('../setting/UpdateUserFullNameScreen') },
+        { id: 'phone', title: 'Phone number', value: userData.phone || 'Add phone number', onPress: () => router.push('../setting/UpdateUserPhoneNumberScreen') },
+        { id: 'email', title: 'Email address', value: userData.email || 'Set email', onPress: () => router.push('../setting/UpdateUserEmailScreen') },
+        { id: 'location', title: 'Location', value: userData.location || 'Set location', onPress: () => { } },
     ];
 
     const getInitials = (first: string, last: string) => {
@@ -67,18 +211,27 @@ function AccountDetailsScreen() {
                 {/* Avatar Section */}
                 <View style={styles.avatarContainer}>
                     <View style={styles.avatarWrapper}>
-                        {USER_DATA.image ? (
-                            <Image source={{ uri: USER_DATA.image }} style={styles.avatarImage} />
-                        ) : (
+                        {uploading ? (
                             <View style={styles.avatarPlaceholder}>
+                                <ActivityIndicator color="#2E7D32" />
+                            </View>
+                        ) : userData.profilePhoto ? (
+                            <Image source={{ uri: userData.profilePhoto }} style={styles.avatarImage} />
+                        ) : (
+                            <View style={[
+                                styles.avatarPlaceholder,
+                                // @ts-ignore
+                                userData.avatarColor && { backgroundColor: userData.avatarColor }
+                            ]}>
                                 <Text style={styles.avatarInitials}>
-                                    {getInitials(USER_DATA.firstName, USER_DATA.lastName)}
+                                    {getInitials(userData.firstName || 'U', userData.lastName || 'N')}
                                 </Text>
                             </View>
                         )}
                         <TouchableOpacity
                             style={styles.editIconContainer}
                             onPress={() => setShowAvatarModal(true)}
+                            disabled={uploading}
                         >
                             <Ionicons name="pencil" size={14} color="#fff" />
                         </TouchableOpacity>
@@ -121,9 +274,9 @@ function AccountDetailsScreen() {
                         <Ionicons name="chevron-forward" size={20} color="#999" />
                     </TouchableOpacity>
 
-                    <TouchableOpacity 
-                        style={styles.listItem} 
-                        onPress={() => { router.push('./DeleteAccountScreen')}}
+                    <TouchableOpacity
+                        style={styles.listItem}
+                        onPress={() => { router.push('./DeleteAccountScreen') }}
                     >
                         <View style={styles.itemTextContainer}>
                             <Text style={[styles.actionText, styles.deleteText]}>Delete account</Text>
@@ -148,21 +301,56 @@ function AccountDetailsScreen() {
                     <View style={styles.modalContent}>
                         <View style={styles.modalHandle} />
 
-                        <TouchableOpacity style={styles.modalOption} onPress={() => setShowAvatarModal(false)}>
+                        <TouchableOpacity style={styles.modalOption} onPress={() => { setShowAvatarModal(false); setShowColorPicker(true); }}>
                             <Text style={styles.modalOptionText}>Choose your avatar</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.modalOption} onPress={() => setShowAvatarModal(false)}>
+                        <TouchableOpacity style={styles.modalOption} onPress={handleTakePhoto}>
                             <Text style={styles.modalOptionText}>Take photo</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.modalOption} onPress={() => setShowAvatarModal(false)}>
+                        <TouchableOpacity style={styles.modalOption} onPress={handlePickImage}>
                             <Text style={styles.modalOptionText}>Choose existing photo</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity
                             style={[styles.modalOption, styles.cancelOption]}
                             onPress={() => setShowAvatarModal(false)}
+                        >
+                            <Text style={[styles.modalOptionText, styles.cancelText]}>Cancel</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Pressable>
+            </Modal>
+
+            {/* Avatar Color Picker Modal */}
+            <Modal
+                visible={showColorPicker}
+                transparent={true}
+                animationType="slide"
+                onRequestClose={() => setShowColorPicker(false)}
+            >
+                <Pressable
+                    style={styles.modalOverlay}
+                    onPress={() => setShowColorPicker(false)}
+                >
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHandle} />
+                        <Text style={styles.modalTitle}>Choose avatar color</Text>
+
+                        <View style={styles.colorGrid}>
+                            {DEFAULT_AVATAR_COLORS.map(color => (
+                                <TouchableOpacity
+                                    key={color}
+                                    style={[styles.colorOption, { backgroundColor: color }]}
+                                    onPress={() => handleSelectColor(color)}
+                                />
+                            ))}
+                        </View>
+
+                        <TouchableOpacity
+                            style={[styles.modalOption, styles.cancelOption]}
+                            onPress={() => setShowColorPicker(false)}
                         >
                             <Text style={[styles.modalOptionText, styles.cancelText]}>Cancel</Text>
                         </TouchableOpacity>
@@ -427,7 +615,34 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         alignItems: 'center',
-        height: 72
+        height: 72,
+        justifyContent: 'center'
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontFamily: 'BrittiSemibold',
+        textAlign: 'center',
+        marginVertical: 10,
+        color: '#080808'
+    },
+    colorGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        padding: 20,
+        gap: 15
+    },
+    colorOption: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        borderWidth: 2,
+        borderColor: '#fff',
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     modalOptionText: {
         fontSize: 16,

@@ -26,21 +26,44 @@ export const requestLocationPermissions = async (): Promise<boolean> => {
 
 /**
  * Fetches the current location and caches it.
+ * Uses getLastKnownPositionAsync as a fast fallback.
  */
 export const fetchAndCacheLocation = async (): Promise<LocationData | null> => {
     try {
         const hasPermission = await requestLocationPermissions();
         if (!hasPermission) return null;
 
-        const location = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-        });
+        // Check if location services are enabled
+        const enabled = await Location.hasServicesEnabledAsync();
+        if (!enabled) {
+            console.warn('Location services are disabled.');
+            return await getCachedLocation(); // Return last cached if available
+        }
+
+        let location;
+        try {
+            // Try to get fast last known position first
+            location = await Location.getLastKnownPositionAsync({});
+
+            // If none or too old (e.g. > 10 mins), get fresh
+            if (!location || (Date.now() - location.timestamp > 10 * 60 * 1000)) {
+                location = await Location.getCurrentPositionAsync({
+                    accuracy: Location.Accuracy.Balanced,
+                });
+            }
+        } catch (e) {
+            console.warn('getCurrentPositionAsync failed, trying last known:', e);
+            location = await Location.getLastKnownPositionAsync({});
+        }
+
+        if (!location) return await getCachedLocation();
 
         const locationData: LocationData = {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
             timestamp: location.timestamp,
         };
+
 
         // Attempt to get reverse geocode (address)
         try {

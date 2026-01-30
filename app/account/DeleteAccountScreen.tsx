@@ -8,14 +8,36 @@ import {
     ScrollView,
     Modal,
     Pressable,
-    Image
+    Image,
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import api, { logout } from '../../services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 export default function DeleteAccountScreen() {
     const router = useRouter();
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
+
+    const handleDeleteAccount = async () => {
+        showLoader();
+        try {
+            await api.delete('/api/user/account/delete-account');
+            setIsModalVisible(false);
+            // Logout and clear tokens locally, then navigate to login
+            await logout(false);
+            router.replace('/auth/login/LoginScreen');
+        } catch (error: any) {
+            console.error('Failed to delete account:', error);
+            const errorMessage = error.response?.data?.error || 'Could not delete account. Please try again.';
+            Alert.alert('Error', errorMessage);
+        } finally {
+            hideLoader();
+        }
+    };
 
     const deleteItems = [
         "your profile and username",
@@ -109,11 +131,7 @@ export default function DeleteAccountScreen() {
                         <View style={styles.modalButtonRow}>
                             <TouchableOpacity
                                 style={[styles.modalButton, styles.confirmDeleteButton]}
-                                onPress={() => {
-                                    // Handle actual deletion logic here
-                                    setIsModalVisible(false);
-                                    router.replace('/auth/login/LoginScreen');
-                                }}
+                                onPress={handleDeleteAccount}
                             >
                                 <Text style={styles.confirmDeleteButtonText}>Delete account</Text>
                             </TouchableOpacity>

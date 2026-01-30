@@ -14,6 +14,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api, { setToken, setRefreshToken } from '@/services/api';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
+import { useLoader } from '@/contexts/LoaderContext';
 
 
 export default function VerifySignupEmailScreen() {
@@ -26,10 +27,9 @@ export default function VerifySignupEmailScreen() {
     // If 'autoSend' is in the URL, start at 0 so handleResend can fire.
     // Otherwise, start at 30 because the email was already sent during signup.
     const [timer, setTimer] = useState(params.autoSend === 'true' ? 0 : 30);
-    
-    const hasAttemptedSend = useRef(false);
 
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
+    const hasAttemptedSend = useRef(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
@@ -46,7 +46,7 @@ export default function VerifySignupEmailScreen() {
     useEffect(() => {
         // Only run if we have an email AND we haven't tried yet
         if (params.email && !hasAttemptedSend.current) {
-            
+
             // If the timer is 0, it means we came from the Login flow
             if (timer === 0) {
                 console.log("Auto-sending OTP for Login flow...");
@@ -61,7 +61,7 @@ export default function VerifySignupEmailScreen() {
     }, [params.email]);
 
     const handleOtpPress = (digit: string) => {
-        if (activeIndex > 3 || isLoading) return;
+        if (activeIndex > 3) return;
 
         const newOtp = [...otp];
         newOtp[activeIndex] = digit;
@@ -76,7 +76,6 @@ export default function VerifySignupEmailScreen() {
     };
 
     const handleOtpDelete = () => {
-        if (isLoading) return;
 
         const newOtp = [...otp];
         if (newOtp[activeIndex] !== '') {
@@ -90,7 +89,7 @@ export default function VerifySignupEmailScreen() {
 
 
     const handleVerify = async (otpCode: string) => {
-        setIsLoading(true);
+        showLoader();
         try {
             // 1. Verify OTP
             const verifyResponse = await api.post("/api/user/auth/register/verify-otp", {
@@ -114,14 +113,14 @@ export default function VerifySignupEmailScreen() {
             console.error('Verify OTP error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
     const handleResend = async () => {
         if (timer > 0) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             await api.get(`/api/user/auth/register/resend-otp/${email}`);
             setTimer(30);
@@ -132,7 +131,7 @@ export default function VerifySignupEmailScreen() {
             console.error('Resend OTP error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -182,7 +181,7 @@ export default function VerifySignupEmailScreen() {
                         {timer > 0 ? (
                             <Text style={styles.timerText}>Resend code in <Text style={styles.timerCount}>{timer}s</Text></Text>
                         ) : (
-                            <TouchableOpacity onPress={handleResend} disabled={isLoading}>
+                            <TouchableOpacity onPress={handleResend}>
                                 <Text style={styles.resendText}>Resend code</Text>
                             </TouchableOpacity>
                         )}

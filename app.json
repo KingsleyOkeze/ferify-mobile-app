@@ -14,7 +14,6 @@
     },
     "android": {
       "package": "com.ferify.app",
-      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -37,10 +36,12 @@
           "backgroundColor": "#ffffff"
         }
       ],
+      "expo-web-browser",
       [
-        "@react-native-google-signin/google-signin",
+        "@react-native-voice/voice",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.83364908021-vvtrd2orck921dat6eo6ib5nrjjv2o8a"
+          "microphonePermission": "Allow Ferify to use the microphone for voice search.",
+          "speechRecognitionPermission": "Allow Ferify to use speech recognition for voice search."
         }
       ]
     ],

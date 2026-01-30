@@ -8,12 +8,12 @@ import {
     TextInput,
     KeyboardAvoidingView,
     Platform,
-    ActivityIndicator,
     Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 function VerifyPasswordResetScreen() {
     const router = useRouter();
@@ -21,8 +21,7 @@ function VerifyPasswordResetScreen() {
 
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(60);
-    const [isLoading, setIsLoading] = useState(false);
-    const [isResending, setIsResending] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
@@ -55,7 +54,7 @@ function VerifyPasswordResetScreen() {
         const otpCode = otp.join('');
         if (otpCode.length < 6) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             const response = await api.post('/api/user/account/reset-password/verify', {
                 otp: otpCode,
@@ -77,14 +76,14 @@ function VerifyPasswordResetScreen() {
             console.error('OTP verification error:', error);
             Alert.alert('Error', error.response?.data?.error || 'Failed to verify code');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
     const handleResend = async () => {
         if (timer > 0) return;
 
-        setIsResending(true);
+        showLoader();
         try {
             await api.post('/api/user/account/reset-password/initiate');
             setTimer(60);
@@ -93,7 +92,7 @@ function VerifyPasswordResetScreen() {
             console.error('OTP resend error:', error);
             Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
         } finally {
-            setIsResending(false);
+            hideLoader();
         }
     };
 
@@ -125,7 +124,9 @@ function VerifyPasswordResetScreen() {
                     {otp.map((digit, index) => (
                         <TextInput
                             key={index}
-                            ref={(ref) => (inputRefs.current[index] = ref)}
+                            ref={(ref) => {
+                                inputRefs.current[index] = ref;
+                            }}
                             style={styles.otpInput}
                             keyboardType="number-pad"
                             maxLength={1}
@@ -143,11 +144,11 @@ function VerifyPasswordResetScreen() {
                     </Text>
                     <TouchableOpacity
                         onPress={handleResend}
-                        disabled={timer > 0 || isResending}
+                        disabled={timer > 0}
                     >
                         <Text style={[
                             styles.resendLink,
-                            (timer > 0 || isResending) && styles.resendLinkDisabled
+                            (timer > 0) && styles.resendLinkDisabled
                         ]}>
                             Resend Code
                         </Text>
@@ -158,16 +159,12 @@ function VerifyPasswordResetScreen() {
                     <TouchableOpacity
                         style={[
                             styles.verifyButton,
-                            (!isOtpComplete || isLoading) && styles.verifyButtonDisabled
+                            !isOtpComplete && styles.verifyButtonDisabled
                         ]}
-                        disabled={!isOtpComplete || isLoading}
+                        disabled={!isOtpComplete}
                         onPress={handleVerify}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.verifyButtonText}>Verify & Update</Text>
-                        )}
+                        <Text style={styles.verifyButtonText}>Verify & Update</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>

@@ -1,20 +1,20 @@
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import { LoaderProvider } from '../contexts/LoaderContext';
 
 function StackLayout() {
     const insets = useSafeAreaInsets();
   
     useEffect(() => {
-        GoogleSignin.configure({
-            // webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-            webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-            offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-            forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-            iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID, // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
-        });
+        // GoogleSignin.configure({
+        //     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+        //     offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+        //     forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
+        //     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID, // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+        //     profileImageSize: 150,
+        // });
     }, []);
 
     return (
@@ -245,7 +245,9 @@ function StackLayout() {
 export default function RootLayout() {
     return (
         <SafeAreaProvider>
-            <StackLayout />
+            <LoaderProvider>
+                <StackLayout />
+            </LoaderProvider>
         </SafeAreaProvider>
     );
 }

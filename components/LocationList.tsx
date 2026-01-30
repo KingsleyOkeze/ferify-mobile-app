@@ -38,7 +38,7 @@ export default function LocationList({
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
-                {recommendations.map((item) => (
+                {Array.isArray(recommendations) && recommendations.map((item) => (
                     <TouchableOpacity
                         key={item.place_id}
                         style={styles.resultCard}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -8,104 +8,73 @@ import {
     TouchableOpacity,
     SafeAreaView,
     Dimensions,
+    RefreshControl,
+    ActivityIndicator,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
+import api from '@/services/api';
 import mapImage from '../../assets/images/popular-search-icons/map_icon.png'
 import shareLocationHand from '../../assets/images/popular-search-icons/share_location_hand_icon.png'
 import alertIcon from '../../assets/images/popular-search-icons/alert_icon.png'
 import shineIcon from '../../assets/images/popular-search-icons/shine_icon.png'
 
-
 const { width } = Dimensions.get('window');
 
-// Mock Data
-const recentlyUpdated = [
-    {
-        id: '1',
-        image: require('@/assets/images/transportation-icons/busImage.png'),
-        route: 'Oshodi - Iyana Ipaja',
-        timeAgo: '18 min ago',
-        contributors: 12,
-        priceRange: '₦400 - ₦500',
-    },
-    {
-        id: '2',
-        image: require('@/assets/images/transportation-icons/okadaImage.png'),
-        route: 'Ikeja - Ogba',
-        timeAgo: '25 min ago',
-        contributors: 8,
-        priceRange: '₦200 - ₦300',
-    },
-    {
-        id: '3',
-        image: require('@/assets/images/transportation-icons/kekeImage.png'),
-        route: 'Yaba - Surulere',
-        timeAgo: '10 min ago',
-        contributors: 15,
-        priceRange: '₦150 - ₦200',
-    },
-];
-
-const popularRoutesToday = [
-    {
-        id: '1',
-        image: require('@/assets/images/transportation-icons/busImage.png'),
-        route: 'Lekki - Ajah',
-        priceRange: '₦500 - ₦700',
-        time: '3:55pm',
-        points: 80,
-    },
-    {
-        id: '2',
-        image: require('@/assets/images/transportation-icons/kekeImage.png'),
-        route: 'Victoria Island - Ikoyi',
-        priceRange: '₦300 - ₦400',
-        time: '4:15pm',
-        points: 80,
-    },
-    {
-        id: '3',
-        image: require('@/assets/images/transportation-icons/okadaImage.png'),
-        route: 'Maryland - Ojota',
-        priceRange: '₦200 - ₦250',
-        time: '4:30pm',
-        points: 80,
-    },
-    {
-        id: '4',
-        image: require('@/assets/images/transportation-icons/okadaImage.png'),
-        route: 'CMS - Obalende',
-        priceRange: '₦300 - ₦400',
-        time: '4:45pm',
-        points: 80,
-    },
-];
-
-const tipsAndInsights = [
-    {
-        id: '1',
-        title: 'Peak Hour Alert',
-        body: 'Expect heavy traffic on 3rd Mainland Bridge',
-        image: require('@/assets/images/popular-search-icons/alert_icon.png'),
-    },
-    {
-        id: '2',
-        title: 'Fast Route',
-        body: 'Take Ikorodu Road for faster commute',
-        image: require('@/assets/images/popular-search-icons/alert_icon.png'),
-    },
-    {
-        id: '3',
-        title: 'Traffic Update',
-        body: 'Gridlock cleared at Berger',
-        image: require('@/assets/images/popular-search-icons/alert_icon.png'),
-    },
-];
-
 function DiscoverScreen() {
+    const router = useRouter();
+    const [refreshing, setRefreshing] = useState(false);
+    const [loading, setLoading] = useState(true);
+
+    const [recentlyUpdated, setRecentlyUpdated] = useState<any[]>([]);
+    const [popularRoutes, setPopularRoutes] = useState<any[]>([]);
+    const [insights, setInsights] = useState<any[]>([]);
+
+    const fetchDiscoverData = useCallback(async () => {
+        try {
+            const [recentRes, popularRes, insightsRes] = await Promise.all([
+                api.get('/api/fare/nearby'), // Reusing nearby as global recent
+                api.get('/api/fare/popular'),
+                api.get('/api/fare/insights')
+            ]);
+
+            if (recentRes.data) setRecentlyUpdated(recentRes.data.fares || []);
+            if (popularRes.data) setPopularRoutes(popularRes.data);
+            if (insightsRes.data) setInsights(insightsRes.data);
+        } catch (error) {
+            console.error("Error fetching discover data:", error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchDiscoverData();
+    }, [fetchDiscoverData]);
+
+    const onRefresh = () => {
+        setRefreshing(true);
+        fetchDiscoverData();
+    };
+
+    if (loading && !refreshing) {
+        return (
+            <SafeAreaView style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+                <ActivityIndicator size="large" color="#014C1D" />
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                }
+            >
 
                 {/* Header */}
                 <View style={styles.header}>
@@ -114,45 +83,53 @@ function DiscoverScreen() {
                 </View>
 
                 {/* Recently Updated Section */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Recently updated</Text>
-                    </View>
-                    <View style={styles.verticalList}>
-                        {recentlyUpdated.map((item, index) => (
-                            <TouchableOpacity
-                                key={item.id}
-                                style={[
-                                    styles.recentCard,
-                                    index === recentlyUpdated.length - 1 && { borderBottomWidth: 0 }
-                                ]}
-                            >
-                                {/* 1. Image View */}
-                                <Image source={item.image} style={styles.recentImage} />
-
-                                {/* 2. Middle View (Details) */}
-                                <View style={styles.recentDetails}>
-                                    <Text style={styles.recentRoute} numberOfLines={1}>{item.route}</Text>
-
-                                    <View style={styles.recentMetaRow}>
-                                        <Ionicons name="calendar-outline" size={12} color="#666" style={styles.metaIcon} />
-                                        <Text style={styles.recentMetaText}>{item.timeAgo}</Text>
+                {recentlyUpdated.length > 0 && (
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={styles.sectionTitle}>Recently updated</Text>
+                        </View>
+                        <View style={styles.verticalList}>
+                            {recentlyUpdated.map((item, index) => (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={[
+                                        styles.recentCard,
+                                        index === recentlyUpdated.length - 1 && { borderBottomWidth: 0 }
+                                    ]}
+                                >
+                                    {/* 1. Icon View */}
+                                    <View style={[styles.recentImage, { justifyContent: 'center', alignItems: 'center' }]}>
+                                        <Ionicons
+                                            name={item.vehicleType === 'bus' ? 'bus' : item.vehicleType === 'keke' ? 'bicycle' : 'car'}
+                                            size={32}
+                                            color="#080808"
+                                        />
                                     </View>
 
-                                    <View style={styles.recentMetaRow}>
-                                        <Ionicons name="people-outline" size={12} color="#666" style={styles.metaIcon} />
-                                        <Text style={styles.recentMetaText}>{item.contributors} contributors</Text>
-                                    </View>
-                                </View>
+                                    {/* 2. Middle View (Details) */}
+                                    <View style={styles.recentDetails}>
+                                        <Text style={styles.recentRoute} numberOfLines={1}>{item.from} - {item.to}</Text>
 
-                                {/* 3. Price View */}
-                                <View style={styles.recentPriceContainer}>
-                                    <Text style={styles.recentPrice}>{item.priceRange}</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
+                                        <View style={styles.recentMetaRow}>
+                                            <Ionicons name="time-outline" size={12} color="#666" style={styles.metaIcon} />
+                                            <Text style={styles.recentMetaText}>{item.time}</Text>
+                                        </View>
+
+                                        <View style={styles.recentMetaRow}>
+                                            <Ionicons name="people-outline" size={12} color="#666" style={styles.metaIcon} />
+                                            <Text style={styles.recentMetaText}>{item.contributors || 1} contributors</Text>
+                                        </View>
+                                    </View>
+
+                                    {/* 3. Price View */}
+                                    <View style={styles.recentPriceContainer}>
+                                        <Text style={styles.recentPrice}>{item.priceRange}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </View>
-                </View>
+                )}
 
                 {/* Popular Searches */}
                 <View style={styles.section}>
@@ -163,7 +140,7 @@ function DiscoverScreen() {
                         </View>
                     </View>
 
-                    <TouchableOpacity style={styles.popularSearchCard}>
+                    <TouchableOpacity style={styles.popularSearchCard} onPress={() => router.push('/route/RouteSelectScreen')}>
                         <Image source={shareLocationHand} style={styles.searchImage} />
                         <View style={styles.searchContent}>
                             <Text style={styles.searchMessage}>Check fare estimates for your next trip</Text>
@@ -173,56 +150,66 @@ function DiscoverScreen() {
                 </View>
 
                 {/* Popular Route Today */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Popular route today</Text>
-                    <View style={styles.verticalList}>
-                        {popularRoutesToday.map((item, index) => (
-                            <TouchableOpacity
-                                key={item.id}
-                                style={[
-                                    styles.popularRouteCard,
-                                    index === popularRoutesToday.length - 1 && { borderBottomWidth: 0 }
-                                ]}
-                            >
-                                {/* Left: Image */}
-                                <Image source={item.image} style={styles.popularRouteImage} />
+                {popularRoutes.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Popular routes today</Text>
+                        <View style={styles.verticalList}>
+                            {popularRoutes.map((item, index) => (
+                                <TouchableOpacity
+                                    key={item.id}
+                                    style={[
+                                        styles.popularRouteCard,
+                                        index === popularRoutes.length - 1 && { borderBottomWidth: 0 }
+                                    ]}
+                                >
+                                    {/* Left: Icon */}
+                                    <View style={[styles.popularRouteImage, { justifyContent: 'center', alignItems: 'center' }]}>
+                                        <Ionicons
+                                            name={item.vehicleType === 'bus' ? 'bus' : item.vehicleType === 'keke' ? 'bicycle' : 'car'}
+                                            size={32}
+                                            color="#080808"
+                                        />
+                                    </View>
 
-                                {/* Middle: Details */}
-                                <View style={styles.popularRouteDetails}>
-                                    <Text style={styles.popularRouteText}>{item.route}</Text>
-                                    <Text style={styles.popularRoutePrice}>{item.priceRange}</Text>
-                                    <Text style={styles.popularRouteTime}>{item.time}</Text>
-                                </View>
+                                    {/* Middle: Details */}
+                                    <View style={styles.popularRouteDetails}>
+                                        <Text style={styles.popularRouteText}>{item.route}</Text>
+                                        <Text style={styles.popularRoutePrice}>{item.priceRange}</Text>
+                                        <Text style={styles.popularRouteTime}>{item.time}</Text>
+                                    </View>
 
-                                {/* Right: Points */}
-                                <View style={styles.pointsBadge}>
-                                    <Text style={styles.pointsText}>+{item.points} points</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
+                                    {/* Right: Points */}
+                                    <View style={styles.pointsBadge}>
+                                        <Text style={styles.pointsText}>+{item.points} pts</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </View>
-                </View>
+                )}
 
                 {/* Tips & Insight */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Tips & Insight</Text>
-                    <View style={styles.verticalList}>
-                        {tipsAndInsights.map((item) => (
-                            <TouchableOpacity key={item.id} style={styles.tipCard}>
-                                <View style={styles.tipIconContainer}>
-                                    <Image source={item.image as any} style={styles.tipIcon} />
-                                </View>
-                                <View style={styles.tipContent}>
-                                    <Text style={styles.tipTitle}>{item.title}</Text>
-                                    <Text style={styles.tipBody} numberOfLines={2}>{item.body}</Text>
-                                </View>
-                            </TouchableOpacity>
-                        ))}
+                {insights.length > 0 && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Tips & Insight</Text>
+                        <View style={styles.verticalList}>
+                            {insights.map((item) => (
+                                <TouchableOpacity key={item.id} style={styles.tipCard}>
+                                    <View style={styles.tipIconContainer}>
+                                        <Ionicons name="sparkles" size={24} color="#014C1D" />
+                                    </View>
+                                    <View style={styles.tipContent}>
+                                        <Text style={styles.tipTitle}>{item.title}</Text>
+                                        <Text style={styles.tipBody} numberOfLines={2}>{item.body}</Text>
+                                    </View>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
                     </View>
-                </View>
+                )}
 
                 {/* Promo / Broken Border Card */}
-                <TouchableOpacity style={styles.promoCard}>
+                <TouchableOpacity style={styles.promoCard} onPress={() => router.push('/achievement/LeadersBoardScreen')}>
                     <View style={styles.promoImageContainer}>
                         <Image source={shineIcon} style={styles.promoImage} />
                     </View>
@@ -265,8 +252,6 @@ const styles = StyleSheet.create({
     },
     section: {
         marginBottom: 24,
-        // flexDirection: 'column',
-        // justifyContent: 'space-between'
     },
     sectionHeader: {
         flexDirection: 'row',
@@ -290,23 +275,16 @@ const styles = StyleSheet.create({
 
     recentCardContainer: {
         backgroundColor: '#FFFFFF',
-
     },
 
     recentCard: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
-        padding: 12,
-        // marginBottom: 12,
+        alignItems: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 12,
         width: '100%',
-        height: 127,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.05,
-        // shadowRadius: 8,
-        // elevation: 2,
     },
     recentImage: {
         width: 60,
@@ -373,8 +351,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        borderColor: '#DADADA'
-        // height: 65,
+        borderColor: '#DADADA',
     },
     searchImage: {
         width: 24,
@@ -404,21 +381,18 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 10,
         backgroundColor: '#FFFFFF',
-        // backgroundColor: 'red',
-        // borderTopWidth: 1,
-        // borderTopColor: '#DADADA',
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         gap: 16,
     },
     popularRouteCard: {
         flexDirection: 'row',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         backgroundColor: '#FFFFFF',
         width: '100%',
-        height: 113,
         borderRadius: 12,
-        padding: 12,
+        paddingVertical: 16,
+        paddingHorizontal: 12,
         borderBottomWidth: 1,
         borderColor: '#F0F0F0',
     },
@@ -476,7 +450,6 @@ const styles = StyleSheet.create({
         minHeight: 91,
         borderWidth: 1,
         borderColor: '#F0F0F0',
-        // marginHorizontal: 10,
     },
     tipIconContainer: {
         width: 48,
@@ -523,11 +496,11 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         backgroundColor: '#F08D2512',
         marginBottom: 20,
-        height: 106
+        height: 106,
     },
     promoImageContainer: {
         marginRight: 16,
-        height: '100%'
+        height: '100%',
     },
     promoImage: {
         width: 20,

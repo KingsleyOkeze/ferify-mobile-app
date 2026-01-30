@@ -16,12 +16,13 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 function PasswordResetScreen() {
     const router = useRouter();
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     // Focus States
     const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
@@ -33,7 +34,7 @@ function PasswordResetScreen() {
     const handleUpdate = async () => {
         if (!isFormValid) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             const response = await api.post('/api/user/account/reset-password/initiate');
             if (response.status === 200) {
@@ -47,7 +48,7 @@ function PasswordResetScreen() {
             console.error('Password reset initiation error:', error);
             Alert.alert('Error', error.response?.data?.error || 'Failed to send verification code');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -122,21 +123,17 @@ function PasswordResetScreen() {
                     <TouchableOpacity
                         style={[
                             styles.updateButton,
-                            (!isFormValid || isLoading) && styles.updateButtonDisabled
+                            (!isFormValid) && styles.updateButtonDisabled
                         ]}
-                        disabled={!isFormValid || isLoading}
+                        disabled={!isFormValid}
                         onPress={handleUpdate}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={[
-                                styles.updateButtonText,
-                                !isFormValid && styles.updateButtonTextDisabled
-                            ]}>
-                                Get Verification Code
-                            </Text>
-                        )}
+                        <Text style={[
+                            styles.updateButtonText,
+                            !isFormValid && styles.updateButtonTextDisabled
+                        ]}>
+                            Get Verification Code
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
@@ -242,7 +239,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     updateButtonTextDisabled: {
-        color: '#979797', 
+        color: '#979797',
         fontWeight: 600,
     },
 });

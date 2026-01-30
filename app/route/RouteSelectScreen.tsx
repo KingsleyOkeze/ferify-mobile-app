@@ -18,6 +18,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import ModeOfTransportSelect from '@/components/ModeOfTransportSelect';
 import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 import LocationInputs from '@/components/LocationInputs';     // ← added
 import LocationList from '@/components/LocationList';         // ← added
@@ -33,6 +34,7 @@ function RouteSelectScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const isAndroid = Platform.OS === 'android';
+    const { showLoader, hideLoader } = useLoader();
 
     // Inputs
     const [fromLocation, setFromLocation] = useState('');
@@ -75,7 +77,8 @@ function RouteSelectScreen() {
             const response = await api.get('/api/route/placesearch', {
                 params: { query: text }
             });
-            setRecommendations(response.data || []);
+            const data = response.data;
+            setRecommendations(Array.isArray(data) ? data : (data?.result || []));
         } catch (error) {
             console.error('Search error:', error);
         } finally {
@@ -105,7 +108,7 @@ function RouteSelectScreen() {
 
     const performFareCheck = async (from: Recommendation, to: Recommendation, mode: string) => {
         try {
-            setIsSearching(true);
+            showLoader();
             const response = await api.get('/api/fare/estimate', {
                 params: {
                     from: from.name,
@@ -115,19 +118,38 @@ function RouteSelectScreen() {
             });
 
             router.push({
-                pathname: "/route/RouteSummaryScreen",
+                pathname: "/route/RouteResultScreen",
                 params: {
                     from: from.name,
                     to: to.name,
+                    fromId: from.place_id,
+                    toId: to.place_id,
                     mode: mode,
                     fareData: JSON.stringify(response.data)
                 }
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Fare check error:', error);
-            Alert.alert("Error", "Could not calculate fare estimate. Please try again.");
+
+            // If it's a 404 (No data found), we still navigate but with null fare data
+            if (error.response?.status === 404) {
+                router.push({
+                    pathname: "/route/RouteResultScreen",
+                    params: {
+                        from: from.name,
+                        to: to.name,
+                        fromId: from.place_id,
+                        toId: to.place_id,
+                        mode: mode,
+                        fareData: null,
+                        errorMessage: error.response?.data?.message || "No fare data found"
+                    }
+                });
+            } else {
+                Alert.alert("Error", "Could not calculate fare estimate. Please try again.");
+            }
         } finally {
-            setIsSearching(false);
+            hideLoader();
         }
     };
 
@@ -136,6 +158,35 @@ function RouteSelectScreen() {
             performFareCheck(fromResult, toResult, selectedMode);
         }
     }, [selectedMode]);
+
+    // Handle initial parameters from Voice Search or other deep links
+    useEffect(() => {
+        const init = async () => {
+            const { initialFrom, initialTo } = params;
+
+            if (initialFrom) {
+                setFromLocation(initialFrom as string);
+                // Set a temporary result to enable the "To" input
+                setFromResult({
+                    name: initialFrom as string,
+                    place_id: 'current_location'
+                });
+            }
+
+            if (initialTo) {
+                setToLocation(initialTo as string);
+                // Trigger search for the destination immediately
+                handleSearch(initialTo as string, 'to');
+                // Focus the destination input to let user select from list
+                setTimeout(() => {
+                    setActiveInput('to');
+                    toInputRef.current?.focus();
+                }, 800);
+            }
+        };
+
+        init();
+    }, [params.initialFrom, params.initialTo]);
 
     const Wrapper = isAndroid ? View : SafeAreaView;
 
@@ -277,11 +328,11 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     headerSpacer: { width: 24 },
-    headerTitle: { 
-        fontSize: 18, 
-        fontWeight: '700', 
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
         fontFamily: 'BrittiSemibold',
-        color: '#000000' 
+        color: '#000000'
     },
     closeButton: { padding: 4 },
     modeSection: { paddingHorizontal: 20, marginBottom: 24 },

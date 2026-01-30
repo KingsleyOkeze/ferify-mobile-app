@@ -94,7 +94,8 @@ const styles = StyleSheet.create({
     },
     locationContainer: {
         position: 'relative',
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        backgroundColor: 'red'
     },
     locationInput: {
         backgroundColor: '#F0F0F0',

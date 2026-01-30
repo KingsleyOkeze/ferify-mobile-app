@@ -11,16 +11,54 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 
+import api from '@/services/api';
+import { ActivityIndicator } from 'react-native';
+
 export default function LeadersBoardScreen() {
     const router = useRouter();
     const [activeToggle, setActiveToggle] = useState<'week' | 'month'>('week');
     const [slideAnim] = useState(new Animated.Value(0));
+    const [loading, setLoading] = useState(true);
+    const [leaderboard, setLeaderboard] = useState<any[]>([]);
+
+    React.useEffect(() => {
+        fetchLeaderboard();
+    }, [activeToggle]); // Re-fetch if toggle changes (though currently same endpoint)
+
+    const fetchLeaderboard = async () => {
+        setLoading(true);
+        try {
+            // In a future update, timeframe can be passed as a query param
+            const response = await api.get('/api/user/account/leaderboard');
+
+            // Map icons based on rank
+            const rankIcons: any = {
+                1: 'ribbon-outline',
+                2: 'star-outline',
+                3: 'medal-outline',
+                4: 'diamond-outline',
+                5: 'shield-outline'
+            };
+
+            const mappedData = response.data.map((item: any) => ({
+                ...item,
+                name: item.username,
+                icon: rankIcons[item.rank] || 'people-outline'
+            }));
+
+            setLeaderboard(mappedData);
+        } catch (error) {
+            console.error("Error fetching leaderboard:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleToggle = (choice: 'week' | 'month') => {
         setActiveToggle(choice);
         Animated.spring(slideAnim, {
             toValue: choice === 'week' ? 0 : 1,
-            useNativeDriver: false, // backgroundColor and layout properties don't support native driver
+            useNativeDriver: false,
             tension: 50,
             friction: 7,
         }).start();
@@ -31,25 +69,8 @@ export default function LeadersBoardScreen() {
         outputRange: ['0%', '50%'],
     });
 
-    // Mock data for weekly rankings
-    const weeklyRankings = [
-        { id: 1, name: 'Ikeja Master', count: '142 fares', icon: 'ribbon-outline' },
-        { id: 2, name: 'Lekki Legend', count: '128 fares', icon: 'star-outline' },
-        { id: 3, name: 'Mainland King', count: '115 fares', icon: 'medal-outline' },
-        { id: 4, name: 'Island Queen', count: '98 fares', icon: 'diamond-outline' },
-        { id: 5, name: 'Route Guardian', count: '87 fares', icon: 'shield-outline' },
-    ];
+    const currentRankings = leaderboard;
 
-    // Mock data for monthly rankings
-    const monthlyRankings = [
-        { id: 1, name: 'Lagos Titan', count: '542 fares', icon: 'trophy-outline' },
-        { id: 2, name: 'Metro Guru', count: '488 fares', icon: 'flash-outline' },
-        { id: 3, name: 'City Guide', count: '415 fares', icon: 'navigate-outline' },
-        { id: 4, name: 'Map Expert', count: '398 fares', icon: 'map-outline' },
-        { id: 5, name: 'Transit Pro', count: '387 fares', icon: 'bus-outline' },
-    ];
-
-    const currentRankings = activeToggle === 'week' ? weeklyRankings : monthlyRankings;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -108,20 +129,28 @@ export default function LeadersBoardScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.listContainer}>
-                    {currentRankings.map((item, index) => (
-                        <View key={item.id} style={styles.rankingItem}>
-                            <View style={styles.rankingLeft}>
-                                <View style={styles.iconContainer}>
-                                    <Ionicons name={item.icon as any} size={24} color="#080808" />
+                {loading ? (
+                    <ActivityIndicator size="large" color="#080808" style={{ marginTop: 40 }} />
+                ) : (
+                    <View style={styles.listContainer}>
+                        {currentRankings.map((item, index) => (
+                            <View key={item.id} style={styles.rankingItem}>
+                                <View style={styles.rankingLeft}>
+                                    <View style={styles.iconContainer}>
+                                        <Ionicons name={item.icon as any} size={24} color="#080808" />
+                                    </View>
+                                    <View>
+                                        <Text style={styles.rankingName}>{item.name}</Text>
+                                        <Text style={[styles.rankingName, { fontSize: 12, color: '#666', fontWeight: '400' }]}>{item.title}</Text>
+                                    </View>
                                 </View>
-                                <Text style={styles.rankingName}>{item.name}</Text>
+                                <Text style={styles.rankingCount}>{item.count}</Text>
                             </View>
-                            <Text style={styles.rankingCount}>{item.count}</Text>
-                        </View>
-                    ))}
-                </View>
+                        ))}
+                    </View>
+                )}
             </ScrollView>
+
         </SafeAreaView>
     );
 }

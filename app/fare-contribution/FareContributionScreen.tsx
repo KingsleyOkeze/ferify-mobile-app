@@ -10,7 +10,8 @@ import {
     Animated,
     Dimensions,
     SafeAreaView,
-    ActivityIndicator
+    ActivityIndicator,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TimeSelectionModal from './TimeSelectionModal';
@@ -18,8 +19,12 @@ import SuccessModal from './SuccessModal';
 import RewardsModal from './RewardsModal';
 import ModeOfTransportSelect from '../../components/ModeOfTransportSelect';
 import LocationInputs from '../../components/LocationInputs';
-import { useRouter } from "expo-router";
+import RouteFromAndTo from '@/components/RouteFromAndTo';
+import { useRouter, useLocalSearchParams } from "expo-router";
+import api from '@/services/api';
 import { getCachedLocation } from '@/services/locationService';
+import { useLoader } from '@/contexts/LoaderContext';
+
 
 const { height } = Dimensions.get('window');
 
@@ -64,19 +69,26 @@ const predefinedConditions: ConditionOption[] = [
 
 function FareContributionScreen() {
     const router = useRouter();
+    const { from, to } = useLocalSearchParams();
+
     // Form state
     const [fromLocation, setFromLocation] = useState('');
     const [toLocation, setToLocation] = useState('');
 
     useEffect(() => {
-        const loadInitialLocation = async () => {
-            const cached = await getCachedLocation();
-            if (cached && cached.address) {
-                setFromLocation(cached.address);
-            }
-        };
-        loadInitialLocation();
-    }, []);
+        if (from || to) {
+            if (from) setFromLocation(from as string);
+            if (to) setToLocation(to as string);
+        } else {
+            const loadInitialLocation = async () => {
+                const cached = await getCachedLocation();
+                if (cached && cached.address) {
+                    setFromLocation(cached.address);
+                }
+            };
+            loadInitialLocation();
+        }
+    }, [from, to]);
     const [fareAmount, setFareAmount] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
     const [selectedTimeLabel, setSelectedTimeLabel] = useState('');
@@ -98,7 +110,7 @@ function FareContributionScreen() {
     const [rewardsModalVisible, setRewardsModalVisible] = useState(false);
 
     // Loading state
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     const toInputRef = useRef<TextInput | null>(null);
 
@@ -148,32 +160,48 @@ function FareContributionScreen() {
 
     const handleSubmit = async () => {
         if (isFormValid) {
-            setIsSubmitting(true);
+            showLoader();
 
             try {
-                // Simulate API call
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                // In a real app, userId should come from AuthContext
+                const userId = "temp-user-123";
 
-                console.log('Form submitted:', {
-                    fromLocation,
-                    toLocation,
-                    fareAmount,
-                    selectedTime,
-                    selectedVehicle,
-                    selectedConditions,
-                    customCondition,
-                    notes,
-                });
+                // Get user's current location for the "Near You" feature
+                const cachedLocation = await getCachedLocation();
+                const location = cachedLocation ? {
+                    type: 'Point',
+                    coordinates: [cachedLocation.longitude, cachedLocation.latitude]
+                } : undefined;
+
+                const payload = {
+                    userId,
+                    fromLocation: { raw: fromLocation },
+                    toLocation: { raw: toLocation },
+                    vehicleType: selectedVehicle,
+                    fareAmount: Number(fareAmount),
+                    timeOfDay: selectedTime,
+                    conditions: selectedConditions,
+                    notes: notes,
+                    location: location
+                };
+
+
+                const response = await api.post('/api/fare/submit', payload);
+
+                console.log('Fare submitted successfully:', response.data);
 
                 // Show success modal
-                setIsSubmitting(false);
+                hideLoader();
                 setSuccessModalVisible(true);
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Submission error:', error);
-                setIsSubmitting(false);
+                const errorMessage = error.response?.data?.error || "Could not submit fare. Please try again.";
+                Alert.alert("Error", errorMessage);
+                hideLoader();
             }
         }
     };
+
 
     const handleClaimReward = () => {
         setSuccessModalVisible(false);
@@ -229,6 +257,11 @@ function FareContributionScreen() {
                     onToBlur={() => setToFocused(false)}
                     toInputRef={toInputRef}
                 />
+
+                {/* Route Summary */}
+                {(from && to) && (
+                    <RouteFromAndTo from={fromLocation} to={toLocation} />
+                )}
 
                 {/* Fare Amount */}
                 <Text style={styles.sectionTitle}>How much did you pay?</Text>
@@ -322,7 +355,7 @@ function FareContributionScreen() {
                     disabled={!isFormValid}
                 >
                     <Text style={[styles.submitButtonText, !isFormValid && styles.submitButtonTextDisabled]}>
-                        Submit Fare
+                        {(from && to) ? "Confirm Fare" : "Submit Fare"}
                     </Text>
                 </TouchableOpacity>
             </ScrollView>
@@ -348,15 +381,6 @@ function FareContributionScreen() {
                 visible={rewardsModalVisible}
                 onClose={() => setRewardsModalVisible(false)}
             />
-
-            {/* Loading Overlay */}
-            {isSubmitting && (
-                <View style={styles.loadingOverlay}>
-                    <View style={styles.loadingContainer}>
-                        <ActivityIndicator size="large" color="#000" />
-                    </View>
-                </View>
-            )}
         </SafeAreaView>
     );
 }
@@ -508,28 +532,6 @@ const styles = StyleSheet.create({
     },
     submitButtonTextDisabled: {
         color: '#979797',
-    },
-    // Loading Overlay Styles (only thing kept here as it's simple)
-    loadingOverlay: {
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: '#0A0A0A66',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 9999,
-    },
-    loadingContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 16,
-        padding: 32,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 10,
     },
 });
 

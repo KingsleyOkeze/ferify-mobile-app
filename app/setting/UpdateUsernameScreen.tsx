@@ -16,13 +16,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 function UpdateUsernameScreen() {
     const router = useRouter();
     const [currentUsername, setCurrentUsername] = useState('Not set');
     const [newUsername, setNewUsername] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -36,12 +37,12 @@ function UpdateUsernameScreen() {
         fetchUserData();
     }, []);
 
-    const isFormValid = newUsername.trim().length > 0 && !isLoading;
+    const isFormValid = newUsername.trim().length > 0;
 
     const handleUpdate = async () => {
         if (!isFormValid) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             const response = await api.put('/api/user/account/update-username', { newUsername: newUsername.trim() });
             if (response.status === 200) {
@@ -52,10 +53,11 @@ function UpdateUsernameScreen() {
                     { text: 'OK', onPress: () => router.back() }
                 ]);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Update username error:', error);
+            Alert.alert('Error', error.response?.data?.error || 'Failed to update username');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -104,7 +106,6 @@ function UpdateUsernameScreen() {
                             onBlur={() => setIsInputFocused(false)}
                             autoCapitalize="none"
                             autoCorrect={false}
-                            editable={!isLoading}
                         />
                     </View>
                 </ScrollView>
@@ -119,16 +120,12 @@ function UpdateUsernameScreen() {
                         disabled={!isFormValid}
                         onPress={handleUpdate}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={[
-                                styles.updateButtonText,
-                                !isFormValid && styles.updateButtonTextDisabled
-                            ]}>
-                                Update
-                            </Text>
-                        )}
+                        <Text style={[
+                            styles.updateButtonText,
+                            !isFormValid && styles.updateButtonTextDisabled
+                        ]}>
+                            Update
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>

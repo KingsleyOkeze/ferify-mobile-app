@@ -14,13 +14,14 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-// import api from '@/services/api'; // Future integration
+import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 function SubmitFeedbackScreen() {
     const router = useRouter();
+    const { showLoader, hideLoader } = useLoader();
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async () => {
         if (!subject.trim() || !message.trim()) {
@@ -28,22 +29,38 @@ function SubmitFeedbackScreen() {
             return;
         }
 
-        setIsLoading(true);
+        showLoader();
         try {
-            // Mock API Call
-            // await api.post('/api/support/feedback', { subject, message });
+            const response = await api.post('/api/user/account/feedback', {
+                subject: subject.trim(),
+                message: message.trim()
+            });
 
-            // Simulate delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            const remainingSubmissions = response.data.remainingSubmissions;
+            const quotaMessage = remainingSubmissions > 0
+                ? `\n\nYou have ${remainingSubmissions} feedback submission${remainingSubmissions === 1 ? '' : 's'} remaining today.`
+                : "\n\nYou've used all your feedback submissions for today.";
 
-            Alert.alert("Thank You", "Your feedback has been sent successfully!", [
-                { text: "OK", onPress: () => router.back() }
-            ]);
-        } catch (error) {
+            Alert.alert(
+                "Thank You",
+                "Your feedback has been sent successfully!" + quotaMessage,
+                [{ text: "OK", onPress: () => router.back() }]
+            );
+        } catch (error: any) {
             console.error(error);
-            Alert.alert("Error", "Failed to send feedback. Please try again.");
+
+            // Handle rate limiting
+            if (error.response?.status === 429) {
+                Alert.alert(
+                    "Daily Limit Reached",
+                    error.response?.data?.message || "You've reached your daily feedback limit. Please try again in 24 hours."
+                );
+            } else {
+                const errorMessage = error.response?.data?.error || "Failed to send feedback. Please try again.";
+                Alert.alert("Error", errorMessage);
+            }
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -90,15 +107,10 @@ function SubmitFeedbackScreen() {
                     </View>
 
                     <TouchableOpacity
-                        style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+                        style={styles.submitButton}
                         onPress={handleSubmit}
-                        disabled={isLoading}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.submitButtonText}>Submit Feedback</Text>
-                        )}
+                        <Text style={styles.submitButtonText}>Submit Feedback</Text>
                     </TouchableOpacity>
 
                 </ScrollView>

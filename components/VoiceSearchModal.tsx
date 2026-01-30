@@ -16,111 +16,195 @@ import Animated, {
     withDelay,
     Easing,
     cancelAnimation,
-    withSequence,
+    interpolate,
+    useDerivedValue,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
+import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
+import { getCachedLocation } from '@/services/locationService';
+import { isVoiceAvailable, getVoiceUnavailableMessage } from '@/utils/voiceUtils';
 
-const { width, height } = Dimensions.get('window');
+// --- CONFIGURATION ---
+const DELAY_BEFORE_WAVE = 1000;
 
+// --- COMPONENTS ---
+
+// 1. The Red Ripple (Listening Mode)
+const RippleRing = ({ delay }: { delay: number }) => {
+    const ring = useSharedValue(0);
+
+    useEffect(() => {
+        ring.value = withDelay(
+            DELAY_BEFORE_WAVE + delay,
+            withRepeat(
+                withTiming(1, {
+                    duration: 2000,
+                    easing: Easing.out(Easing.ease),
+                }),
+                -1,
+                false
+            )
+        );
+        return () => cancelAnimation(ring);
+    }, []);
+
+    const style = useAnimatedStyle(() => {
+        return {
+            opacity: interpolate(ring.value, [0, 0.7, 1], [0.8, 0.4, 0]),
+            transform: [{ scale: interpolate(ring.value, [0, 1], [1, 2.8]) }],
+        };
+    });
+
+    return <Animated.View style={[styles.ripple, style]} />;
+};
+
+// 2. The Black Spinner (Processing Mode)
+const ProcessingSpinner = () => {
+    const rotation = useSharedValue(0);
+
+    useEffect(() => {
+        rotation.value = withRepeat(
+            withTiming(360, {
+                duration: 1000,
+                easing: Easing.linear,
+            }),
+            -1,
+            false
+        );
+        return () => cancelAnimation(rotation);
+    }, []);
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ rotate: `${rotation.value}deg` }],
+        };
+    });
+
+    return (
+        <View style={styles.spinnerContainer}>
+            {/* The light grey track */}
+            <View style={styles.spinnerTrack} />
+            {/* The rotating black segment */}
+            <Animated.View style={[styles.spinnerSegment, animatedStyle]} />
+        </View>
+    );
+};
+
+// --- MAIN MODAL ---
 interface VoiceSearchModalProps {
     visible: boolean;
     onClose: () => void;
 }
 
-const PulseCircle = ({ delay = 0 }: { delay?: number }) => {
-    const scale = useSharedValue(1);
-    const opacity = useSharedValue(0.6);
+export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalProps) {
+    const router = useRouter();
+    const [mode, setMode] = useState<'listening' | 'processing' | 'unavailable'>('listening');
+    const [spokenText, setSpokenText] = useState<string>('');
+    const [voiceReady, setVoiceReady] = useState<boolean>(false);
 
     useEffect(() => {
-        // user requested: "red lick wave to be showing around the mic after like a sec"
-        // we add 1000ms base delay to the pulses
-        const baseDelay = 1000;
+        // Check voice availability on mount
+        const checkVoice = async () => {
+            const available = await isVoiceAvailable();
+            setVoiceReady(available);
 
-        scale.value = withDelay(
-            baseDelay + delay,
-            withRepeat(
-                withTiming(2.2, {
-                    duration: 1800,
-                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                }),
-                -1,
-                false
-            )
-        );
-        opacity.value = withDelay(
-            baseDelay + delay,
-            withRepeat(
-                withTiming(0, {
-                    duration: 1800,
-                    easing: Easing.bezier(0.25, 0.1, 0.25, 1),
-                }),
-                -1,
-                false
-            )
-        );
+            if (!available) {
+                setMode('unavailable');
+            }
+        };
+        checkVoice();
+
+        // Setup Voice listeners only if available
+        if (Voice) {
+            Voice.onSpeechStart = () => setMode('listening');
+            Voice.onSpeechResults = (e: SpeechResultsEvent) => {
+                if (e.value && e.value.length > 0) {
+                    setSpokenText(e.value[0]);
+                    setMode('processing');
+                    handleCompletion(e.value[0]);
+                }
+            };
+            Voice.onSpeechError = (e: SpeechErrorEvent) => {
+                console.error('Speech recognition error:', e.error);
+                onClose();
+            };
+        }
 
         return () => {
-            cancelAnimation(scale);
-            cancelAnimation(opacity);
+            const cleanup = async () => {
+                try {
+                    if (Voice) {
+                        await Voice.stop();
+                        await Voice.destroy();
+                        Voice.removeAllListeners();
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+            cleanup();
         };
     }, []);
 
-    const animatedStyle = useAnimatedStyle(() => ({
-        transform: [{ scale: scale.value }],
-        opacity: opacity.value,
-    }));
+    const handleCompletion = async (text: string) => {
+        try {
+            const cachedLocation = await getCachedLocation();
+            const fromAddress = cachedLocation?.address || '';
 
-    return <Animated.View style={[styles.pulseCircle, animatedStyle]} />;
-};
-
-export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalProps) {
-    const router = useRouter();
-    const [status, setStatus] = useState<'listening' | 'processing'>('listening');
-
-    // Spinner animation for processing state
-    const rotation = useSharedValue(0);
+            onClose();
+            // Navigate to RouteSelectScreen with params
+            router.push({
+                pathname: "/route/RouteSelectScreen",
+                params: {
+                    initialTo: text,
+                    initialFrom: fromAddress
+                }
+            });
+        } catch (error) {
+            console.error('Error in handleCompletion:', error);
+            onClose();
+        }
+    };
 
     useEffect(() => {
-        if (visible) {
-            setStatus('listening');
-            // Simulate switching to processing after 4 seconds (1s wait + 3s listening)
-            const timer = setTimeout(() => {
-                setStatus('processing');
-                rotation.value = 0;
-                rotation.value = withRepeat(
-                    withTiming(360, {
-                        duration: 800,
-                        easing: Easing.linear,
-                    }),
-                    -1,
-                    false
-                );
-            }, 4000);
-
-            return () => {
-                clearTimeout(timer);
-                cancelAnimation(rotation);
-            };
+        if (visible && voiceReady) {
+            setMode('listening');
+            setSpokenText('');
+            startListening();
+        } else if (visible && !voiceReady) {
+            setMode('unavailable');
         } else {
-            setStatus('listening');
-            cancelAnimation(rotation);
+            stopListening();
         }
-    }, [visible]);
+    }, [visible, voiceReady]);
 
-    useEffect(() => {
-        if (status === 'processing' && visible) {
-            // After user stop talking, processing starts, then lead to route select
-            const timer = setTimeout(() => {
-                onClose();
-                router.push("/route/RouteSelect");
-            }, 2500);
-            return () => clearTimeout(timer);
+    const startListening = async () => {
+        if (!voiceReady) {
+            console.warn("Voice module is not available.");
+            return;
         }
-    }, [status, visible]);
 
-    const spinnerStyle = useAnimatedStyle(() => ({
-        transform: [{ rotate: `${rotation.value}deg` }],
-    }));
+        try {
+            if (Voice && typeof Voice.start === 'function') {
+                await Voice.start('en-US');
+            }
+        } catch (e) {
+            console.error('Voice start error:', e);
+            setMode('unavailable');
+        }
+    };
+
+    const stopListening = async () => {
+        try {
+            // Add the check here to stop the "property of null" error
+            if (Voice && typeof Voice.stop === 'function') {
+                await Voice.stop();
+            }
+        } catch (e) {
+            console.error('Voice stop error:', e);
+        }
+    };
+
 
     return (
         <Modal
@@ -131,147 +215,162 @@ export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalP
         >
             <View style={styles.overlay}>
                 <View style={styles.modalCard}>
-                    {/* Stage for animations - Mic at the top */}
+
+                    {/* Visual Stage */}
                     <View style={styles.micStage}>
-                        {status === 'listening' ? (
+
+                        {/* LISTENING MODE: Show Red Ripples */}
+                        {mode === 'listening' && (
                             <>
-                                <PulseCircle delay={0} />
-                                <PulseCircle delay={800} />
-
-                                <View style={styles.micCircle}>
-                                    <Ionicons name="mic" size={32} color="#fff" />
-                                </View>
+                                <RippleRing delay={0} />
+                                <RippleRing delay={600} />
+                                <RippleRing delay={1200} />
                             </>
+                        )}
+
+                        {/* PROCESSING MODE: Show Spinner Track */}
+                        {mode === 'processing' && <ProcessingSpinner />}
+
+                        {/* The Mic Icon (Always on top) */}
+                        <View style={styles.micCircle}>
+                            <Ionicons name="mic" size={32} color="#000" />
+                        </View>
+                    </View>
+
+                    {/* Text Updates based on Mode */}
+                    <View style={styles.textWrapper}>
+                        <Text style={[
+                            styles.statusText,
+                            mode === 'processing' ? styles.textBlack :
+                                mode === 'unavailable' ? styles.textGray : styles.textRed
+                        ]}>
+                            {mode === 'listening' ? 'Listening...' :
+                                mode === 'processing' ? 'Processing...' :
+                                    'Voice Search Unavailable'}
+                        </Text>
+
+                        {mode === 'unavailable' ? (
+                            <Text style={styles.unavailableMessage}>
+                                {getVoiceUnavailableMessage()}
+                            </Text>
                         ) : (
-                            <View style={styles.processingWrapper}>
-                                {/* Spinner Track (Light Grey Circle) */}
-                                <View style={styles.spinnerTrack} />
-
-                                {/* Spinner Segment (Black "Snake") */}
-                                <Animated.View style={[styles.spinnerOverlay, spinnerStyle]}>
-                                    <View style={styles.spinnerSegment} />
-                                </Animated.View>
-
-                                <View style={[styles.micCircle, { backgroundColor: '#F9F9F9', elevation: 0, shadowOpacity: 0 }]}>
-                                    <Ionicons name="mic" size={32} color="#080808" />
-                                </View>
-                            </View>
+                            <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
+                                <Text style={styles.cancelText}>Tap to cancel</Text>
+                            </TouchableOpacity>
                         )}
                     </View>
 
-                    {/* Text Section */}
-                    <View style={styles.textSection}>
-                        <Text style={[
-                            styles.statusText,
-                            status === 'listening' ? styles.redText : styles.blackText
-                        ]}>
-                            {status === 'listening' ? 'Listening...' : 'Processing...'}
-                        </Text>
-
-                        <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-                            <Text style={styles.cancelText}>Tap to cancel</Text>
-                        </TouchableOpacity>
-                    </View>
                 </View>
             </View>
-        </Modal>
+        </Modal >
     );
 }
 
 const styles = StyleSheet.create({
     overlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.4)', // Darker overlay for card focus
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
         justifyContent: 'center',
         alignItems: 'center',
     },
     modalCard: {
-        width: 241,
-        height: 217,
-        backgroundColor: '#fff',
+        width: 260,
+        height: 240,
+        backgroundColor: '#FFFFFF',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
-        // Premium shadow
+        paddingVertical: 20,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.15,
-        shadowRadius: 20,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 12,
         elevation: 10,
     },
     micStage: {
-        width: 120,
-        height: 120,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
-    processingWrapper: {
         width: 100,
         height: 100,
         justifyContent: 'center',
         alignItems: 'center',
+        marginBottom: 20,
+        position: 'relative',
     },
     micCircle: {
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#FF3B30',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: '#F5F5F5',
         justifyContent: 'center',
         alignItems: 'center',
-        zIndex: 5,
+        zIndex: 20, // Must be higher than ripples and spinner
     },
-    pulseCircle: {
+    // --- RED RIPPLE STYLES ---
+    ripple: {
         position: 'absolute',
-        width: 60,
-        height: 60,
-        borderRadius: 30,
-        backgroundColor: '#FF3B30',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        backgroundColor: 'rgba(255, 59, 48, 0.2)',
         zIndex: 1,
+    },
+    // --- PROCESSING SPINNER STYLES ---
+    spinnerContainer: {
+        position: 'absolute',
+        width: 86, // Slightly larger than mic circle (70 + borders)
+        height: 86,
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 10,
     },
     spinnerTrack: {
         position: 'absolute',
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        borderWidth: 3,
-        borderColor: '#E0E0E0',
-        zIndex: 2,
-    },
-    spinnerOverlay: {
-        position: 'absolute',
-        width: 80,
-        height: 80,
-        zIndex: 3,
-        justifyContent: 'center',
-        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+        borderRadius: 43,
+        borderWidth: 4,
+        borderColor: '#F0F0F0', // Very light grey track
     },
     spinnerSegment: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        borderWidth: 3,
-        borderColor: 'transparent',
-        borderTopColor: '#080808', // The "snake" segment
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        borderRadius: 43,
+        borderWidth: 4,
+        borderTopColor: '#000000', // The "Black stuff"
+        borderRightColor: '#000000',
+        borderBottomColor: 'transparent',
+        borderLeftColor: 'transparent',
+        zIndex: 15, // Ensure it's above the track
     },
-    textSection: {
+    // --- TEXT STYLES ---
+    textWrapper: {
         alignItems: 'center',
+        gap: 8,
     },
     statusText: {
         fontSize: 18,
         fontWeight: '700',
-        marginBottom: 4,
+        letterSpacing: 0.5,
     },
-    redText: {
+    textRed: {
         color: '#FF3B30',
     },
-    blackText: {
-        color: '#080808',
+    textBlack: {
+        color: '#000000',
     },
     cancelText: {
         fontSize: 14,
-        color: '#9a9a9a',
+        color: '#8E8E93',
         fontWeight: '500',
+    },
+    textGray: {
+        color: '#666666',
+    },
+    unavailableMessage: {
+        fontSize: 13,
+        color: '#8E8E93',
+        textAlign: 'center',
+        paddingHorizontal: 20,
+        lineHeight: 18,
     },
 });

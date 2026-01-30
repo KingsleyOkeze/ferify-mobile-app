@@ -1,6 +1,6 @@
 import api, { setToken } from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -17,12 +17,18 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
+import Constants from "expo-constants";
 
-// Logo
+WebBrowser.maybeCompleteAuthSession();
+
 
 export default function SignUpScreen() {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
+    const [isLoading, setIsLoading] = useState(false); // Kept for Google initialization if needed, but primary actions will use GlobalLoader
 
     // Form State
     const [email, setEmail] = useState("");
@@ -33,48 +39,106 @@ export default function SignUpScreen() {
     // Validation State
     const [isEmailValid, setIsEmailValid] = useState(false);
 
-    // Google Sign-In
-    const signInWithGoogle = async () => {
-        setIsLoading(true);
-        try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            const idToken = userInfo.data?.idToken;
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+        scopes: ["profile", "email"],
+    });
 
-            if (idToken) {
-                api.post('/api/user/auth/google-login', { idToken })
-                    .then(async (res) => {
-                        console.log("Google Signup Backend Success:", res.data);
-                        if (res.data.accessToken) {
-                            await setToken(res.data.accessToken);
-                            router.replace('/(tabs)/HomeScreen');
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Google Backend Error:", error, error.response?.data || error.message);
-                        Alert.alert("Google Sign-Up Failed", "Could not verify with server.");
-                    })
-                    .finally(() => setIsLoading(false));
-            } else {
-                Alert.alert("Error", "No ID token received from Google");
-                setIsLoading(false);
+    useEffect(() => {
+        if (request) {
+            console.log("Signup Redirect URI:", request.redirectUri);
+        }
+    }, [request]);
+
+    // Handle Google Sign-In response
+    useEffect(() => {
+        if (response?.type === "success") {
+            const { idToken } = response.params;
+
+            if (!idToken) {
+                console.error("No ID token found in response params!", response);
+                // Fallback to authentication object if params doesn't have it
+                const backupToken = response.authentication?.idToken;
+                if (backupToken) {
+                    signInWithGoogle(backupToken);
+                } else {
+                    Alert.alert("Google Sign-In Failed", "No ID token received.");
+                }
+                return;
             }
-        } catch (error: any) {
-            console.error("Google Sign-In Error", error);
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                // play services not available or outdated
-                Alert.alert("Error", "Google Play Services not available");
-            } else {
-                // some other error happened
-                Alert.alert("Error", "An unexpected error occurred during Google Sign-In");
+
+            signInWithGoogle(idToken);
+        }
+    }, [response]);
+
+    const signInWithGoogle = async (idToken: string) => {
+        try {
+            showLoader();
+            setIsLoading(true);
+            const res = await api.post("/api/user/auth/google-login", { idToken });
+
+            // Save the JWT access token
+            if (!res.data?.accessToken) {
+                throw new Error("No access token from server");
             }
+
+            await setToken(res.data.accessToken);
+            router.replace("/(tabs)/HomeScreen");
+
+        } catch (err: any) {
+            console.error("Backend Google Login Error:", err);
+            Alert.alert("Login Failed", err.response?.data?.error || "An error occurred.");
+        } finally {
+            hideLoader();
             setIsLoading(false);
         }
     };
+
+
+    // Google Sign-In
+    // const signInWithGoogle = async () => {
+    //     setIsLoading(true);
+    //     // try {
+    //     //     await GoogleSignin.hasPlayServices();
+    //     //     const userInfo = await GoogleSignin.signIn();
+    //     //     const idToken = userInfo.data?.idToken;
+
+    //     //     if (idToken) {
+    //     //         api.post('/api/user/auth/google-login', { idToken })
+    //     //             .then(async (res) => {
+    //     //                 console.log("Google Signup Backend Success:", res.data);
+    //     //                 if (res.data.accessToken) {
+    //     //                     await setToken(res.data.accessToken);
+    //     //                     router.replace('/(tabs)/HomeScreen');
+    //     //                 }
+    //     //             })
+    //     //             .catch((error) => {
+    //     //                 console.error("Google Backend Error:", error, error.response?.data || error.message);
+    //     //                 Alert.alert("Google Sign-Up Failed", "Could not verify with server.");
+    //     //             })
+    //     //             .finally(() => setIsLoading(false));
+    //     //     } else {
+    //     //         Alert.alert("Error", "No ID token received from Google");
+    //     //         setIsLoading(false);
+    //     //     }
+    //     // } catch (error: any) {
+    //     //     console.error("Google Sign-In Error", error);
+    //     //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //     //         // user cancelled the login flow
+    //     //     } else if (error.code === statusCodes.IN_PROGRESS) {
+    //     //         // operation (e.g. sign in) is in progress already
+    //     //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //     //         // play services not available or outdated
+    //     //         Alert.alert("Error", "Google Play Services not available");
+    //     //     } else {
+    //     //         // some other error happened
+    //     //         Alert.alert("Error", "An unexpected error occurred during Google Sign-In");
+    //     //     }
+    //     //     setIsLoading(false);
+    //     // }
+    // };
 
     // Validation
     useEffect(() => {
@@ -89,7 +153,7 @@ export default function SignUpScreen() {
     const handleCreateAccount = async () => {
         if (!isFormValid) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             // Initiate Registration (Email + Password)
             const response = await api.post('/api/user/auth/register/initiate', {
@@ -110,7 +174,7 @@ export default function SignUpScreen() {
             console.error("Signup Error:", error.response?.data || error.message);
             Alert.alert("Signup Failed", error.response?.data?.error || "An error occurred. Please try again.");
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -206,16 +270,12 @@ export default function SignUpScreen() {
                         <TouchableOpacity
                             style={[
                                 styles.createButton,
-                                (!isFormValid || isLoading) && styles.disabledButton
+                                (!isFormValid) && styles.disabledButton
                             ]}
                             onPress={handleCreateAccount}
-                            disabled={!isFormValid || isLoading}
+                            disabled={!isFormValid}
                         >
-                            {isLoading ? (
-                                <ActivityIndicator color="#fff" />
-                            ) : (
-                                <Text style={styles.createButtonText}>Continue</Text>
-                            )}
+                            <Text style={styles.createButtonText}>Continue</Text>
                         </TouchableOpacity>
 
                         {/* Or Separator */}
@@ -228,7 +288,7 @@ export default function SignUpScreen() {
                         {/* Google Button */}
                         <TouchableOpacity
                             style={styles.googleButton}
-                            onPress={signInWithGoogle}
+                            onPress={() => promptAsync()}
                             disabled={isLoading}
                         >
                             <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />

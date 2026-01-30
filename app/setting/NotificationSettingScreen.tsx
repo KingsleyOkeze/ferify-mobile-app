@@ -28,13 +28,13 @@ function NotificationSettingScreen() {
             value: fareAlerts,
             onValueChange: setFareAlerts,
         },
-        {
-            id: 'routeUpdates',
-            title: 'Route updates',
-            description: 'Real-time traffic and road alerts',
-            value: routeUpdates,
-            onValueChange: setRouteUpdates,
-        },
+        // {
+        //     id: 'routeUpdates',
+        //     title: 'Route updates',
+        //     description: 'Real-time traffic and road alerts',
+        //     value: routeUpdates,
+        //     onValueChange: setRouteUpdates,
+        // },
         {
             id: 'communityActivity',
             title: 'Community activity',

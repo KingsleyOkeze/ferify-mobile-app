@@ -71,11 +71,40 @@ interface Badge {
     totalAim?: number;
 }
 
+import api from '@/services/api';
+import { ActivityIndicator } from 'react-native';
+
 export default function BadgesScreen() {
     const router = useRouter();
+    const [loading, setLoading] = useState(true);
+    const [fetchedBadges, setFetchedBadges] = useState<Badge[]>([]);
     const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
-    const badges: Badge[] = [
+    React.useEffect(() => {
+        fetchBadges();
+    }, []);
+
+    const fetchBadges = async () => {
+        try {
+            const response = await api.get('/api/user/account/badges');
+            // Merge backend status with frontend metadata (requirements, icons, etc.)
+            const mergedBadges = staticBadges.map(sb => {
+                const fb = response.data.find((b: any) => b.id === sb.id);
+                return {
+                    ...sb,
+                    earned: fb ? fb.earned : false
+                };
+            });
+            setFetchedBadges(mergedBadges);
+        } catch (error) {
+            console.error("Error fetching badges:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const staticBadges: Badge[] = [
+
         {
             id: 'starter',
             title: 'fare starter',
@@ -187,23 +216,28 @@ export default function BadgesScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.grid}>
-                    {badges.map((badge) => (
-                        <TouchableOpacity
-                            key={badge.id}
-                            style={styles.badgeCard}
-                            onPress={() => setSelectedBadge(badge)}
-                        >
-                            <Image
-                                source={badge.earned ? badgeImages[badge.id].earned : badgeImages[badge.id].notEarned}
-                                style={styles.badgeImage}
-                                resizeMode="contain"
-                            />
-                            <Text style={styles.badgeTitle}>{badge.title}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
+                {loading ? (
+                    <ActivityIndicator size="large" color="#080808" style={{ marginTop: 40 }} />
+                ) : (
+                    <View style={styles.grid}>
+                        {fetchedBadges.map((badge) => (
+                            <TouchableOpacity
+                                key={badge.id}
+                                style={styles.badgeCard}
+                                onPress={() => setSelectedBadge(badge)}
+                            >
+                                <Image
+                                    source={badge.earned ? badgeImages[badge.id].earned : badgeImages[badge.id].notEarned}
+                                    style={styles.badgeImage}
+                                    resizeMode="contain"
+                                />
+                                <Text style={styles.badgeTitle}>{badge.title}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
             </ScrollView>
+
 
             {/* Badge Detail Modal */}
             <Modal
@@ -361,7 +395,7 @@ const styles = StyleSheet.create({
     modalBadgeImage: {
         width: 86.6,
         height: 100,
-        marginTop: 20, 
+        marginTop: 20,
         marginBottom: 14,
     },
     requirementsContainer: {
@@ -391,7 +425,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 32,
-        maxWidth: '80%', 
+        maxWidth: '80%',
     },
     progressContainer: {
         width: '100%',
@@ -418,5 +452,5 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
- 
+
 });

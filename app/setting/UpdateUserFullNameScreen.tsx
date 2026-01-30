@@ -9,61 +9,76 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
-    ActivityIndicator,
-    Alert,
-    Image,
+    Alert
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '@/services/api';
+import api, { getUserData, setUserData } from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
 
-function UpdateUserEmailScreen() {
+function UpdateUserFullNameScreen() {
     const router = useRouter();
-    const [currentEmail, setCurrentEmail] = useState('');
-    const [newEmail, setNewEmail] = useState('');
-    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [currentFullName, setCurrentFullName] = useState('Not set');
+    const [focusedField, setFocusedField] = useState<string | null>(null);
     const { showLoader, hideLoader } = useLoader();
-    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        const fetchCurrentEmail = async () => {
+        const fetchUserData = async () => {
             try {
-                const email = await AsyncStorage.getItem('userEmail');
-                if (email) {
-                    setCurrentEmail(email);
-                } else {
-                    setCurrentEmail('Not set');
+                const data = await getUserData();
+                if (data) {
+                    if (data.firstName) setFirstName(data.firstName);
+                    if (data.lastName) setLastName(data.lastName);
+                    if (data.firstName || data.lastName) {
+                        setCurrentFullName(`${data.firstName || ''} ${data.lastName || ''}`.trim());
+                    }
                 }
             } catch (error) {
-                console.error('Error fetching email:', error);
+                console.error('Error fetching user data for name update:', error);
             }
         };
-        fetchCurrentEmail();
+        fetchUserData();
     }, []);
 
+    const isFormValid = firstName.trim().length > 0 && lastName.trim().length > 0;
+
     const handleUpdate = async () => {
-        setIsLoading(true);
+        if (!isFormValid) return;
+
         showLoader();
         try {
-            const response = await api.post('/api/user/account/update-user-email', { newEmail });
+            const response = await api.put('/api/user/account/update-full-name', {
+                firstName: firstName.trim(),
+                lastName: lastName.trim()
+            });
+
             if (response.status === 200) {
-                router.push({
-                    pathname: './VerifyUpdateUserEmailScreen',
-                    params: { email: newEmail }
-                });
+                // Update cache
+                const cachedData = await getUserData();
+                if (cachedData) {
+                    const updatedData = {
+                        ...cachedData,
+                        firstName: response.data.firstName,
+                        lastName: response.data.lastName,
+                        fullName: `${response.data.firstName} ${response.data.lastName}`
+                    };
+                    await setUserData(updatedData);
+                }
+
+                Alert.alert('Success', 'Name updated successfully', [
+                    { text: 'OK', onPress: () => router.back() }
+                ]);
             }
         } catch (error: any) {
-            console.error('Update email error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to initiate email update');
+            console.error('Update full name error:', error.response?.data || error.message);
+            Alert.alert('Error', error.response?.data?.error || 'Failed to update name');
         } finally {
-            setIsLoading(false);
             hideLoader();
         }
     };
-
-    const isFormValid = newEmail.trim().length > 0 && newEmail.includes('@') && !isLoading;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -72,7 +87,7 @@ function UpdateUserEmailScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Email</Text>
+                <Text style={styles.headerTitle}>Full Name</Text>
                 <TouchableOpacity onPress={() => router.dismiss()} style={styles.headerButton}>
                     <Ionicons name="close" size={24} color="#000" />
                 </TouchableOpacity>
@@ -83,53 +98,53 @@ function UpdateUserEmailScreen() {
                 style={styles.content}
             >
                 <ScrollView contentContainerStyle={styles.formContainer}>
-                    <View style={styles.imageContainer}>
-                        <Image
-                            source={require('../../assets/images/settings-icons/email_icon.png')}
-                            style={styles.emailIcon}
-                        />
-                    </View>
-                    <Text style={styles.screenTitle}>Update your email</Text>
+                    <Text style={styles.screenTitle}>Update your name</Text>
                     <Text style={styles.descriptionText}>
-                        Changing your email address will require you to verify the new one before it becomes active.
+                        This is the name that will be displayed in your profile and community contributions.
                     </Text>
 
-                    {/* Current Email */}
+                    {/* Current Name Info */}
                     <View style={styles.infoGroup}>
-                        <Text style={styles.label}>Current email address</Text>
-                        <Text style={styles.currentValue}>{currentEmail}</Text>
+                        <Text style={styles.label}>Current name</Text>
+                        <Text style={styles.currentValue}>{currentFullName}</Text>
                     </View>
 
-                    {/* New Email Input */}
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>New email address</Text>
-                        <View style={styles.inputWrapper}>
+                    {/* First Name Input */}
+                    <View style={styles.inputStack}>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.fieldLabel}>First name</Text>
                             <TextInput
                                 style={[
                                     styles.input,
-                                    isInputFocused && styles.inputFocused,
-                                    isLoading && { opacity: 0.5 }
+                                    focusedField === 'firstName' && styles.inputFocused
                                 ]}
-                                placeholder="Enter new email"
+                                placeholder="Enter first name"
                                 placeholderTextColor="#999"
-                                value={newEmail}
-                                onChangeText={setNewEmail}
-                                onFocus={() => setIsInputFocused(true)}
-                                onBlur={() => setIsInputFocused(false)}
-                                autoCapitalize="none"
-                                autoCorrect={false}
-                                keyboardType="email-address"
-                                editable={!isLoading}
+                                value={firstName}
+                                onChangeText={setFirstName}
+                                onFocus={() => setFocusedField('firstName')}
+                                onBlur={() => setFocusedField(null)}
+                                autoCapitalize="words"
                             />
-                            {isLoading && (
-                                <View style={styles.inputLoading}>
-                                    <Text style={{ fontSize: 12, color: '#666' }}>Sending...</Text>
-                                </View>
-                            )}
                         </View>
-                        <Text style={styles.verificationNotice}>
-                            A verification code will be sent to your email
-                        </Text>
+
+                        {/* Last Name Input */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.fieldLabel}>Last name</Text>
+                            <TextInput
+                                style={[
+                                    styles.input,
+                                    focusedField === 'lastName' && styles.inputFocused
+                                ]}
+                                placeholder="Enter last name"
+                                placeholderTextColor="#999"
+                                value={lastName}
+                                onChangeText={setLastName}
+                                onFocus={() => setFocusedField('lastName')}
+                                onBlur={() => setFocusedField(null)}
+                                autoCapitalize="words"
+                            />
+                        </View>
                     </View>
                 </ScrollView>
 
@@ -147,7 +162,7 @@ function UpdateUserEmailScreen() {
                             styles.updateButtonText,
                             !isFormValid && styles.updateButtonTextDisabled
                         ]}>
-                            {isLoading ? 'Sending...' : 'Update'}
+                            Update
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -187,17 +202,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 30,
         paddingBottom: 40,
-        // alignItems: 'center',
-    },
-    imageContainer: {
-        marginBottom: 24,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    emailIcon: {
-        width: 104.22,
-        height: 100,
-        resizeMode: 'contain',
     },
     screenTitle: {
         fontSize: 24,
@@ -205,20 +209,19 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 10,
-        textAlign: 'left',
     },
     descriptionText: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#393939',
+        color: '#666',
         lineHeight: 20,
         marginBottom: 30,
-        textAlign: 'left',
     },
     infoGroup: {
         marginBottom: 30,
-        width: '100%',
+        paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#F0F0F0',
     },
     label: {
         fontSize: 14,
@@ -228,18 +231,23 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     currentValue: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#666',
+        color: '#393939',
+    },
+    inputStack: {
+        gap: 20,
     },
     inputGroup: {
-        marginBottom: 20,
         width: '100%',
     },
-    inputWrapper: {
-        position: 'relative',
-        justifyContent: 'center',
+    fieldLabel: {
+        fontSize: 14,
+        fontWeight: 600,
+        fontFamily: 'BrittiRegular',
+        color: '#000',
+        marginBottom: 10,
     },
     input: {
         height: 50,
@@ -248,7 +256,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#000',
         backgroundColor: '#F9F9F9',
@@ -256,18 +263,6 @@ const styles = StyleSheet.create({
     inputFocused: {
         borderColor: '#000',
         backgroundColor: '#fff',
-    },
-    inputLoading: {
-        position: 'absolute',
-        right: 16,
-    },
-    verificationNotice: {
-        fontSize: 12,
-        fontWeight: 400,
-        fontFamily: 'BrittiRegular',
-        color: '#999',
-        textAlign: 'right',
-        marginTop: 8,
     },
     footer: {
         padding: 20,
@@ -295,4 +290,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default UpdateUserEmailScreen;
+export default UpdateUserFullNameScreen;

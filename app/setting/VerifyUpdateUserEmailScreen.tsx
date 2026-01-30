@@ -16,17 +16,19 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 function VerifyUpdateUserEmailScreen() {
     const router = useRouter();
-    const { email } = useLocalSearchParams();
+    const params = useLocalSearchParams();
+    const email = params.email as string || "your email";
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(30);
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
+        let interval: ReturnType<typeof setInterval>;
         if (timer > 0) {
             interval = setInterval(() => {
                 setTimer((prev) => prev - 1);
@@ -59,7 +61,7 @@ function VerifyUpdateUserEmailScreen() {
             return;
         }
 
-        setIsLoading(true);
+        showLoader();
         try {
             const response = await api.post('/api/user/account/update-email/verify', { otp: otpString });
             if (response.status === 200) {
@@ -70,33 +72,35 @@ function VerifyUpdateUserEmailScreen() {
 
                 // Redirect back to home or profile
                 Alert.alert('Success', 'Email updated successfully', [
-                    { text: 'OK', onPress: () => router.replace('/tabs/HomeScreen') }
+                    { text: 'OK', onPress: () => router.dismiss(2) }
                 ]);
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Verify OTP error:', error);
+            Alert.alert('Error', error.response?.data?.error || 'Verification failed');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
     const handleResend = async () => {
         if (timer > 0) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
-            await api.post('/api/user/account/update-email/initiate', { newEmail: email });
+            await api.post('/api/user/account/update-user-email', { newEmail: email });
             setTimer(30);
             setOtp(['', '', '', '', '', '']);
             inputRefs.current[0]?.focus();
-        } catch (error) {
+        } catch (error: any) {
             console.error('Resend OTP error:', error);
+            Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
-    const isOtpComplete = otp.join('').length === 6 && !isLoading;
+    const isOtpComplete = otp.join('').length === 6;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -124,7 +128,9 @@ function VerifyUpdateUserEmailScreen() {
                         {otp.map((digit, index) => (
                             <TextInput
                                 key={index}
-                                ref={(ref) => (inputRefs.current[index] = ref)}
+                                ref={(ref) => {
+                                    inputRefs.current[index] = ref;
+                                }}
                                 style={[styles.otpInput, digit !== '' && styles.otpInputFilled]}
                                 value={digit}
                                 onChangeText={(value) => handleOtpChange(value, index)}
@@ -133,7 +139,6 @@ function VerifyUpdateUserEmailScreen() {
                                 maxLength={1}
                                 selectTextOnFocus
                                 autoFocus={index === 0}
-                                editable={!isLoading}
                             />
                         ))}
                     </View>
@@ -143,7 +148,7 @@ function VerifyUpdateUserEmailScreen() {
                         {timer > 0 ? (
                             <Text style={styles.timerText}>Resend code in {timer}s</Text>
                         ) : (
-                            <TouchableOpacity onPress={handleResend} disabled={isLoading}>
+                            <TouchableOpacity onPress={handleResend}>
                                 <Text style={styles.resendText}>Resend code</Text>
                             </TouchableOpacity>
                         )}
@@ -160,16 +165,12 @@ function VerifyUpdateUserEmailScreen() {
                         disabled={!isOtpComplete}
                         onPress={handleVerify}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={[
-                                styles.verifyButtonText,
-                                !isOtpComplete && styles.verifyButtonTextDisabled
-                            ]}>
-                                Verify
-                            </Text>
-                        )}
+                        <Text style={[
+                            styles.verifyButtonText,
+                            !isOtpComplete && styles.verifyButtonTextDisabled
+                        ]}>
+                            Verify
+                        </Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     verifyButtonTextDisabled: {
-        color: '#999',
+        color: '#979797',
     },
 });
 

@@ -1,6 +1,6 @@
 import VoiceSearchModal from "@/components/VoiceSearchModal";
 import ModeOfTransportSelect from "@/components/ModeOfTransportSelect";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -12,45 +12,105 @@ import {
     Pressable,
     FlatList,
     Dimensions,
+    Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
+import { ActivityIndicator } from "react-native";
+import api from "@/services/api";
+import { getCachedLocation, fetchAndCacheLocation } from "@/services/locationService";
+import { io } from "socket.io-client";
+import busImage from "../../assets/images/transportation-icons/busImage.png";
+import kekeImage from "../../assets/images/transportation-icons/kekeImage.png";
+import okadaImage from "../../assets/images/transportation-icons/okadaImage.png";
+import { isVoiceAvailable } from '@/utils/voiceUtils';
 
-const sharedFares = [
-    {
-        id: '1',
-        from: 'Oshodi',
-        to: 'Ikeja',
-        time: '18mins ago',
-        contributors: 12,
-        priceRange: '₦400 - ₦500',
-        image: require("../../assets/images/transportation-icons/busImage.png")
-    },
-    {
-        id: '2',
-        from: 'Ikeja',
-        to: 'Yaba',
-        time: '30mins ago',
-        contributors: 8,
-        priceRange: '₦600 - ₦800',
-        image: require("../../assets/images/transportation-icons/busImage.png")
-    },
-    {
-        id: '3',
-        from: 'CMS',
-        to: 'Ajah',
-        time: '5mins ago',
-        contributors: 25,
-        priceRange: '₦1000 - ₦1200',
-        image: require("../../assets/images/transportation-icons/busImage.png")
-    }
-];
+const getVehicleImage = (type: string) => {
+    const mode = type?.toLowerCase();
+    if (mode === 'keke') return kekeImage;
+    if (mode === 'bike' || mode === 'okada') return okadaImage;
+    return busImage;
+};
 
 function HomeScreen() {
     const router = useRouter();
     const [searchText, setSearchText] = useState("");
     const [selectedMode, setSelectedMode] = useState<string | null>(null);
     const [voiceModalVisible, setVoiceModalVisible] = useState(false);
+    const [voiceAvailable, setVoiceAvailable] = useState<boolean>(false);
+
+    // Nearby Fares State
+    const [nearbyFares, setNearbyFares] = useState<any[]>([]);
+    const [isLocalFeed, setIsLocalFeed] = useState(true);
+    const [loadingNearby, setLoadingNearby] = useState(false);
+
+    useEffect(() => {
+        // Check voice availability
+        const checkVoice = async () => {
+            const available = await isVoiceAvailable();
+            setVoiceAvailable(available);
+        };
+        checkVoice();
+
+        // Initial load
+        loadNearbyFares();
+
+        // Socket connection for real-time updates
+        // Connecting through the API Gateway
+        const serverUrl = process.env.EXPO_PUBLIC_SERVER_URL || '';
+        const socket = io(serverUrl, {
+            path: '/api/fare/socket.io', // Path through gateway
+            transports: ['websocket']
+        });
+
+        socket.on('nearby_contribution', (newFare: any) => {
+            console.log('New nearby fare received via socket:', newFare);
+            // Prepend new fare and keep top 3
+            setNearbyFares(prev => {
+                const exists = prev.find(f => f.id === newFare.id);
+                if (exists) return prev;
+                return [newFare, ...prev].slice(0, 3);
+            });
+            // If we get a socket event, it's definitely a new activity (usually local in the future with rooms)
+            setIsLocalFeed(true);
+        });
+
+        // Silent refresh when app comes to foreground or screen is re-visited
+        const interval = setInterval(loadNearbyFares, 60000); // Check every minute
+
+        return () => {
+            socket.disconnect();
+            clearInterval(interval);
+        };
+    }, []);
+
+    const loadNearbyFares = async () => {
+        try {
+            // Try to get location, but don't block if it fails
+            const location = await getCachedLocation() || await fetchAndCacheLocation();
+
+            const params: any = {};
+            if (location) {
+                params.lng = location.longitude;
+                params.lat = location.latitude;
+                params.radius = 10000; // 10km
+            }
+
+            const response = await api.get('/api/fare/nearby', { params });
+
+            if (response.data) {
+                const { fares, isLocal } = response.data;
+                if (fares && fares.length > 0) {
+                    setNearbyFares(fares);
+                    setIsLocalFeed(isLocal);
+                }
+            }
+        } catch (error) {
+            console.warn("Failed to load nearby fares:", error);
+        }
+    };
+
+
 
     const FEATURED_CARDS = [
         {
@@ -137,7 +197,17 @@ function HomeScreen() {
                         />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => setVoiceModalVisible(true)}>
+                    <TouchableOpacity onPress={() => {
+                        if (!voiceAvailable) {
+                            Alert.alert(
+                                "Voice Search Unavailable",
+                                "Voice search requires a custom development build and is not available in Expo Go.",
+                                [{ text: "OK" }]
+                            );
+                        } else {
+                            setVoiceModalVisible(true);
+                        }
+                    }}>
                         <Ionicons name="mic" size={20} color="#000" style={styles.micIcon} />
                     </TouchableOpacity>
                 </View>
@@ -193,40 +263,54 @@ function HomeScreen() {
                 </View>
 
                 {/* Shared by commuters near you */}
-                <Text style={styles.sectionTitle}>Shared by commuters near you</Text>
+                <Text style={styles.sectionTitle}>
+                    {isLocalFeed ? "Shared by commuters near you" : "Recent shared activity"}
+                </Text>
+
                 <View style={styles.feedContainer}>
-                    {sharedFares.map((item, index) => (
-                        <View
-                            key={item.id}
-                            style={[
-                                styles.feedCard,
-                                // index === 0 && styles.firstFeedCard,
-                                { borderBottomWidth: 1, borderBottomColor: '#F2F2F2' }
-                            ]}
-                        >
-                            <View style={styles.feedCardLeft}>
-                                <Image source={item.image} style={styles.feedTransportImage} />
-                            </View>
-
-                            <View style={styles.feedCardMiddle}>
-                                <Text style={styles.routeEntryText}>
-                                    <Text style={styles.routeDestinationText}>{item.from} - {item.to}</Text>
-                                </Text>
-                                <View style={styles.feedMetaRow}>
-                                    <Ionicons name="time-outline" size={14} color="#666" />
-                                    <Text style={styles.feedMetaText}>{item.time}</Text>
-                                </View>
-                                <View style={styles.feedMetaRow}>
-                                    <Ionicons name="people-outline" size={14} color="#666" />
-                                    <Text style={styles.feedMetaText}>{item.contributors} contributors</Text>
-                                </View>
-                            </View>
-
-                            <View style={styles.feedCardRight}>
-                                <Text style={styles.feedPriceText}>{item.priceRange}</Text>
-                            </View>
+                    {nearbyFares.length === 0 ? (
+                        <View style={{ padding: 20, alignItems: 'center' }}>
+                            <Text style={{ fontFamily: 'BrittiRegular', color: '#666' }}>No fares shared nearby yet.</Text>
                         </View>
-                    ))}
+                    ) : (
+                        nearbyFares.map((item, index) => (
+                            <View
+                                key={item.id}
+                                style={[
+                                    styles.feedCard,
+                                    { borderBottomWidth: 1, borderBottomColor: '#F2F2F2' }
+                                ]}
+                            >
+                                <View style={styles.feedCardLeft}>
+                                    <View style={styles.feedTransportImage}>
+                                        <Image
+                                            source={getVehicleImage(item.vehicleType)}
+                                            style={{ width: '100%', height: '100%' }}
+                                            resizeMode="contain"
+                                        />
+                                    </View>
+                                </View>
+
+                                <View style={styles.feedCardMiddle}>
+                                    <Text style={styles.routeEntryText}>
+                                        <Text style={styles.routeDestinationText}>{item.from} - {item.to}</Text>
+                                    </Text>
+                                    <View style={styles.feedMetaRow}>
+                                        <Ionicons name="time-outline" size={14} color="#666" />
+                                        <Text style={styles.feedMetaText}>{item.time}</Text>
+                                    </View>
+                                    <View style={styles.feedMetaRow}>
+                                        <Ionicons name="people-outline" size={14} color="#666" />
+                                        <Text style={styles.feedMetaText}>{item.contributors || 1} contributors</Text>
+                                    </View>
+                                </View>
+
+                                <View style={styles.feedCardRight}>
+                                    <Text style={styles.feedPriceText}>{item.priceRange}</Text>
+                                </View>
+                            </View>
+                        ))
+                    )}
                 </View>
             </ScrollView>
 
@@ -240,7 +324,7 @@ function HomeScreen() {
             </TouchableOpacity>
         </View>
     );
-};
+}
 
 
 const styles = StyleSheet.create({
@@ -327,7 +411,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
         height: 37,
         width: 92,
-        justifyContent: 'center',    
+        justifyContent: 'center',
         alignItems: 'center'
     },
     shareButtonText: {

@@ -72,7 +72,11 @@ export interface UserData {
     firstName?: string;
     lastName?: string;
     username?: string;
-    profilePhoto?: string;
+    fullName?: string;
+    phone?: string;
+    location?: string;
+    profilePhoto?: string | null;
+    avatarColor?: string;
 }
 
 export const setUserData = async (userData: UserData) => {
@@ -160,7 +164,7 @@ api.interceptors.response.use(
         if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
             // This is definitely a timeout
             console.log("Request timed out. Please try again.");
-        } 
+        }
         return Promise.reject(error);
     }
 );

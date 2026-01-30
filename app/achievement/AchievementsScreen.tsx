@@ -8,9 +8,12 @@ import {
     ScrollView,
     Image,
     FlatList,
+    ActivityIndicator
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import api from '@/services/api';
+
 
 // Badge Images Mapping
 const badgeImages: any = {
@@ -30,29 +33,43 @@ const badgeImages: any = {
 
 export default function AchievementsScreen() {
     const router = useRouter();
+    const [loading, setLoading] = React.useState(true);
+    const [achievementData, setAchievementData] = React.useState<any>(null);
+    const [leaderboardData, setLeaderboardData] = React.useState<any[]>([]);
 
-    // Mock data for levels
-    const levels = [
-        { id: 1, label: 'Level 1', earned: true },
-        { id: 2, label: 'Level 2', earned: true },
-        { id: 3, label: 'Level 3', earned: false },
-        { id: 4, label: 'Level 4', earned: false },
-        { id: 5, label: 'Level 5', earned: false },
-    ];
+    React.useEffect(() => {
+        fetchData();
+    }, []);
 
-    // Mock data for badges
+    const fetchData = async () => {
+        try {
+            const [achResponse, lbResponse] = await Promise.all([
+                api.get('/api/user/account/achievements'),
+                api.get('/api/user/account/leaderboard')
+            ]);
+            setAchievementData(achResponse.data);
+            setLeaderboardData(lbResponse.data.slice(0, 3)); // Only show top 3 on summary
+        } catch (error) {
+            console.error("Error fetching achievement data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Levels logic: Determine which levels are earned based on achievementData.level
+    const levels = Array.from({ length: 5 }, (_, i) => ({
+        id: i + 1,
+        label: `Level ${i + 1}`,
+        earned: achievementData ? achievementData.level >= (i + 1) : false
+    }));
+
+    // Badges logic: Map backend earnedBadges to display format
     const badges = [
-        { id: 'starter', title: 'fare starter', earned: true },
-        { id: 'helper', title: 'route helper', earned: true },
-        { id: 'dropper', title: 'fare dropper', earned: false },
+        { id: 'starter', title: 'fare starter', earned: achievementData?.earnedBadges?.includes('starter') },
+        { id: 'helper', title: 'route helper', earned: achievementData?.earnedBadges?.includes('helper') },
+        { id: 'dropper', title: 'fare dropper', earned: achievementData?.earnedBadges?.includes('dropper') },
     ];
 
-    // Mock data for leadership
-    const leadershipItems = [
-        { id: 1, title: 'Ikeja Master', description: 'Most contributions in Ikeja', count: '42 fares' },
-        { id: 2, title: 'Route Legend', description: 'Verified over 100 routes', count: '12 routes' },
-        { id: 3, title: 'Top Reporter', description: 'Consistent daily reports', count: '8 reports' },
-    ];
 
     return (
         <SafeAreaView style={styles.container}>
@@ -73,88 +90,95 @@ export default function AchievementsScreen() {
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
             >
-                {/* Stats Cards */}
-                <View style={styles.statsContainer}>
-                    <View style={styles.statCard}>
-                        <View style={styles.statCardHeader}>
-                            <Ionicons name="star" size={16} color="#FFD700" />
-                            <Text style={styles.statCardTitle}>Points</Text>
-                        </View>
-                        <Text style={styles.statNumber}>1,240</Text>
-                    </View>
-                    <View style={styles.statCard}>
-                        <View style={styles.statCardHeader}>
-                            <Ionicons name="people" size={16} color="#000000" />
-                            <Text style={styles.statCardTitle}>Helped</Text>
-                        </View>
-                        <Text style={styles.statNumber}>852</Text>
-                    </View>
-                </View>
-
-                {/* Level Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Level</Text>
-                    <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.levelList}
-                    >
-                        {levels.map((level) => (
-                            <View key={level.id} style={styles.levelCard}>
-                                <View style={[styles.levelImageContainer, !level.earned && styles.dullLevel]}>
-                                    <Ionicons name="trophy" size={32} color={level.earned ? "#080808" : "#999"} />
+                {loading ? (
+                    <ActivityIndicator size="large" color="#080808" style={{ marginTop: 40 }} />
+                ) : (
+                    <>
+                        {/* Stats Cards */}
+                        <View style={styles.statsContainer}>
+                            <View style={styles.statCard}>
+                                <View style={styles.statCardHeader}>
+                                    <Ionicons name="star" size={16} color="#FFD700" />
+                                    <Text style={styles.statCardTitle}>Points</Text>
                                 </View>
-                                <Text style={styles.levelLabel}>{level.label}</Text>
+                                <Text style={styles.statNumber}>{achievementData?.points?.toLocaleString() || 0}</Text>
                             </View>
-                        ))}
-                    </ScrollView>
-                </View>
-
-                {/* Badges Section */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Badges</Text>
-                        <TouchableOpacity onPress={() => router.push('./BadgesScreen')}>
-                            <Text style={styles.seeAll}>See all</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.badgeRow}>
-                        {badges.map((badge) => (
-                            <View key={badge.id} style={styles.badgeCard}>
-                                <Image
-                                    source={badge.earned ? badgeImages[badge.id].earned : badgeImages[badge.id].notEarned}
-                                    style={styles.badgeImage}
-                                    resizeMode="contain"
-                                />
-                                <Text style={styles.badgeTitle}>{badge.title}</Text>
+                            <View style={styles.statCard}>
+                                <View style={styles.statCardHeader}>
+                                    <Ionicons name="people" size={16} color="#000000" />
+                                    <Text style={styles.statCardTitle}>Helped</Text>
+                                </View>
+                                <Text style={styles.statNumber}>{achievementData?.helped?.toLocaleString() || 0}</Text>
                             </View>
-                        ))}
-                    </View>
-                </View>
+                        </View>
 
-                {/* Leadership Section */}
-                <View style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Leadership</Text>
-                        <TouchableOpacity onPress={() => router.push('./LeadersBoardScreen')}>
-                            <Text style={styles.seeAll}>See all</Text>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.leadershipList}>
-                        {leadershipItems.map((item, index) => (
-                            <View key={item.id} style={styles.leadershipItem}>
-                                <View style={styles.leadershipLeft}>
-                                    <Text style={styles.rankText}>#{index + 1}</Text>
-                                    <View>
-                                        <Text style={styles.leadershipText}>{item.title}</Text>
-                                        <Text style={styles.leadershipDesc}>{item.description}</Text>
+
+                        {/* Level Section */}
+                        <View style={styles.section}>
+                            <Text style={styles.sectionTitle}>Level</Text>
+                            <ScrollView
+                                horizontal
+                                showsHorizontalScrollIndicator={false}
+                                contentContainerStyle={styles.levelList}
+                            >
+                                {levels.map((level) => (
+                                    <View key={level.id} style={styles.levelCard}>
+                                        <View style={[styles.levelImageContainer, !level.earned && styles.dullLevel]}>
+                                            <Ionicons name="trophy" size={32} color={level.earned ? "#080808" : "#999"} />
+                                        </View>
+                                        <Text style={styles.levelLabel}>{level.label}</Text>
                                     </View>
-                                </View>
-                                <Text style={styles.leadershipCount}>{item.count}</Text>
+                                ))}
+                            </ScrollView>
+                        </View>
+
+                        {/* Badges Section */}
+                        <View style={styles.section}>
+                            <View style={styles.sectionHeader}>
+                                <Text style={styles.sectionTitle}>Badges</Text>
+                                <TouchableOpacity onPress={() => router.push('./BadgesScreen')}>
+                                    <Text style={styles.seeAll}>See all</Text>
+                                </TouchableOpacity>
                             </View>
-                        ))}
-                    </View>
-                </View>
+                            <View style={styles.badgeRow}>
+                                {badges.map((badge) => (
+                                    <View key={badge.id} style={styles.badgeCard}>
+                                        <Image
+                                            source={badge.earned ? badgeImages[badge.id].earned : badgeImages[badge.id].notEarned}
+                                            style={styles.badgeImage}
+                                            resizeMode="contain"
+                                        />
+                                        <Text style={styles.badgeTitle}>{badge.title}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+
+                        {/* Leadership Section */}
+                        <View style={styles.section}>
+                            <View style={styles.sectionHeader}>
+                                <Text style={styles.sectionTitle}>Leadership</Text>
+                                <TouchableOpacity onPress={() => router.push('./LeadersBoardScreen')}>
+                                    <Text style={styles.seeAll}>See all</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={styles.leadershipList}>
+                                {leaderboardData.map((item, index) => (
+                                    <View key={item.id} style={styles.leadershipItem}>
+                                        <View style={styles.leadershipLeft}>
+                                            <Text style={styles.rankText}>#{index + 1}</Text>
+                                            <View>
+                                                <Text style={styles.leadershipText}>{item.username}</Text>
+                                                <Text style={styles.leadershipDesc}>{item.title}</Text>
+                                            </View>
+                                        </View>
+                                        <Text style={styles.leadershipCount}>{item.count}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+                    </>
+                )}
             </ScrollView>
         </SafeAreaView>
     );

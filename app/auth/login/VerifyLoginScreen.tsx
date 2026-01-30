@@ -14,6 +14,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api, { setToken, setUserData, setRefreshToken } from '@/services/api';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
+import { useLoader } from '@/contexts/LoaderContext';
 
 export default function VerifyLoginScreen() {
     const router = useRouter();
@@ -21,9 +22,9 @@ export default function VerifyLoginScreen() {
     const email = params.email as string || "your email";
 
     const [otp, setOtp] = useState(['', '', '', '']);
-    const [timer, setTimer] = useState(30);
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
     const [activeIndex, setActiveIndex] = useState(0);
+    const [timer, setTimer] = useState(30);
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
@@ -37,7 +38,7 @@ export default function VerifyLoginScreen() {
     }, [timer]);
 
     const handleOtpPress = (digit: string) => {
-        if (activeIndex > 3 || isLoading) return;
+        if (activeIndex > 3) return;
 
         const newOtp = [...otp];
         newOtp[activeIndex] = digit;
@@ -52,7 +53,6 @@ export default function VerifyLoginScreen() {
     };
 
     const handleOtpDelete = () => {
-        if (isLoading) return;
 
         const newOtp = [...otp];
         if (newOtp[activeIndex] !== '') {
@@ -66,7 +66,7 @@ export default function VerifyLoginScreen() {
 
 
     const handleVerify = async (otpCode: string) => {
-        setIsLoading(true);
+        showLoader();
         try {
             // Verify Login OTP
             const response = await api.post("/api/user/auth/login/verify", {
@@ -95,14 +95,14 @@ export default function VerifyLoginScreen() {
             console.error('Verify Login error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
     const handleResend = async () => {
         if (timer > 0) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             await api.post("/api/user/auth/login/initiate", { email });
             setTimer(30);
@@ -113,7 +113,7 @@ export default function VerifyLoginScreen() {
             console.error('Resend Login OTP error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -164,7 +164,7 @@ export default function VerifyLoginScreen() {
                         {timer > 0 ? (
                             <Text style={styles.timerText}>Resend code in <Text style={styles.timerCount}>{timer}s</Text></Text>
                         ) : (
-                            <TouchableOpacity onPress={handleResend} disabled={isLoading}>
+                            <TouchableOpacity onPress={handleResend}>
                                 <Text style={styles.resendText}>Resend code</Text>
                             </TouchableOpacity>
                         )}

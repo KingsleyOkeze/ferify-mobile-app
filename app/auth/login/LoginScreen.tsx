@@ -1,8 +1,9 @@
 import api, { getUserData, setToken, setUserData } from "@/services/api";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { useRouter } from "expo-router";
 import * as WebBrowser from 'expo-web-browser';
+import * as Google from "expo-auth-session/providers/google";
+import { makeRedirectUri } from "expo-auth-session";
 import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
@@ -18,6 +19,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import { useLoader } from "@/contexts/LoaderContext";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -26,65 +28,61 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [loading, setLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     const [firstName, setFirstName] = useState<string>("");
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
-    useEffect(() => {
-        const loadProfile = async () => {
-            const userData = await getUserData();
-            if (userData?.firstName) {
-                setFirstName(userData.firstName);
-            }
-        };
-        loadProfile();
-    }, []);
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+        scopes: ["profile", "email"],
+    });
 
-    // Google Sign-In
-    const signInWithGoogle = async () => {
+    useEffect(() => {
+        if (request) {
+            console.log("Login Redirect URI:", request.redirectUri);
+        }
+    }, [request]);
+
+    useEffect(() => {
+        if (response?.type === "success") {
+            const { idToken } = response.params;
+
+            if (!idToken) {
+                const backupToken = response.authentication?.idToken;
+                if (backupToken) {
+                    signInWithGoogle(backupToken);
+                } else {
+                    Alert.alert("Google Sign-In Failed", "No ID token received.");
+                }
+                return;
+            }
+
+            signInWithGoogle(idToken);
+        }
+    }, [response]);
+
+    const signInWithGoogle = async (idToken: string) => {
         setLoading(true);
         try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            const idToken = userInfo.data?.idToken;
+            const res = await api.post("/api/user/auth/google-login", { idToken });
+            console.log("Google Login Backend Success:", res.data);
+            if (res.data.accessToken) {
+                await setToken(res.data.accessToken);
 
-            if (idToken) {
-                api.post('/api/user/auth/google-login', { idToken })
-                    .then(async (res) => {
-                        console.log("Google Login Backend Success:", res.data);
-                        if (res.data.accessToken) {
-                            await setToken(res.data.accessToken);
+                // Save User Data for Caching
+                if (res.data.user) {
+                    await setUserData(res.data.user);
+                }
 
-                            // Save User Data for Caching
-                            if (res.data.user) {
-                                await setUserData(res.data.user);
-                            }
-
-                            router.replace('/(tabs)/HomeScreen');
-                        }
-                    })
-                    .catch((error) => {
-                        console.error("Google Backend Error:", error.response?.data || error.message);
-                        Alert.alert("Google Sign-In Failed", "Could not verify with server.");
-                    })
-                    .finally(() => setLoading(false));
-            } else {
-                Alert.alert("Error", "No ID token received from Google");
-                setLoading(false);
+                router.replace("/(tabs)/HomeScreen");
             }
         } catch (error: any) {
-            console.error("Google Sign-In Error", error);
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-                // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-                // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-                // play services not available or outdated
-                Alert.alert("Error", "Google Play Services not available");
-            } else {
-                // some other error happened
-                Alert.alert("Error", "An unexpected error occurred during Google Sign-In");
-            }
+            console.error("Google Backend Error:", error.response?.data || error.message);
+            Alert.alert("Google Sign-In Failed", "Could not verify with server.");
+        } finally {
             setLoading(false);
         }
     };
@@ -98,6 +96,7 @@ export default function LoginScreen() {
     const handleContinue = async () => {
         if (!isEmailValid) return;
 
+        showLoader();
         setLoading(true);
         try {
             // This would typically initiate the login process (e.g., check email, then move to verification or password)
@@ -127,6 +126,7 @@ export default function LoginScreen() {
             // Alert.alert("Error", error.response?.data?.error || "Failed to start sign in. Please try again.");
         } finally {
             setLoading(false);
+            hideLoader();
         }
     };
 

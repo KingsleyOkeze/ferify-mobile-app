@@ -11,12 +11,14 @@ import {
     ScrollView,
     ActivityIndicator,
     Alert,
-    Dimensions
+    Dimensions,
+    Keyboard
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { useLoader } from '@/contexts/LoaderContext';
 
 const { width } = Dimensions.get('window');
 
@@ -24,15 +26,15 @@ function UpdateUserPhoneNumberScreen() {
     const router = useRouter();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     // Basic phone number validation (e.g., at least 10 digits)
-    const isFormValid = phoneNumber.trim().length >= 10 && !isLoading;
+    const isFormValid = phoneNumber.trim().length >= 10;
 
     const handleUpdate = async () => {
         if (!isFormValid) return;
 
-        setIsLoading(true);
+        showLoader();
         try {
             const response = await api.put('/api/user/account/update-phone', { phoneNumber: phoneNumber.trim() });
 
@@ -46,7 +48,7 @@ function UpdateUserPhoneNumberScreen() {
             console.error('Update phone error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Failed to update phone number');
         } finally {
-            setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -106,13 +108,14 @@ function UpdateUserPhoneNumberScreen() {
                             placeholderTextColor="#999"
                             value={phoneNumber}
                             showSoftInputOnFocus={false} // Custom keypad
-                            onFocus={() => setIsInputFocused(true)}
+                            onFocus={() => {
+                                setIsInputFocused(true);
+                                Keyboard.dismiss(); // Ensure platform keyboard is hidden
+                            }}
                             onBlur={() => setIsInputFocused(false)}
-                            autoFocus={true}
-                            editable={!isLoading}
                         />
                         <View style={styles.statementRow}>
-                            <Text style={styles.statementText}>Will be verified via OTP</Text>
+                            <Text style={styles.statementText}>Please insert valid number.</Text>
                         </View>
                     </View>
 
@@ -123,19 +126,15 @@ function UpdateUserPhoneNumberScreen() {
                             !isFormValid && styles.updateButtonDisabled,
                             { marginTop: 24 }
                         ]}
-                        disabled={!isFormValid || isLoading}
+                        disabled={!isFormValid}
                         onPress={handleUpdate}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={[
-                                styles.updateButtonText,
-                                !isFormValid && styles.updateButtonTextDisabled
-                            ]}>
-                                Update
-                            </Text>
-                        )}
+                        <Text style={[
+                            styles.updateButtonText,
+                            !isFormValid && styles.updateButtonTextDisabled
+                        ]}>
+                            Update
+                        </Text>
                     </TouchableOpacity>
                 </ScrollView>
 
