@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Redirect } from "expo-router";
 import axios from 'axios';
-import { getToken } from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import { fetchAndCacheLocation } from "@/services/locationService";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 // Import your custom design directly
 import MyCustomSplashScreen from "./auth/onboarding/SplashScreen";
+import InAppNotification from "@/components/InAppNotification";
+import { View } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,25 +27,26 @@ export default function Index() {
     });
 
     const [isReady, setIsReady] = useState(false);
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const { isAuthenticated, loading: authLoading } = useAuth();
 
     useEffect(() => {
         async function loadApp() {
             try {
-                const token = await getToken();
-                setIsAuthenticated(!!token);
-
-                if (token) {
-                    await fetchAndCacheLocation();
+                // If auth is no longer loading, we check if location needs fetching
+                if (!authLoading && isAuthenticated) {
+                    // Don't await this, so we don't block the splash screen if location hangs or prompts permission
+                    fetchAndCacheLocation().catch(err => console.warn("Background location fetch failed:", err));
                 }
 
-                // Keep the custom splash visible for 2 seconds
-                await new Promise(resolve => setTimeout(resolve, 2000));
+                if (!authLoading) {
+                    // Keep the custom splash visible for a bit for aesthetics
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    setIsReady(true);
+                }
 
             } catch (e) {
                 console.error("Initialization Error:", e);
             } finally {
-                setIsReady(true);
                 // Hide the NATIVE splash (image from app.json)
                 if (fontsLoaded || fontError) {
                     await SplashScreen.hideAsync();
@@ -52,25 +55,24 @@ export default function Index() {
         }
 
         loadApp();
-    }, [fontsLoaded, fontError]);
+    }, [fontsLoaded, fontError, authLoading, isAuthenticated]);
 
     // Stage 1: Native Splash (shows while fonts are loading)
     if (!fontsLoaded && !fontError) return null;
 
     // Stage 2: Custom Splash (shows while auth/location is being checked)
-    if (!isReady) {
+    if (!isReady || authLoading) {
         return <MyCustomSplashScreen />;
     }
 
     // Stage 3: Final Destination
     // return (
-    //     <Redirect 
-    //         href={isAuthenticated ? "/(tabs)/HomeScreen" : "/auth/onboarding/OnboardingScreen"} 
+    //     <Redirect
+    //         href={isAuthenticated ? "/(tabs)/HomeScreen" : "/auth/onboarding/OnboardingScreen"}
     //     />
     // );
 
     return (
-        // <Redirect href="./route/RouteResultScreen" />
         <Redirect href="./auth/login/LoginScreen" />
     );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface RouteFromAndToProps {
@@ -11,15 +11,26 @@ const RouteFromAndTo: React.FC<RouteFromAndToProps> = ({ from, to }) => {
     return (
         <View style={styles.container}>
             <View style={styles.contentWrapper}>
-                <Text style={styles.locationText}>{from}</Text>
-
-                <View style={styles.separatorContainer}>
-                    <View style={styles.dot} />
-                    <View style={styles.line} />
-                    <Ionicons name="caret-forward" size={12} color="#fff" style={styles.arrowIcon} />
+                <Text 
+                    style={styles.locationText} 
+                    numberOfLines={1} 
+                    ellipsizeMode="tail"
+                >
+                    {from}
+                </Text>
+                <View style={styles.separatorContainer}><Image 
+                        source={require('../assets/images/routes-icons/from_to_icon.png')} 
+                        style={styles.arrowIcon} 
+                    />
                 </View>
 
-                <Text style={styles.locationText}>{to}</Text>
+                <Text 
+                    style={styles.locationText}
+                    numberOfLines={1} 
+                    ellipsizeMode="tail"
+                >
+                    {to}
+                </Text>
             </View>
         </View>
     );
@@ -28,43 +39,36 @@ const RouteFromAndTo: React.FC<RouteFromAndToProps> = ({ from, to }) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#000000',
-        borderRadius: 12,
-        paddingVertical: 12,
+        borderRadius: 100,
         paddingHorizontal: 16,
+        height: 44,
         alignItems: 'center',
         justifyContent: 'center',
         marginVertical: 10,
+        overflow: 'hidden',
     },
     contentWrapper: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
     },
     locationText: {
         color: '#FFFFFF',
         fontSize: 14,
         fontWeight: '600',
+
+        flex: 1,              
+        flexShrink: 1,        
+        textAlign: 'center',
     },
     separatorContainer: {
-        flexDirection: 'row',
+        paddingHorizontal: 8,        
+        justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: 10,
-    },
-    dot: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#FFFFFF',
-        marginRight: 4,
-    },
-    line: {
-        width: 15,
-        height: 1,
-        backgroundColor: '#FFFFFF',
-        marginRight: 0,
     },
     arrowIcon: {
-        marginLeft: -4,
+        width: 40,
     }
 });
 

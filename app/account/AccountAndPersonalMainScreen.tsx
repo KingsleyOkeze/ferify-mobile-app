@@ -28,6 +28,7 @@ function AccountAndPersonalMainScreen() {
             description: 'Manage saved routes and modes',
             image: require('../../assets/images/account-and-personal-icons/transport_preferences_icon.png'),
             onPress: () => { router.push('/account/TransportPreferenceScreen') },
+            disabled: true,
         },
         {
             id: 'privacy',
@@ -62,19 +63,20 @@ function AccountAndPersonalMainScreen() {
                             key={item.id}
                             style={[
                                 styles.menuItem,
-                                // index === 0 && styles.firstMenuItem
+                                item.disabled && styles.disabledMenuItem
                             ]}
                             onPress={item.onPress}
+                            disabled={item.disabled}
                         >
                             <View style={styles.itemLeft}>
-                                <Image source={item.image} style={styles.itemImage} />
+                                <Image source={item.image} style={[styles.itemImage, item.disabled && { opacity: 0.5 }]} />
                                 <View style={styles.textContainer}>
-                                    <Text style={styles.itemTitle}>{item.title}</Text>
-                                    <Text style={styles.itemDescription}>{item.description}</Text>
+                                    <Text style={[styles.itemTitle, item.disabled && { color: '#999' }]}>{item.title}</Text>
+                                    <Text style={[styles.itemDescription, item.disabled && { color: '#bbb' }]}>{item.description}</Text>
                                 </View>
                             </View>
                             {/* Arrow without tail: Chevron Forward */}
-                            <Ionicons name="chevron-forward" size={16} color="#999" />
+                            {!item.disabled && <Ionicons name="chevron-forward" size={16} color="#999" />}
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: 600,
+        fontWeight: '600', // Fixed: fontWeight should be string '600' or number 600, but safest as string in some RN versions/libs or standard css. RN supports number. 
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
@@ -122,8 +124,9 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
     },
-    // firstMenuItem: {
-    // },
+    disabledMenuItem: {
+        backgroundColor: '#F9F9F9', // Light background for disabled state
+    },
     itemLeft: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -141,14 +144,14 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: 400,
+        fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 14,
-        fontWeight: 400,
+        fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#757575',
     },

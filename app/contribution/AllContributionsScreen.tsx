@@ -28,6 +28,8 @@ if (
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+const noContributionImage = require('../../assets/images/no-data-images/no_data_found_image.png');
+
 type TabType = 'fares' | 'routes' | 'reports';
 
 function AllContributionsScreen() {
@@ -168,7 +170,10 @@ function AllContributionsScreen() {
                 </View>
             ) : (
                 <ScrollView
-                    contentContainerStyle={styles.scrollContent}
+                    contentContainerStyle={[
+                        styles.scrollContent,
+                        (!isLoading && historyData.length === 0) && { flexGrow: 1 }
+                    ]}
                     refreshControl={
                         <RefreshControl refreshing={isLoading} onRefresh={fetchHistory} />
                     }
@@ -205,9 +210,22 @@ function AllContributionsScreen() {
                             ))}
                         </View>
                     ))}
+
                     {(!isLoading && historyData.length === 0) && (
-                        <View style={{ padding: 20, alignItems: 'center' }}>
-                            <Text style={{ color: '#666' }}>No contributions found.</Text>
+                        <View style={styles.emptyStateContainer}>
+                            <Image source={noContributionImage} style={styles.noDataImage} resizeMode="contain" />
+                            <Text style={styles.noDataTitle}>No {activeTab} yet</Text>
+                            <Text style={styles.noDataSubtitle}>
+                                When you submit {activeTab === 'fares' ? 'fare updates' : activeTab === 'routes' ? 'new routes' : 'reports'}, they will appear here.
+                            </Text>
+                            <TouchableOpacity
+                                style={styles.emptyStateButton}
+                                onPress={() => router.push('../fare-contribution/FareContributionScreen')}
+                            >
+                                <Text style={styles.emptyStateButtonText}>
+                                    {activeTab === 'reports' ? 'Report an Issue' : 'Share Fare'}
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     )}
                 </ScrollView>
@@ -357,6 +375,51 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#1B9E4B',
+    },
+    // Empty State Styles
+    emptyStateContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 40,
+        paddingVertical: 60,
+    },
+    noDataImage: {
+        width: 95.6,
+        height: 97.36,
+        marginBottom: 24,
+    },
+    noDataTitle: {
+        fontSize: 18,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
+        color: '#080808',
+        textAlign: 'center',
+        marginBottom: 12,
+    },
+    noDataSubtitle: {
+        fontSize: 14,
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
+        color: '#757575',
+        textAlign: 'center',
+        lineHeight: 22,
+        marginBottom: 32,
+        width: '90%'
+    },
+    emptyStateButton: {
+        backgroundColor: '#080808',
+        borderRadius: 100,
+        width: 148,
+        height: 48,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    emptyStateButtonText: {
+        color: '#FBFBFB',
+        fontSize: 16,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
 });
 

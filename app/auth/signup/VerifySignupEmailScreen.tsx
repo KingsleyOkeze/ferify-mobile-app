@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api, { setToken, setRefreshToken } from '@/services/api';
+import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 import { useLoader } from '@/contexts/LoaderContext';
 
@@ -29,6 +30,7 @@ export default function VerifySignupEmailScreen() {
     const [timer, setTimer] = useState(params.autoSend === 'true' ? 0 : 30);
 
     const { showLoader, hideLoader } = useLoader();
+    const { login } = useAuth();
     const hasAttemptedSend = useRef(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -87,7 +89,6 @@ export default function VerifySignupEmailScreen() {
         setOtp(newOtp);
     };
 
-
     const handleVerify = async (otpCode: string) => {
         showLoader();
         try {
@@ -101,14 +102,12 @@ export default function VerifySignupEmailScreen() {
 
             // 2. Login User (Backend returns tokens)
             if (verifyResponse.data.accessToken) {
-                await setToken(verifyResponse.data.accessToken);
-                if (verifyResponse.data.refreshToken) {
-                    await setRefreshToken(verifyResponse.data.refreshToken);
-                }
+                const userData = verifyResponse.data.user || { email, id: verifyResponse.data.userId || 'temp-id' };
+                await login(userData, verifyResponse.data.accessToken, verifyResponse.data.refreshToken);
+
                 // 3. Navigate to Profile Setup
                 router.replace('/auth/signup/FullNameInputScreen');
             }
-
         } catch (error: any) {
             console.error('Verify OTP error:', error.response?.data || error.message);
             Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');

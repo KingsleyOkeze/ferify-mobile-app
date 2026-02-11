@@ -14,17 +14,17 @@ interface Recommendation {
     place_id: string;
 }
 
-interface LocationListProps {
+interface LocationRecommendationProps {
     isSearching: boolean;
     recommendations: Recommendation[];
     onSelect: (item: Recommendation) => void;
 }
 
-export default function LocationList({
+export default function LocationRecommendation({
     isSearching,
     recommendations,
     onSelect,
-}: LocationListProps) {
+}: LocationRecommendationProps) {
     return (
         <>
             {isSearching && (
@@ -38,11 +38,13 @@ export default function LocationList({
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
             >
-                {Array.isArray(recommendations) && recommendations.map((item) => (
+                {Array.isArray(recommendations) && recommendations.map((item, index) => (
                     <TouchableOpacity
                         key={item.place_id}
-                        style={styles.resultCard}
-                        onPress={() => onSelect(item)}
+                        style={
+                            index === 0 ? [{ ...styles.resultCard, ...styles.firstResultCard }] : styles.resultCard
+                        }
+                        onPress={() => requestAnimationFrame(() => onSelect(item))}
                     >
                         <View style={styles.iconContainer}>
                             <Ionicons name="location-sharp" size={20} color="#000" />
@@ -67,6 +69,10 @@ const styles = StyleSheet.create({
     resultsList: {
         paddingHorizontal: 20,
         paddingBottom: 40,
+    },
+    firstResultCard: {
+        borderTopWidth: 1,
+        borderTopColor: '#F0F0F0',
     },
     resultCard: {
         flexDirection: 'row',

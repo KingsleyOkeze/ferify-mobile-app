@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Platform } from 'react-native';
+import { Platform, DeviceEventEmitter } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Base URL configuration
@@ -125,72 +125,79 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // If error is 401 and we haven't retried yet
+        // 1. Handle 401 Unauthorized (Token Refresh)
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
                 const refreshToken = await getRefreshToken();
                 if (!refreshToken) {
-                    await logout(false);
+                    await Promise.all([removeToken(), removeRefreshToken()]);
                     return Promise.reject(error);
                 }
 
-                // Attempt to refresh token
                 const response = await axios.post(`${BASE_URL}/api/user/auth/refresh-token`, {
                     refreshToken: refreshToken
                 });
 
                 const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-                // Save new tokens
                 await setToken(accessToken);
                 if (newRefreshToken) {
                     await setRefreshToken(newRefreshToken);
                 }
 
-                // Update original request header and retry
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return api(originalRequest);
 
             } catch (refreshError) {
-                // If refresh fails, logout
                 console.error('Token refresh failed:', refreshError);
-                await logout(false);
+                await Promise.all([removeToken(), removeRefreshToken()]);
                 return Promise.reject(refreshError);
             }
         }
 
-        if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
-            // This is definitely a timeout
-            console.log("Request timed out. Please try again.");
+        // 2. Handle Retry Mechanism (Network Errors, Timeouts, 5xx)
+        const isNetworkError = !error.response && error.message === 'Network Error';
+        const isTimeout = error.code === 'ECONNABORTED' && error.message.includes('timeout');
+        const isServerError = error.response?.status && error.response.status >= 500;
+
+        if ((isNetworkError || isTimeout || isServerError) && (!originalRequest._retryCount || originalRequest._retryCount < 3)) {
+            originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+            const backoffDelay = originalRequest._retryCount * 1500; // 1.5s, 3s, 4.5s
+
+            console.log(`[RETRY] Request failed. Retrying (${originalRequest._retryCount}/3) in ${backoffDelay}ms... Source: ${isNetworkError ? 'Network' : isTimeout ? 'Timeout' : 'Server'}`);
+
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+            return api(originalRequest);
         }
+
+        // 3. User Feedback (Toasts) - only show on final failure
+        // 3. User Feedback (Toasts) - only show on final failure
+        if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
+            DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: 'Request timed out. Please check your connection.' });
+        } else if (error.response?.data?.error) {
+            // Backend returned a specific error message
+            DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: error.response.data.error });
+        } else if (error.response?.status) { // Our hard coded err msg incase server doesn't explicitly define it
+            const status = error.response.status;
+            let msg = 'An unexpected error occurred.';
+
+            if (status >= 500) msg = 'Server error. Please try again later.';
+            else if (status === 404) msg = 'Requested resource not found.';
+            else if (status === 403) msg = 'You do not have permission to do this.';
+            else if (status === 401) msg = 'Session expired. Please login again.';
+            else if (status === 400) msg = 'Invalid request. Please check your input.';
+            else if (status === 402) msg = 'Payment required.';
+            else if (status === 429) msg = 'Too many requests. Please slow down.';
+
+            DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: `${msg} (${status})` });
+        } else if (isNetworkError || error.code === 'ERR_NETWORK') {
+            // This usually means the client is offline OR the server is completely unreachable
+            DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: 'Network error. Please check your internet connection.' });
+        }
+
         return Promise.reject(error);
     }
 );
-
-/**
- * Unified logout function
- * @param notifyBackend Whether to attempt to blacklist the token on the server
- */
-export const logout = async (notifyBackend: boolean = true) => {
-    try {
-        if (notifyBackend) {
-            const refreshToken = await getRefreshToken();
-            if (refreshToken) {
-                await api.post('/api/user/auth/logout', { refreshToken });
-            }
-        }
-    } catch (error) {
-        console.error('Error notifying backend of logout:', error);
-    } finally {
-        // Always clear local storage regardless of backend success
-        await Promise.all([
-            removeToken(),
-            removeRefreshToken(),
-            removeUserData()
-        ]);
-    }
-};
 
 export default api;

@@ -6,7 +6,8 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
-    ActivityIndicator
+    ActivityIndicator,
+    Image
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -72,16 +73,16 @@ function SavedRoutesScreen() {
             title: 'Home',
             address: homeAddress === 'Add home address' ? '' : homeAddress,
             placeholder: 'Add home address',
-            icon: 'home-outline',
-            onPress: () => { router.push({ pathname: '/setting/account/AddRouteScreen', params: { type: 'home' } }) },
+            image: require('../../assets/images/saved-routes-icons/add_home_icon.png'),
+            onPress: () => { router.push({ pathname: './AddRouteScreen', params: { type: 'home' } }) },
         },
         {
             id: 'work',
             title: 'Work',
             address: workAddress === 'Add work address' ? '' : workAddress,
             placeholder: 'Add work address',
-            icon: 'briefcase-outline',
-            onPress: () => { router.push({ pathname: '/setting/account/AddRouteScreen', params: { type: 'work' } }) },
+            image: require('../../assets/images/saved-routes-icons/add_work_icon.png'),
+            onPress: () => { router.push({ pathname: './AddRouteScreen', params: { type: 'work' } }) },
         },
     ];
 
@@ -113,7 +114,7 @@ function SavedRoutesScreen() {
                             >
                                 <View style={styles.itemLeft}>
                                     <View style={styles.iconCircle}>
-                                        <Ionicons name={item.icon as any} size={22} color="#000" />
+                                        <Image source={item.image as any} style={styles.icon} />
                                     </View>
                                     <View>
                                         <Text style={styles.itemTitle}>{item.title}</Text>
@@ -138,7 +139,7 @@ function SavedRoutesScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 20,
@@ -195,6 +196,10 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 16,
+    },
+    icon: {
+        width: 44,
+        height: 44,
     },
     itemTitle: {
         fontSize: 16,

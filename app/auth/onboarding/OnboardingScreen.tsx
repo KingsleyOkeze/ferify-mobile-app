@@ -17,8 +17,8 @@ const { width } = Dimensions.get("window");
 const slides = [
     {
         id: 0,
-        title: "Verify Any Fare",
-        subtitle: "Check accurate fare estimates before you ever step out.",
+        title: "Step out ready and prepared, every single day",
+        subtitle: "Get fare estimate for every stop your route, so you're never stranded.",
         images: [
             require("../../../assets/images/onboarding/handFareCheckImage.png"),
             require("../../../assets/images/onboarding/busAndConductorImage.png"),
@@ -28,8 +28,8 @@ const slides = [
     },
     {
         id: 1, // IDs should remain sequential for simplicity if needed
-        title: "Earn Rewards",
-        subtitle: "Get rewarded for submitting accurate fare. Your contributing help others",
+        title: "Share the fare, earn points, and help the next person",
+        subtitle: "Your small update makes transport easier for thousands of others",
         images: require("../../../assets/images/onboarding/rewardImage.png"),
     },
 ];
@@ -149,7 +149,6 @@ export default function OnboardingScreen() {
                 <Text style={styles.title}>{slides[step].title}</Text>
                 <Text style={styles.subtitle}>{slides[step].subtitle}</Text>
 
-
                 {/* Bottom Buttons Row */}
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
@@ -215,6 +214,7 @@ const styles = StyleSheet.create({
         fontFamily: "BrittiBold",
         fontSize: 24,
         fontWeight: 700,
+        width: '77%',
         textAlign: "center",
         marginBottom: 12,
         color: "#080808",
@@ -223,6 +223,7 @@ const styles = StyleSheet.create({
         fontFamily: "BrittiRegular",
         fontSize: 16,
         fontWeight: 400,
+        width: '95%',
         color: "#757575",
         textAlign: "center",
         lineHeight: 22,

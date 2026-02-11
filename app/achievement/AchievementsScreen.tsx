@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
 
 
@@ -37,20 +38,77 @@ export default function AchievementsScreen() {
     const [achievementData, setAchievementData] = React.useState<any>(null);
     const [leaderboardData, setLeaderboardData] = React.useState<any[]>([]);
 
+    const [error, setError] = React.useState<string | null>(null);
+    const [badges, setBadges] = React.useState<any[]>([]);
+
     React.useEffect(() => {
+        loadCachedData();
         fetchData();
     }, []);
 
+    const loadCachedData = async () => {
+        try {
+            const [achStr, lbStr, badgesStr] = await Promise.all([
+                AsyncStorage.getItem('cached_achievements'),
+                AsyncStorage.getItem('cached_leaderboard'),
+                AsyncStorage.getItem('cached_badges')
+            ]);
+
+            const CACHE_TTL = 24 * 60 * 60 * 1000;
+            const now = Date.now();
+
+            let hasValidCache = false;
+
+            if (achStr) {
+                const cached = JSON.parse(achStr);
+                const isFresh = cached.timestamp && (now - cached.timestamp < CACHE_TTL);
+                if (cached.data) {
+                    setAchievementData(cached.data);
+                    if (isFresh) hasValidCache = true;
+                }
+            }
+
+            if (lbStr) {
+                const cached = JSON.parse(lbStr);
+                if (cached.data) setLeaderboardData(cached.data);
+            }
+
+            if (badgesStr) {
+                const cached = JSON.parse(badgesStr);
+                if (cached.data) setBadges(cached.data.slice(0, 3));
+            }
+
+            // Only stop loading if we have "fresh enough" data
+            if (hasValidCache) {
+                setLoading(false);
+            }
+        } catch (e) {
+            console.error('Error loading cached achievements:', e);
+        }
+    };
+
     const fetchData = async () => {
         try {
-            const [achResponse, lbResponse] = await Promise.all([
+            const [achResponse, lbResponse, badgesResponse] = await Promise.all([
                 api.get('/api/user/account/achievements'),
-                api.get('/api/user/account/leaderboard')
+                api.get('/api/user/account/leaderboard'),
+                api.get('/api/user/account/badges')
             ]);
+
+            const now = Date.now();
             setAchievementData(achResponse.data);
-            setLeaderboardData(lbResponse.data.slice(0, 3)); // Only show top 3 on summary
+            setLeaderboardData(lbResponse.data.slice(0, 3));
+            setBadges(badgesResponse.data.slice(0, 3));
+
+            // Cache with timestamps
+            await Promise.all([
+                AsyncStorage.setItem('cached_achievements', JSON.stringify({ timestamp: now, data: achResponse.data })),
+                AsyncStorage.setItem('cached_leaderboard', JSON.stringify({ timestamp: now, data: lbResponse.data.slice(0, 3) })),
+                AsyncStorage.setItem('cached_badges', JSON.stringify({ timestamp: now, data: badgesResponse.data }))
+            ]);
         } catch (error) {
             console.error("Error fetching achievement data:", error);
+            setError("Sync failed. Using cached data.");
         } finally {
             setLoading(false);
         }
@@ -62,13 +120,6 @@ export default function AchievementsScreen() {
         label: `Level ${i + 1}`,
         earned: achievementData ? achievementData.level >= (i + 1) : false
     }));
-
-    // Badges logic: Map backend earnedBadges to display format
-    const badges = [
-        { id: 'starter', title: 'fare starter', earned: achievementData?.earnedBadges?.includes('starter') },
-        { id: 'helper', title: 'route helper', earned: achievementData?.earnedBadges?.includes('helper') },
-        { id: 'dropper', title: 'fare dropper', earned: achievementData?.earnedBadges?.includes('dropper') },
-    ];
 
 
     return (

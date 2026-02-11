@@ -90,6 +90,7 @@ function SubmitFeedbackScreen() {
                             placeholderTextColor="#999"
                             value={subject}
                             onChangeText={setSubject}
+                            maxLength={200}
                         />
                     </View>
 
@@ -103,6 +104,7 @@ function SubmitFeedbackScreen() {
                             onChangeText={setMessage}
                             multiline
                             textAlignVertical="top"
+                            maxLength={2000}
                         />
                     </View>
 
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'BrittiRegular',
         color: '#080808',
+        lineHeight: 24,
     },
     textArea: {
         height: 150,

@@ -17,11 +17,13 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import api, { setUserData } from '@/services/api';
+import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfileImageAndUsernameInputScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
+    const { updateUser } = useAuth();
     const [image, setImage] = useState<string | null>(null);
     const [username, setUsername] = useState('');
     const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -47,7 +49,7 @@ export default function ProfileImageAndUsernameInputScreen() {
 
         setIsLoading(true);
         try {
-            // 1. Update Profile Photo if selected
+            // Update Profile Photo if selected
             if (image) {
                 const formData = new FormData();
                 const uriParts = image.split('.');
@@ -65,19 +67,19 @@ export default function ProfileImageAndUsernameInputScreen() {
                 });
             }
 
-            // 2. Update Profile Details
+            // Update Profile Details
             const profileResponse = await api.put('/api/user/account/update-profile', {
                 firstName: params.firstName,
                 lastName: params.lastName,
                 username: username.trim(),
             });
 
-            // 3. Save User Data Locally
+            // Save User Data Locally
             if (profileResponse.data.user) {
-                await setUserData(profileResponse.data.user);
+                updateUser(profileResponse.data.user);
             }
 
-            // 4. Move to Home
+            // Move to Home
             router.replace('/(tabs)/HomeScreen');
 
         } catch (error: any) {

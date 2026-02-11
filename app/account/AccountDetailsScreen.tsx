@@ -15,7 +15,8 @@ import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import { Alert, ActivityIndicator } from 'react-native';
 
-import api, { getUserData, setUserData, UserData } from '@/services/api';
+import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Fallback user data
 const DEFAULT_USER_DATA = {
@@ -40,44 +41,17 @@ const DEFAULT_AVATAR_COLORS = [
 
 function AccountDetailsScreen() {
     const router = useRouter();
+    const { user, logout, refreshUser, updateUser } = useAuth();
+
     const [showAvatarModal, setShowAvatarModal] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
     const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
-    const [userData, setUserDataState] = useState<UserData | typeof DEFAULT_USER_DATA>(DEFAULT_USER_DATA);
     const [uploading, setUploading] = useState(false);
 
     React.useEffect(() => {
-        loadUserProfile();
+        // Refresh when entering screen to ensure data is fresh
+        refreshUser();
     }, []);
-
-    const loadUserProfile = async () => {
-        try {
-            // 1. Check cache
-            const cachedData = await getUserData();
-            if (cachedData) {
-                setUserDataState(prev => ({ ...prev, ...cachedData }));
-            }
-
-            // 2. Fetch from backend
-            const response = await api.get('/api/user/account/profile');
-            if (response.data) {
-                const fetchedData = response.data;
-                const updatedData = {
-                    ...fetchedData,
-                    fullName: fetchedData.firstName && fetchedData.lastName
-                        ? `${fetchedData.firstName} ${fetchedData.lastName}`
-                        : (fetchedData.firstName || fetchedData.lastName || 'Set your name')
-                };
-                setUserDataState(updatedData);
-                // 3. Update cache
-                await setUserData(updatedData);
-            }
-        } catch (error) {
-            console.error('Error loading user profile:', error);
-        } finally {
-            // No loading spinner for initial load as we show cache/placeholders
-        }
-    };
 
     const handleTakePhoto = async () => {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
@@ -135,9 +109,7 @@ function AccountDetailsScreen() {
             });
 
             if (response.data.profilePhoto) {
-                const updatedData = { ...userData, profilePhoto: response.data.profilePhoto };
-                setUserDataState(updatedData);
-                await setUserData(updatedData);
+                updateUser({ profilePhoto: response.data.profilePhoto });
                 Alert.alert('Success', 'Profile photo updated successfully');
             }
         } catch (error) {
@@ -151,20 +123,13 @@ function AccountDetailsScreen() {
     const handleSelectColor = async (color: string) => {
         setUploading(true);
         try {
-            // For "Choose your avatar", we'll store the color as a special string or update a color field
-            // Since the backend handles 'profilePhoto', we could potentially send a color code or just clear the photo
-            // and let the frontend handle the background color if it's not a URL.
-            // For now, let's assume we set a 'placeholderColor' in the profile.
-
             const response = await api.put('/api/user/account/update-profile', {
                 profilePhoto: null, // Clear photo
                 avatarColor: color  // Custom field
             });
 
             if (response.status === 200) {
-                const updatedData = { ...userData, profilePhoto: null, avatarColor: color };
-                setUserDataState(updatedData);
-                await setUserData(updatedData);
+                updateUser({ profilePhoto: null, avatarColor: color });
             }
         } catch (error) {
             console.error('Error updating avatar color:', error);
@@ -174,22 +139,22 @@ function AccountDetailsScreen() {
         }
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
         setIsLogoutModalVisible(false);
-        // Add actual logout logic here (e.g., clearing tokens)
+        await logout();
         router.replace('/auth/login/LoginScreen');
     };
 
     const personalInfoItems = [
-        { id: 'username', title: 'Username', value: userData.username ? `@${userData.username}` : 'Set username', onPress: () => router.push('../setting/UpdateUsernameScreen') },
-        { id: 'name', title: 'Full name', value: userData.fullName || 'Set your name', onPress: () => router.push('../setting/UpdateUserFullNameScreen') },
-        { id: 'phone', title: 'Phone number', value: userData.phone || 'Add phone number', onPress: () => router.push('../setting/UpdateUserPhoneNumberScreen') },
-        { id: 'email', title: 'Email address', value: userData.email || 'Set email', onPress: () => router.push('../setting/UpdateUserEmailScreen') },
-        { id: 'location', title: 'Location', value: userData.location || 'Set location', onPress: () => { } },
+        { id: 'username', title: 'Username', value: user?.username ? `@${user.username}` : 'Set username', onPress: () => router.push('../setting/UpdateUsernameScreen') },
+        { id: 'name', title: 'Full name', value: user?.fullName || 'Set your name', onPress: () => router.push('../setting/UpdateUserFullNameScreen') },
+        { id: 'phone', title: 'Phone number', value: user?.phone || 'Add phone number', onPress: () => router.push('../setting/UpdateUserPhoneNumberScreen') },
+        { id: 'email', title: 'Email address', value: user?.email || 'Set email', onPress: () => router.push('../setting/UpdateUserEmailScreen') },
+        { id: 'location', title: 'Location', value: user?.location || 'Set location', onPress: () => { } },
     ];
 
-    const getInitials = (first: string, last: string) => {
-        return `${first.charAt(0)}${last.charAt(0)}`;
+    const getInitials = (first?: string, last?: string) => {
+        return `${(first || 'U').charAt(0)}${(last || 'N').charAt(0)}`;
     };
 
     return (

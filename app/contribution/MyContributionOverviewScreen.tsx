@@ -14,6 +14,8 @@ import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
 
+const noContributionImage = require('../../assets/images/no-data-images/no_contribution_image.png');
+
 function MyContributionOverviewScreen() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
@@ -90,6 +92,10 @@ function MyContributionOverviewScreen() {
         }, [])
     );
 
+    // Check if user has any contributions (if any value is not '0')
+    const hasContributions = stats.some(stat => stat.value !== '0' && stat.value !== 0 && stat.value !== '0.0');
+
+
     const menuItems = [
         {
             id: 'achievement',
@@ -126,24 +132,39 @@ function MyContributionOverviewScreen() {
             </View>
 
             <ScrollView
-                contentContainerStyle={styles.scrollContent}
+                contentContainerStyle={[
+                    styles.scrollContent,
+                    (!isLoading && !hasContributions) && { flexGrow: 1 }
+                ]}
                 showsVerticalScrollIndicator={false}
                 refreshControl={
                     <RefreshControl refreshing={isLoading} onRefresh={fetchStats} />
                 }
             >
-                {/* Stats Grid */}
-                <View style={styles.statsGrid}>
-                    {stats.map((stat) => (
-                        <View key={stat.id} style={styles.statCard}>
-                            <View style={styles.cardHeader}>
-                                <Image style={styles.cardImage} source={stat.image} />
-                                <Text style={styles.cardTitle}>{stat.title}</Text>
+                {/* 
+                    Conditionally Render Stats Grid or Empty State
+                */}
+                {hasContributions ? (
+                    <View style={styles.statsGrid}>
+                        {stats.map((stat) => (
+                            <View key={stat.id} style={styles.statCard}>
+                                <View style={styles.cardHeader}>
+                                    <Image style={styles.cardImage} source={stat.image} />
+                                    <Text style={styles.cardTitle}>{stat.title}</Text>
+                                </View>
+                                <Text style={styles.cardValue}>{stat.value}</Text>
                             </View>
-                            <Text style={styles.cardValue}>{stat.value}</Text>
-                        </View>
-                    ))}
-                </View>
+                        ))}
+                    </View>
+                ) : (
+                    <View style={styles.emptyStateContainer}>
+                        <Image source={noContributionImage} style={styles.noDataImage} resizeMode="contain" />
+                        <Text style={styles.noDataTitle}>No contribution yet</Text>
+                        <Text style={styles.noDataText}>
+                            When you submit fares or reports, they will appear here.
+                        </Text>
+                    </View>
+                )}
 
                 {/* Menu List */}
                 <View style={styles.menuContainer}>
@@ -193,15 +214,15 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: 600,
+        fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginTop: 10,
-        marginBottom: 5,
+        marginBottom: 15,
     },
     headerSubtitle: {
         fontSize: 14,
-        fontWeight: 400,
+        fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#393939',
     },
@@ -245,10 +266,41 @@ const styles = StyleSheet.create({
     },
     cardValue: {
         fontSize: 20,
-        fontWeight: 600,
+        fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         alignSelf: 'flex-end', // Align number to right end
+    },
+    // Empty State Styles
+    emptyStateContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 30,
+        paddingVertical: 60,
+    },
+    noDataImage: {
+        width: 68.67,
+        height: 68,
+        marginBottom: 16,
+    },
+    noDataTitle: {
+        fontSize: 18,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
+        color: '#080808',
+        marginTop: 18,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    noDataText: {
+        fontSize: 14,
+        fontWeight: '400',
+        fontFamily: 'BrittiRegular',
+        color: '#757575',
+        textAlign: 'center',
+        lineHeight: 20,
+        width: '80%'
     },
     menuContainer: {
         // paddingHorizontal: 20,
@@ -284,14 +336,14 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: 400,
+        fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#000000',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 14,
-        fontWeight: 400,
+        fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#757575',
     },

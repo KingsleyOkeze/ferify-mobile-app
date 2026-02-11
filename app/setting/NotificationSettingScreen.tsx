@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,48 +6,92 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    ActivityIndicator,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import CustomSwitch from '@/components/CustomSwitch';
+import api from '@/services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function NotificationSettingScreen() {
     const router = useRouter();
 
     // State for toggles
-    const [fareAlerts, setFareAlerts] = useState(true);
-    const [routeUpdates, setRouteUpdates] = useState(true);
     const [communityActivity, setCommunityActivity] = useState(false);
     const [tipsAndInsight, setTipsAndInsight] = useState(true);
+    const [loading, setLoading] = useState(true);
+
+    const CACHE_KEY = 'NOTIFICATION_SETTINGS_CACHE';
+
+    useEffect(() => {
+        loadSettings();
+    }, []);
+
+    const loadSettings = async () => {
+        try {
+            // 1. Try Cache First (Smart Caching)
+            const cached = await AsyncStorage.getItem(CACHE_KEY);
+            if (cached) {
+                const parsed = JSON.parse(cached);
+                setCommunityActivity(parsed.communityActivity);
+                setTipsAndInsight(parsed.tipsAndInsight);
+            }
+
+            // 2. Fetch from Backend
+            const response = await api.get('/api/user/notification-settings');
+            const { settings } = response.data;
+
+            if (settings) {
+                setCommunityActivity(settings.communityActivity);
+                setTipsAndInsight(settings.tipsAndInsight);
+                // Update Cache
+                await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(settings));
+            }
+        } catch (error) {
+            console.error("Error loading notification settings:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const updateSetting = async (key: string, value: boolean) => {
+        // Optimistic UI Update
+        if (key === 'communityActivity') setCommunityActivity(value);
+        if (key === 'tipsAndInsight') setTipsAndInsight(value);
+
+        try {
+            const body = {
+                communityActivity: key === 'communityActivity' ? value : communityActivity,
+                tipsAndInsight: key === 'tipsAndInsight' ? value : tipsAndInsight,
+            };
+
+            await api.patch('/api/user/notification-settings/update', body);
+
+            // Sync Cache
+            await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(body));
+        } catch (error) {
+            console.error("Error updating notification setting:", error);
+            // Rollback on error
+            if (key === 'communityActivity') setCommunityActivity(!value);
+            if (key === 'tipsAndInsight') setTipsAndInsight(!value);
+        }
+    };
 
     const notificationItems = [
-        {
-            id: 'fareAlerts',
-            title: 'Fare alert',
-            description: 'Get notified when prices change',
-            value: fareAlerts,
-            onValueChange: setFareAlerts,
-        },
-        // {
-        //     id: 'routeUpdates',
-        //     title: 'Route updates',
-        //     description: 'Real-time traffic and road alerts',
-        //     value: routeUpdates,
-        //     onValueChange: setRouteUpdates,
-        // },
         {
             id: 'communityActivity',
             title: 'Community activity',
             description: 'When others confirm your route',
             value: communityActivity,
-            onValueChange: setCommunityActivity,
+            onValueChange: (val: boolean) => updateSetting('communityActivity', val),
         },
         {
             id: 'tipsAndInsight',
             title: 'Tips & insight',
             description: 'Smart suggestions from Ferify',
             value: tipsAndInsight,
-            onValueChange: setTipsAndInsight,
+            onValueChange: (val: boolean) => updateSetting('tipsAndInsight', val),
         },
     ];
 
@@ -62,22 +106,28 @@ function NotificationSettingScreen() {
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.listContainer}>
-                    {notificationItems.map((item, index) => (
-                        <View key={item.id} style={styles.listItem}>
-                            <View style={styles.textContainer}>
-                                <Text style={styles.itemTitle}>{item.title}</Text>
-                                <Text style={styles.itemDescription}>{item.description}</Text>
+                {loading ? (
+                    <View style={{ padding: 40, alignItems: 'center' }}>
+                        <ActivityIndicator color="#080808" />
+                    </View>
+                ) : (
+                    <View style={styles.listContainer}>
+                        {notificationItems.map((item, index) => (
+                            <View key={item.id} style={styles.listItem}>
+                                <View style={styles.textContainer}>
+                                    <Text style={styles.itemTitle}>{item.title}</Text>
+                                    <Text style={styles.itemDescription}>{item.description}</Text>
+                                </View>
+                                <CustomSwitch
+                                    value={item.value}
+                                    onValueChange={item.onValueChange}
+                                    trackColor={{ false: '#E3E3E3', true: '#080808' }}
+                                    thumbColor={'#FFFFFF'}
+                                />
                             </View>
-                            <CustomSwitch
-                                value={item.value}
-                                onValueChange={item.onValueChange}
-                                trackColor={{ false: '#E3E3E3', true: '#080808' }}
-                                thumbColor={'#FFFFFF'}
-                            />
-                        </View>
-                    ))}
-                </View>
+                        ))}
+                    </View>
+                )}
             </ScrollView>
         </SafeAreaView>
     );

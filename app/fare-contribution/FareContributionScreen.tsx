@@ -19,14 +19,21 @@ import SuccessModal from './SuccessModal';
 import RewardsModal from './RewardsModal';
 import ModeOfTransportSelect from '../../components/ModeOfTransportSelect';
 import LocationInputs from '../../components/LocationInputs';
+import LocationRecommendation from '../../components/LocationRecommendation'; // Added
 import RouteFromAndTo from '@/components/RouteFromAndTo';
 import { useRouter, useLocalSearchParams } from "expo-router";
 import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { getCachedLocation } from '@/services/locationService';
 import { useLoader } from '@/contexts/LoaderContext';
 
 
 const { height } = Dimensions.get('window');
+
+interface Recommendation {
+    name: string;
+    place_id: string;
+}
 
 interface TimeOption {
     label: string;
@@ -109,10 +116,62 @@ function FareContributionScreen() {
     const [successModalVisible, setSuccessModalVisible] = useState(false);
     const [rewardsModalVisible, setRewardsModalVisible] = useState(false);
 
+    // Search State
+    const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [activeInput, setActiveInput] = useState<'from' | 'to' | null>(null);
+
     // Loading state
     const { showLoader, hideLoader } = useLoader();
 
     const toInputRef = useRef<TextInput | null>(null);
+
+    const handleSearch = async (text: string, type: 'from' | 'to') => {
+        if (type === 'from') {
+            setFromLocation(text);
+        } else {
+            setToLocation(text);
+        }
+
+        // If user clears input, clear recommendations
+        if (text.length < 2) {
+            setRecommendations([]);
+            return;
+        }
+
+        setIsSearching(true);
+        try {
+            const response = await api.get('/api/route/placesearch', {
+                params: { query: text }
+            });
+            const data = response.data;
+            setRecommendations(Array.isArray(data) ? data : (data?.result || []));
+        } catch (error) {
+            console.error('Search error:', error);
+        } finally {
+            setIsSearching(false);
+        }
+    };
+
+    const handleSelectRecommendation = (item: Recommendation) => {
+        // Update whichever input is active
+        if (activeInput === 'from') {
+            setFromLocation(item.name);
+            // Optional: Auto-focus to 'to' input if from is selected
+            setTimeout(() => {
+                setToFocused(true);
+                setActiveInput('to');
+                toInputRef.current?.focus();
+            }, 100);
+        } else if (activeInput === 'to') {
+            setToLocation(item.name);
+            setToFocused(false);
+            setActiveInput(null); // Close search
+        }
+
+        // Clear search results after selection
+        setRecommendations([]);
+    };
 
     // Animation values
     // Kept for consistency if needed, though modals now handle their own animations
@@ -158,13 +217,15 @@ function FareContributionScreen() {
         }
     };
 
+    const { user } = useAuth();
+
     const handleSubmit = async () => {
         if (isFormValid) {
             showLoader();
 
             try {
-                // In a real app, userId should come from AuthContext
-                const userId = "temp-user-123";
+                // Get real userId from AuthContext
+                const userId = user?.id;
 
                 // Get user's current location for the "Near You" feature
                 const cachedLocation = await getCachedLocation();
@@ -242,122 +303,146 @@ function FareContributionScreen() {
                 <Text style={styles.title}>Update fare</Text>
                 <Text style={styles.subtitle}>Help others know the correct price</Text>
 
-                {/* Location Inputs */}
-                <LocationInputs
-                    fromLocation={fromLocation}
-                    toLocation={toLocation}
-                    fromFocused={fromFocused}
-                    toFocused={toFocused}
-                    fromResult={fromLocation.length > 0}
-                    onFromChange={setFromLocation}
-                    onToChange={setToLocation}
-                    onFromFocus={() => setFromFocused(true)}
-                    onFromBlur={() => setFromFocused(false)}
-                    onToFocus={() => setToFocused(true)}
-                    onToBlur={() => setToFocused(false)}
-                    toInputRef={toInputRef}
-                />
-
-                {/* Route Summary */}
-                {(from && to) && (
+                {/* Location Inputs - Only show if we're NOT in confirmation mode */}
+                {(!from || !to) ? (
+                    <LocationInputs
+                        fromLocation={fromLocation}
+                        toLocation={toLocation}
+                        fromFocused={fromFocused}
+                        toFocused={toFocused}
+                        fromResult={fromLocation.length > 0}
+                        onFromChange={(text) => handleSearch(text, 'from')}
+                        onToChange={(text) => handleSearch(text, 'to')}
+                        onFromFocus={() => {
+                            setFromFocused(true);
+                            setActiveInput('from');
+                        }}
+                        onFromBlur={() => setFromFocused(false)}
+                        onToFocus={() => {
+                            setToFocused(true);
+                            setActiveInput('to');
+                        }}
+                        onToBlur={() => setToFocused(false)}
+                        toInputRef={toInputRef}
+                    />
+                ) : (
+                    /* Show this when we are confirming a specific route */
                     <RouteFromAndTo from={fromLocation} to={toLocation} />
                 )}
 
-                {/* Fare Amount */}
-                <Text style={styles.sectionTitle}>How much did you pay?</Text>
-                <View style={styles.fareInputContainer}>
-                    <Text style={styles.nairaSign}>₦</Text>
-                    <TextInput
-                        style={styles.fareInput}
-                        placeholder="Enter fare amount"
-                        placeholderTextColor="#999"
-                        keyboardType="numeric"
-                        value={fareAmount}
-                        onChangeText={setFareAmount}
+                {/* 
+                  Show Recommendation List if:
+                  1. We have search results (recommendations.length > 0)
+                  2. OR we are currently searching (isSearching)
+                  3. OR user is focused on an input and hasn't selected yet (implied by having recommendations)
+                  
+                  Otherwise show the form content.
+                */}
+                {(recommendations.length > 0 || isSearching) ? (
+                    <LocationRecommendation
+                        isSearching={isSearching}
+                        recommendations={recommendations}
+                        onSelect={handleSelectRecommendation}
                     />
-                </View>
+                ) : (
+                    <>
+                        {/* Fare Amount */}
+                        <Text style={styles.sectionTitle}>How much did you pay?</Text>
+                        <View style={styles.fareInputContainer}>
+                            <Text style={styles.nairaSign}>₦</Text>
+                            <TextInput
+                                style={styles.fareInput}
+                                placeholder="Enter fare amount"
+                                placeholderTextColor="#999"
+                                keyboardType="numeric"
+                                value={fareAmount}
+                                onChangeText={setFareAmount}
+                            />
+                        </View>
 
-                {/* Quick Select Chips */}
-                <View style={styles.quickSelectContainer}>
-                    {[100, 200, 300, 400, 500].map((amount) => (
+                        {/* Quick Select Chips */}
+                        <View style={styles.quickSelectContainer}>
+                            {[100, 200, 300, 400, 500].map((amount) => (
+                                <TouchableOpacity
+                                    key={amount}
+                                    style={styles.quickSelectChip}
+                                    onPress={() => setFareAmount(amount.toString())}
+                                >
+                                    <Text style={styles.quickSelectText}>₦{amount}</Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
+
+                        {/* Time of Route */}
+                        <Text style={styles.sectionTitle}>When did you take this route?</Text>
                         <TouchableOpacity
-                            key={amount}
-                            style={styles.quickSelectChip}
-                            onPress={() => setFareAmount(amount.toString())}
+                            style={styles.selectInput}
+                            onPress={() => openModal('time')}
                         >
-                            <Text style={styles.quickSelectText}>₦{amount}</Text>
+                            <Text style={[styles.selectInputText, !selectedTimeLabel && styles.placeholderText]}>
+                                {selectedTimeLabel || 'Select a time'}
+                            </Text>
+                            <Ionicons name="chevron-down" size={20} color="#666" />
                         </TouchableOpacity>
-                    ))}
-                </View>
 
-                {/* Time of Route */}
-                <Text style={styles.sectionTitle}>When did you take this route?</Text>
-                <TouchableOpacity
-                    style={styles.selectInput}
-                    onPress={() => openModal('time')}
-                >
-                    <Text style={[styles.selectInputText, !selectedTimeLabel && styles.placeholderText]}>
-                        {selectedTimeLabel || 'Select a time'}
-                    </Text>
-                    <Ionicons name="chevron-down" size={20} color="#666" />
-                </TouchableOpacity>
+                        {/* Vehicle Selection */}
+                        <Text style={styles.sectionTitle}>Select the vehicle you used</Text>
+                        <ModeOfTransportSelect
+                            selectedMode={selectedVehicle}
+                            onSelect={(mode) => {
+                                setSelectedVehicle(mode || '');
+                                const label = mode ? (vehicleOptions.find(o => o.value === mode)?.label || '') : '';
+                                setSelectedVehicleLabel(label);
+                            }}
+                        />
 
-                {/* Vehicle Selection */}
-                <Text style={styles.sectionTitle}>Select the vehicle you used</Text>
-                <ModeOfTransportSelect
-                    selectedMode={selectedVehicle}
-                    onSelect={(mode) => {
-                        setSelectedVehicle(mode || '');
-                        const label = mode ? (vehicleOptions.find(o => o.value === mode)?.label || '') : '';
-                        setSelectedVehicleLabel(label);
-                    }}
-                />
+                        {/* Special Conditions */}
+                        <Text style={styles.sectionTitle}>Any special condition? (optional)</Text>
+                        <View style={styles.conditionsChipsContainer}>
+                            {predefinedConditions.map((condition) => (
+                                <TouchableOpacity
+                                    key={condition.value}
+                                    style={[
+                                        styles.conditionChip,
+                                        selectedConditions.includes(condition.value) && styles.conditionChipSelected
+                                    ]}
+                                    onPress={() => toggleCondition(condition.value)}
+                                >
+                                    <Text style={[
+                                        styles.conditionChipText,
+                                        selectedConditions.includes(condition.value) && styles.conditionChipTextSelected
+                                    ]}>
+                                        {condition.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View>
 
-                {/* Special Conditions */}
-                <Text style={styles.sectionTitle}>Any special condition? (optional)</Text>
-                <View style={styles.conditionsChipsContainer}>
-                    {predefinedConditions.map((condition) => (
+                        {/* Notes */}
+                        <Text style={styles.sectionTitle}>Add a note (optional)</Text>
+                        <TextInput
+                            style={styles.notesInput}
+                            placeholder="Add a note"
+                            placeholderTextColor="#999"
+                            multiline
+                            numberOfLines={4}
+                            textAlignVertical="top"
+                            value={notes}
+                            onChangeText={setNotes}
+                        />
+
+                        {/* Submit Button */}
                         <TouchableOpacity
-                            key={condition.value}
-                            style={[
-                                styles.conditionChip,
-                                selectedConditions.includes(condition.value) && styles.conditionChipSelected
-                            ]}
-                            onPress={() => toggleCondition(condition.value)}
+                            style={[styles.submitButton, !isFormValid && styles.submitButtonDisabled]}
+                            onPress={handleSubmit}
+                            disabled={!isFormValid}
                         >
-                            <Text style={[
-                                styles.conditionChipText,
-                                selectedConditions.includes(condition.value) && styles.conditionChipTextSelected
-                            ]}>
-                                {condition.label}
+                            <Text style={[styles.submitButtonText, !isFormValid && styles.submitButtonTextDisabled]}>
+                                {(from && to) ? "Confirm Fare" : "Submit Fare"}
                             </Text>
                         </TouchableOpacity>
-                    ))}
-                </View>
-
-                {/* Notes */}
-                <Text style={styles.sectionTitle}>Add a note (optional)</Text>
-                <TextInput
-                    style={styles.notesInput}
-                    placeholder="Add a note"
-                    placeholderTextColor="#999"
-                    multiline
-                    numberOfLines={4}
-                    textAlignVertical="top"
-                    value={notes}
-                    onChangeText={setNotes}
-                />
-
-                {/* Submit Button */}
-                <TouchableOpacity
-                    style={[styles.submitButton, !isFormValid && styles.submitButtonDisabled]}
-                    onPress={handleSubmit}
-                    disabled={!isFormValid}
-                >
-                    <Text style={[styles.submitButtonText, !isFormValid && styles.submitButtonTextDisabled]}>
-                        {(from && to) ? "Confirm Fare" : "Submit Fare"}
-                    </Text>
-                </TouchableOpacity>
+                    </>
+                )}
             </ScrollView>
 
             {/* Time Selection Modal */}

@@ -1,4 +1,5 @@
-import api, { setToken } from '@/services/api';
+import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLoader } from '@/contexts/LoaderContext';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -28,6 +29,7 @@ WebBrowser.maybeCompleteAuthSession();
 export default function SignUpScreen() {
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
+    const { login } = useAuth();
     const [isLoading, setIsLoading] = useState(false); // Kept for Google initialization if needed, but primary actions will use GlobalLoader
 
     // Form State
@@ -40,10 +42,9 @@ export default function SignUpScreen() {
     const [isEmailValid, setIsEmailValid] = useState(false);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        scopes: ["profile", "email"],
+        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, // Note: use android debug id for dev and android release id for prod.
+        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     });
 
     useEffect(() => {
@@ -84,7 +85,8 @@ export default function SignUpScreen() {
                 throw new Error("No access token from server");
             }
 
-            await setToken(res.data.accessToken);
+            const userData = res.data.user || { id: res.data.userId, email: res.data.email };
+            await login(userData, res.data.accessToken, res.data.refreshToken);
             router.replace("/(tabs)/HomeScreen");
 
         } catch (err: any) {

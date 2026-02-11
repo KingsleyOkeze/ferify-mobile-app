@@ -14,6 +14,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import mapImage from '../../assets/images/popular-search-icons/map_icon.png'
 import shareLocationHand from '../../assets/images/popular-search-icons/share_location_hand_icon.png'
 import alertIcon from '../../assets/images/popular-search-icons/alert_icon.png'
@@ -29,6 +30,7 @@ function DiscoverScreen() {
     const [recentlyUpdated, setRecentlyUpdated] = useState<any[]>([]);
     const [popularRoutes, setPopularRoutes] = useState<any[]>([]);
     const [insights, setInsights] = useState<any[]>([]);
+    const [showInsights, setShowInsights] = useState(true);
 
     const fetchDiscoverData = useCallback(async () => {
         try {
@@ -189,7 +191,7 @@ function DiscoverScreen() {
                 )}
 
                 {/* Tips & Insight */}
-                {insights.length > 0 && (
+                {showInsights && insights.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Tips & Insight</Text>
                         <View style={styles.verticalList}>

@@ -1,4 +1,5 @@
-import api, { getUserData, setToken, setUserData } from "@/services/api";
+import api from "@/services/api";
+import { useAuth } from "@/contexts/AuthContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import * as WebBrowser from 'expo-web-browser';
@@ -34,10 +35,9 @@ export default function LoginScreen() {
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        scopes: ["profile", "email"],
+        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, // Note: use android debug id for dev and android release id for prod.
+        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     });
 
     useEffect(() => {
@@ -64,19 +64,18 @@ export default function LoginScreen() {
         }
     }, [response]);
 
+    const { login } = useAuth();
+
     const signInWithGoogle = async (idToken: string) => {
         setLoading(true);
         try {
             const res = await api.post("/api/user/auth/google-login", { idToken });
             console.log("Google Login Backend Success:", res.data);
-            if (res.data.accessToken) {
-                await setToken(res.data.accessToken);
 
-                // Save User Data for Caching
-                if (res.data.user) {
-                    await setUserData(res.data.user);
-                }
+            const { accessToken, refreshToken, user: userData } = res.data;
 
+            if (accessToken && userData) {
+                await login(userData, accessToken, refreshToken);
                 router.replace("/(tabs)/HomeScreen");
             }
         } catch (error: any) {
@@ -217,8 +216,8 @@ export default function LoginScreen() {
                             {/* Google Button */}
                             <TouchableOpacity
                                 style={styles.googleButton}
-                                onPress={signInWithGoogle}
-                                disabled={loading}
+                                onPress={() => promptAsync()}
+                                disabled={loading || !request}
                             >
                                 <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
                                 <Text style={styles.googleButtonText}>Sign in with Google</Text>

@@ -21,7 +21,8 @@ import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
 
 import LocationInputs from '@/components/LocationInputs';     // ← added
-import LocationList from '@/components/LocationList';         // ← added
+import LocationRecommendation from '@/components/LocationRecommendation';         // ← added
+import { getCachedLocation, fetchAndCacheLocation } from '@/services/locationService';
 
 const { width } = Dimensions.get('window');
 
@@ -159,25 +160,51 @@ function RouteSelectScreen() {
         }
     }, [selectedMode]);
 
-    // Handle initial parameters from Voice Search or other deep links
+    // Handle initial parameters and Location Auto-fill
     useEffect(() => {
         const init = async () => {
             const { initialFrom, initialTo } = params;
 
+            // 1. Handle "From" Location
             if (initialFrom) {
                 setFromLocation(initialFrom as string);
-                // Set a temporary result to enable the "To" input
                 setFromResult({
                     name: initialFrom as string,
                     place_id: 'current_location'
                 });
+            } else {
+                // AUTO-FILL CURRENT LOCATION (Industry Standard: Optimistic + Fresh)
+                // A. Optimistic: specific for speed
+                const cached = await getCachedLocation();
+                if (cached && cached.address) {
+                    setFromLocation(cached.address);
+                    setFromResult({
+                        name: cached.address,
+                        place_id: 'current_location'
+                    });
+                }
+
+                // B. Freshness: Refresh in background to ensure accuracy
+                // Request a fresh location if the cached one is older than 60 seconds
+                fetchAndCacheLocation(60000).then((fresh) => {
+                    if (fresh && fresh.address && fresh.address !== cached?.address) {
+                        setFromLocation(fresh.address);
+                        setFromResult({
+                            name: fresh.address,
+                            place_id: 'current_location'
+                        });
+                    }
+                });
             }
 
+            // 2. Handle "To" Location (e.g. from Voice Search)
             if (initialTo) {
                 setToLocation(initialTo as string);
                 // Trigger search for the destination immediately
                 handleSearch(initialTo as string, 'to');
+
                 // Focus the destination input to let user select from list
+                // We add a slight delay to ensure UI is ready and validation doesn't clash
                 setTimeout(() => {
                     setActiveInput('to');
                     toInputRef.current?.focus();
@@ -187,6 +214,44 @@ function RouteSelectScreen() {
 
         init();
     }, [params.initialFrom, params.initialTo]);
+
+    const handleFromSubmit = () => {
+        // If user hits 'Next' on "From" input
+        if (activeInput === 'from') {
+            // If explicit result not chosen but text exists, try to pick top recommendation
+            if (!fromResult && recommendations.length > 0) {
+                handleSelectRecommendation(recommendations[0]);
+                // handleSelectRecommendation will auto-focus "To"
+            } else if (fromResult) {
+                // If already valid, just move focus
+                toInputRef.current?.focus();
+            }
+        }
+    };
+
+    const handleToSubmit = () => {
+        Keyboard.dismiss();
+        if (activeInput === 'to') {
+            // Case 1: Result selected, Mode selected -> Check Fare
+            if (toResult && fromResult && selectedMode) {
+                performFareCheck(fromResult, toResult, selectedMode);
+                return;
+            }
+
+            // Case 2: No result selected (user typed), but we have matches
+            if (!toResult && recommendations.length > 0 && fromResult) {
+                // Determine which recommendation to pick (Top one)
+                const topMatch = recommendations[0];
+                handleSelectRecommendation(topMatch);
+                return;
+            }
+
+            // Case 3: Mode missing
+            if ((toResult || (recommendations.length > 0)) && !selectedMode) {
+                Alert.alert("Selection Required", "Please select a transport mode to continue.");
+            }
+        }
+    };
 
     const Wrapper = isAndroid ? View : SafeAreaView;
 
@@ -215,7 +280,10 @@ function RouteSelectScreen() {
                             <View style={styles.header}>
                                 <View style={styles.headerSpacer} />
                                 <Text style={styles.headerTitle}>Route Select</Text>
-                                <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
+                                <TouchableOpacity
+                                    onPress={() => requestAnimationFrame(() => router.back())}
+                                    style={styles.closeButton}
+                                >
                                     <Ionicons name="close" size={24} color="#000" />
                                 </TouchableOpacity>
                             </View>
@@ -239,6 +307,8 @@ function RouteSelectScreen() {
                                 }}
                                 onFromBlur={() => setFromFocused(false)}
                                 onToBlur={() => setToFocused(false)}
+                                onFromSubmit={handleFromSubmit}
+                                onToSubmit={handleToSubmit}
                                 toInputRef={toInputRef}
                             />
 
@@ -260,8 +330,8 @@ function RouteSelectScreen() {
                                 )}
                             </View>
 
-                            {/* Replaced results list with LocationList component */}
-                            <LocationList
+                            {/* Replaced results list with LocationRecommendation component */}
+                            <LocationRecommendation
                                 isSearching={isSearching}
                                 recommendations={recommendations}
                                 onSelect={handleSelectRecommendation}
@@ -334,12 +404,23 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#000000'
     },
-    closeButton: { padding: 4 },
-    modeSection: { paddingHorizontal: 20, marginBottom: 24 },
-    sectionTitle: { fontSize: 16, fontWeight: '600', color: '#000', marginBottom: 12 },
+    closeButton: { 
+        padding: 4 
+    },
+    modeSection: { 
+        paddingHorizontal: 20, 
+        marginBottom: 24 
+    },
+    sectionTitle: { 
+        fontSize: 16, 
+        fontWeight: 600, 
+        color: '#000', 
+        marginTop: 12,
+        marginBottom: 12 
+    },
 
     modeOfTransportContainer: {
-        marginVertical: 20,
+        // backgroundColor: 'green'
     }
 });
 

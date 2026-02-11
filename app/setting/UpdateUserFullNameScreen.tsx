@@ -13,35 +13,20 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import api, { getUserData, setUserData } from '@/services/api';
+import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLoader } from '@/contexts/LoaderContext';
 
 function UpdateUserFullNameScreen() {
     const router = useRouter();
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [currentFullName, setCurrentFullName] = useState('Not set');
-    const [focusedField, setFocusedField] = useState<string | null>(null);
+    const { user, updateUser } = useAuth();
     const { showLoader, hideLoader } = useLoader();
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const data = await getUserData();
-                if (data) {
-                    if (data.firstName) setFirstName(data.firstName);
-                    if (data.lastName) setLastName(data.lastName);
-                    if (data.firstName || data.lastName) {
-                        setCurrentFullName(`${data.firstName || ''} ${data.lastName || ''}`.trim());
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching user data for name update:', error);
-            }
-        };
-        fetchUserData();
-    }, []);
+    const [firstName, setFirstName] = useState(user?.firstName || '');
+    const [lastName, setLastName] = useState(user?.lastName || '');
+    const [focusedField, setFocusedField] = useState<string | null>(null);
+
+    const currentFullName = user?.fullName || `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Not set';
 
     const isFormValid = firstName.trim().length > 0 && lastName.trim().length > 0;
 
@@ -56,17 +41,12 @@ function UpdateUserFullNameScreen() {
             });
 
             if (response.status === 200) {
-                // Update cache
-                const cachedData = await getUserData();
-                if (cachedData) {
-                    const updatedData = {
-                        ...cachedData,
-                        firstName: response.data.firstName,
-                        lastName: response.data.lastName,
-                        fullName: `${response.data.firstName} ${response.data.lastName}`
-                    };
-                    await setUserData(updatedData);
-                }
+                // Update global state and cache
+                updateUser({
+                    firstName: response.data.firstName,
+                    lastName: response.data.lastName,
+                    fullName: `${response.data.firstName} ${response.data.lastName}`
+                });
 
                 Alert.alert('Success', 'Name updated successfully', [
                     { text: 'OK', onPress: () => router.back() }

@@ -40,7 +40,7 @@ function PasswordResetScreen() {
             if (response.status === 200) {
                 // Navigate to verification screen with the new password
                 router.push({
-                    pathname: './setting/account/VerifyPasswordResetScreen',
+                    pathname: './VerifyPasswordResetScreen',
                     params: { newPassword }
                 });
             }

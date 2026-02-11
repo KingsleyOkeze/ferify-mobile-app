@@ -10,9 +10,18 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 function MainAccountProfileScreen() {
     const router = useRouter();
+    const { user } = useAuth();
+
+    const getInitials = (fullName?: string) => {
+        if (!fullName) return "??";
+        const parts = fullName.split(' ');
+        if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+        return fullName.substring(0, 2).toUpperCase();
+    };
 
     const menuItems = [
         {
@@ -60,12 +69,12 @@ function MainAccountProfileScreen() {
                 {/* Profile Section */}
                 <View style={styles.profileSection}>
                     <View style={styles.avatarContainer}>
-                        <Text style={styles.avatarText}>KO</Text>
+                        <Text style={styles.avatarText}>{getInitials(user?.fullName || user?.firstName)}</Text>
                     </View>
 
-                    <Text style={styles.userName}>Kelvin O</Text>
-                    <Text style={styles.userHandle}>@kelvin_o</Text>
-                    <Text style={styles.userBadge}>Trusted contributor</Text>
+                    <Text style={styles.userName}>{user?.fullName || user?.firstName || 'User'}</Text>
+                    <Text style={styles.userHandle}>@{user?.username || 'user'}</Text>
+                    <Text style={styles.userBadge}>Member</Text>
 
                     <TouchableOpacity
                         style={styles.viewProfileButton}

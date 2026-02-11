@@ -57,13 +57,13 @@ export default function GlobalLoader({ visible }: GlobalLoaderProps) {
                 {/* The Spinner Container */}
                 <View style={styles.spinnerContainer}>
 
-                    {/* 1. The Light Grey Track (Static) */}
+                    {/* The Light Grey Track (Static) */}
                     <View style={styles.track} />
 
-                    {/* 2. The Black Rotating Segment */}
+                    {/* The Black Rotating Segment */}
                     <Animated.View style={[styles.spinner, animatedStyle]} />
 
-                    {/* 3. The Logo (Static Center) */}
+                    {/* The Logo (Static Center) */}
                     <View style={styles.logoContainer}>
                         <Image
                             source={YOUR_LOGO_SOURCE}

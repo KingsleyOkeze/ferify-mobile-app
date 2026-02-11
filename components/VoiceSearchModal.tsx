@@ -5,7 +5,6 @@ import {
     StyleSheet,
     Modal,
     TouchableOpacity,
-    Dimensions,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Animated, {
@@ -17,15 +16,10 @@ import Animated, {
     Easing,
     cancelAnimation,
     interpolate,
-    useDerivedValue,
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
+// @ts-ignore
 import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
-import { getCachedLocation } from '@/services/locationService';
-import { isVoiceAvailable, getVoiceUnavailableMessage } from '@/utils/voiceUtils';
-
-// --- CONFIGURATION ---
-const DELAY_BEFORE_WAVE = 1000;
 
 // --- COMPONENTS ---
 
@@ -35,7 +29,7 @@ const RippleRing = ({ delay }: { delay: number }) => {
 
     useEffect(() => {
         ring.value = withDelay(
-            DELAY_BEFORE_WAVE + delay,
+            delay, // Delay set by prop + some base offset if needed
             withRepeat(
                 withTiming(1, {
                     duration: 2000,
@@ -98,113 +92,100 @@ interface VoiceSearchModalProps {
 
 export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalProps) {
     const router = useRouter();
-    const [mode, setMode] = useState<'listening' | 'processing' | 'unavailable'>('listening');
-    const [spokenText, setSpokenText] = useState<string>('');
-    const [voiceReady, setVoiceReady] = useState<boolean>(false);
+    const [mode, setMode] = useState<'listening' | 'processing' | 'error'>('listening');
+    const [partialResults, setPartialResults] = useState<string[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
     useEffect(() => {
-        // Check voice availability on mount
-        const checkVoice = async () => {
-            const available = await isVoiceAvailable();
-            setVoiceReady(available);
+        // Setup Voice Listeners
+        Voice.onSpeechStart = onSpeechStart;
+        Voice.onSpeechEnd = onSpeechEnd;
+        Voice.onSpeechResults = onSpeechResults;
+        Voice.onSpeechError = onSpeechError;
 
-            if (!available) {
-                setMode('unavailable');
-            }
-        };
-        checkVoice();
-
-        // Setup Voice listeners only if available
-        if (Voice) {
-            Voice.onSpeechStart = () => setMode('listening');
-            Voice.onSpeechResults = (e: SpeechResultsEvent) => {
-                if (e.value && e.value.length > 0) {
-                    setSpokenText(e.value[0]);
-                    setMode('processing');
-                    handleCompletion(e.value[0]);
-                }
-            };
-            Voice.onSpeechError = (e: SpeechErrorEvent) => {
-                console.error('Speech recognition error:', e.error);
-                onClose();
-            };
-        }
-
-        return () => {
-            const cleanup = async () => {
-                try {
-                    if (Voice) {
-                        await Voice.stop();
-                        await Voice.destroy();
-                        Voice.removeAllListeners();
-                    }
-                } catch (e) {
-                    console.error(e);
-                }
-            };
-            cleanup();
-        };
-    }, []);
-
-    const handleCompletion = async (text: string) => {
-        try {
-            const cachedLocation = await getCachedLocation();
-            const fromAddress = cachedLocation?.address || '';
-
-            onClose();
-            // Navigate to RouteSelectScreen with params
-            router.push({
-                pathname: "/route/RouteSelectScreen",
-                params: {
-                    initialTo: text,
-                    initialFrom: fromAddress
-                }
-            });
-        } catch (error) {
-            console.error('Error in handleCompletion:', error);
-            onClose();
-        }
-    };
-
-    useEffect(() => {
-        if (visible && voiceReady) {
-            setMode('listening');
-            setSpokenText('');
+        if (visible) {
             startListening();
-        } else if (visible && !voiceReady) {
-            setMode('unavailable');
         } else {
             stopListening();
         }
-    }, [visible, voiceReady]);
+
+        return () => {
+            // Cleanup listeners
+            Voice.destroy().then(Voice.removeAllListeners);
+        };
+    }, [visible]);
 
     const startListening = async () => {
-        if (!voiceReady) {
-            console.warn("Voice module is not available.");
-            return;
-        }
-
+        setMode('listening');
+        setErrorMessage('');
+        setPartialResults([]);
         try {
-            if (Voice && typeof Voice.start === 'function') {
-                await Voice.start('en-US');
-            }
-        } catch (e) {
-            console.error('Voice start error:', e);
-            setMode('unavailable');
+            await Voice.start('en-US');
+        } catch (e: any) {
+            console.error('Voice start error', e);
+            handleError('Could not start microphone. ' + (e.message || ''));
         }
     };
 
     const stopListening = async () => {
         try {
-            // Add the check here to stop the "property of null" error
-            if (Voice && typeof Voice.stop === 'function') {
-                await Voice.stop();
-            }
+            await Voice.stop();
+            await Voice.destroy();
         } catch (e) {
-            console.error('Voice stop error:', e);
+            console.error('Voice stop error', e);
         }
     };
 
+    const onSpeechStart = () => {
+        setMode('listening');
+    };
+
+    const onSpeechEnd = () => {
+        // Transition to processing while we wait for final results
+        setMode('processing');
+    };
+
+    const onSpeechResults = (e: SpeechResultsEvent) => {
+        // We got results!
+        console.log('Voice results:', e.value);
+        if (e.value && e.value.length > 0) {
+            const bestMatch = e.value[0];
+            setPartialResults(e.value);
+            setMode('processing');
+
+            // Quick delay to show processing state, then navigate
+            setTimeout(() => {
+                onClose();
+                // Navigate to RouteSelect with the search query
+                router.push({
+                    pathname: "../app/route/RouteSelect",
+                    params: {
+                        initialTo: bestMatch
+                    }
+                });
+            }, 1000);
+        }
+    };
+
+    const onSpeechError = (e: SpeechErrorEvent) => {
+        console.error('Voice error:', e);
+        // Only show error if it's not a "no match" or "cancel" type that we can ignore
+        // '7' is often 'No match', '5' is 'Client side error'
+        if (e.error?.message) {
+            handleError("We couldn't hear you. Try again.");
+        }
+    };
+
+    const handleError = (msg: string) => {
+        setMode('error');
+        setErrorMessage(msg);
+    };
+
+    const handleRetry = () => {
+        stopListening().then(() => {
+            startListening();
+        });
+    };
 
     return (
         <Modal
@@ -231,38 +212,48 @@ export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalP
                         {/* PROCESSING MODE: Show Spinner Track */}
                         {mode === 'processing' && <ProcessingSpinner />}
 
-                        {/* The Mic Icon (Always on top) */}
-                        <View style={styles.micCircle}>
-                            <Ionicons name="mic" size={32} color="#000" />
-                        </View>
+                        {/* ERROR MODE: Show Error Icon (Optional, or just static mic) */}
+                        {mode === 'error' && (
+                            <View style={[styles.micCircle, { backgroundColor: '#FFEBEA' }]}>
+                                <Ionicons name="alert" size={32} color="#FF3B30" />
+                            </View>
+                        )}
+
+                        {/* The Mic Icon (Always on top unless error) */}
+                        {mode !== 'error' && (
+                            <View style={styles.micCircle}>
+                                <Ionicons name="mic" size={32} color="#000" />
+                            </View>
+                        )}
                     </View>
 
                     {/* Text Updates based on Mode */}
                     <View style={styles.textWrapper}>
-                        <Text style={[
-                            styles.statusText,
-                            mode === 'processing' ? styles.textBlack :
-                                mode === 'unavailable' ? styles.textGray : styles.textRed
-                        ]}>
-                            {mode === 'listening' ? 'Listening...' :
-                                mode === 'processing' ? 'Processing...' :
-                                    'Voice Search Unavailable'}
-                        </Text>
-
-                        {mode === 'unavailable' ? (
-                            <Text style={styles.unavailableMessage}>
-                                {getVoiceUnavailableMessage()}
-                            </Text>
-                        ) : (
-                            <TouchableOpacity onPress={onClose} activeOpacity={0.7}>
-                                <Text style={styles.cancelText}>Tap to cancel</Text>
-                            </TouchableOpacity>
+                        {mode === 'listening' && (
+                            <Text style={[styles.statusText, styles.textRed]}>Listening...</Text>
                         )}
+                        {mode === 'processing' && (
+                            <Text style={[styles.statusText, styles.textBlack]}>Processing...</Text>
+                        )}
+                        {mode === 'error' && (
+                            <>
+                                <Text style={[styles.statusText, styles.textRed, { textAlign: 'center' }]}>
+                                    {errorMessage || "Something went wrong"}
+                                </Text>
+                                <TouchableOpacity onPress={handleRetry} style={{ marginTop: 8 }}>
+                                    <Text style={{ color: '#007AFF', fontWeight: '600' }}>Try Again</Text>
+                                </TouchableOpacity>
+                            </>
+                        )}
+
+                        <TouchableOpacity onPress={onClose} activeOpacity={0.7} style={{ marginTop: mode === 'error' ? 16 : 0 }}>
+                            <Text style={styles.cancelText}>Tap to cancel</Text>
+                        </TouchableOpacity>
                     </View>
 
                 </View>
             </View>
-        </Modal >
+        </Modal>
     );
 }
 
@@ -275,12 +266,13 @@ const styles = StyleSheet.create({
     },
     modalCard: {
         width: 260,
-        height: 240,
+        minHeight: 240, // Changed to minHeight for dynamic content
         backgroundColor: '#FFFFFF',
         borderRadius: 24,
         alignItems: 'center',
         justifyContent: 'center',
         paddingVertical: 20,
+        paddingHorizontal: 20,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
@@ -362,15 +354,5 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#8E8E93',
         fontWeight: '500',
-    },
-    textGray: {
-        color: '#666666',
-    },
-    unavailableMessage: {
-        fontSize: 13,
-        color: '#8E8E93',
-        textAlign: 'center',
-        paddingHorizontal: 20,
-        lineHeight: 18,
     },
 });

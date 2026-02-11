@@ -19,6 +19,8 @@ interface LocationInputsProps {
     onToFocus: () => void;
     onFromBlur: () => void;
     onToBlur: () => void;
+    onFromSubmit?: () => void;
+    onToSubmit?: () => void;
     toInputRef: React.RefObject<TextInput | null>;
 }
 
@@ -34,6 +36,8 @@ export default function LocationInputs({
     onToFocus,
     onFromBlur,
     onToBlur,
+    onFromSubmit,
+    onToSubmit,
     toInputRef,
 }: LocationInputsProps) {
     return (
@@ -48,6 +52,9 @@ export default function LocationInputs({
                     onChangeText={onFromChange}
                     onFocus={onFromFocus}
                     onBlur={onFromBlur}
+                    returnKeyType="next"
+                    onSubmitEditing={onFromSubmit}
+                    blurOnSubmit={false}
                 />
 
                 {/* To Input + Connector Arrow */}
@@ -73,6 +80,8 @@ export default function LocationInputs({
                             onToFocus();
                         }}
                         onBlur={onToBlur}
+                        returnKeyType="search"
+                        onSubmitEditing={onToSubmit}
                     />
 
                     <View
@@ -95,7 +104,7 @@ const styles = StyleSheet.create({
     locationContainer: {
         position: 'relative',
         paddingHorizontal: 20,
-        backgroundColor: 'red'
+        backgroundColor: '#FBFBFB'
     },
     locationInput: {
         backgroundColor: '#F0F0F0',

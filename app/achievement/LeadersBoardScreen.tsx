@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
 import { ActivityIndicator } from 'react-native';
 
@@ -22,16 +22,33 @@ export default function LeadersBoardScreen() {
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
 
     React.useEffect(() => {
+        loadCachedLeaderboard();
         fetchLeaderboard();
-    }, [activeToggle]); // Re-fetch if toggle changes (though currently same endpoint)
+    }, [activeToggle]);
+
+    const loadCachedLeaderboard = async () => {
+        try {
+            const cachedString = await AsyncStorage.getItem('cached_leaderboard');
+            if (cachedString) {
+                const cached = JSON.parse(cachedString);
+
+                const CACHE_TTL = 24 * 60 * 60 * 1000;
+                const isFresh = cached.timestamp && (Date.now() - cached.timestamp < CACHE_TTL);
+
+                if (cached.data) {
+                    setLeaderboard(cached.data);
+                    if (isFresh) setLoading(false);
+                }
+            }
+        } catch (e) {
+            console.error('Error loading cached leaderboard:', e);
+        }
+    };
 
     const fetchLeaderboard = async () => {
-        setLoading(true);
         try {
-            // In a future update, timeframe can be passed as a query param
             const response = await api.get('/api/user/account/leaderboard');
 
-            // Map icons based on rank
             const rankIcons: any = {
                 1: 'ribbon-outline',
                 2: 'star-outline',
@@ -47,6 +64,13 @@ export default function LeadersBoardScreen() {
             }));
 
             setLeaderboard(mappedData);
+
+            // Cache with timestamp
+            const cacheData = {
+                timestamp: Date.now(),
+                data: mappedData
+            };
+            await AsyncStorage.setItem('cached_leaderboard', JSON.stringify(cacheData));
         } catch (error) {
             console.error("Error fetching leaderboard:", error);
         } finally {

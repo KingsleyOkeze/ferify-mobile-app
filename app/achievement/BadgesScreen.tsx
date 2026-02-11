@@ -14,6 +14,9 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '@/services/api';
+import { ActivityIndicator } from 'react-native';
 
 // Badge Images Mapping
 const badgeImages: any = {
@@ -66,13 +69,9 @@ interface Badge {
     earned: boolean;
     requirements: string[];
     description: string;
-    icon: string;
-    currentProgress?: number;
-    totalAim?: number;
+    totalAim: number;
+    currentProgress: number;
 }
-
-import api from '@/services/api';
-import { ActivityIndicator } from 'react-native';
 
 export default function BadgesScreen() {
     const router = useRouter();
@@ -80,122 +79,61 @@ export default function BadgesScreen() {
     const [fetchedBadges, setFetchedBadges] = useState<Badge[]>([]);
     const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
+    const [error, setError] = useState<string | null>(null);
+
     React.useEffect(() => {
+        loadCachedBadges();
         fetchBadges();
     }, []);
+
+    const loadCachedBadges = async () => {
+        try {
+            const cachedString = await AsyncStorage.getItem('cached_badges');
+            if (cachedString) {
+                const cached = JSON.parse(cachedString);
+
+                // Industry standard: Check if cache is within TTL (24 hours)
+                const CACHE_TTL = 24 * 60 * 60 * 1000;
+                const isStale = !cached.timestamp || (Date.now() - cached.timestamp > CACHE_TTL);
+
+                if (cached.data) {
+                    setFetchedBadges(cached.data);
+                    // Only stop loading if we have valid data (stale or fresh)
+                    setLoading(false);
+                }
+
+                if (isStale) {
+                    console.log('[CACHE] Badges cache is stale or missing timestamp. Revalidating...');
+                    // If it's stale, fetchBadges (already called in useEffect) will handle it
+                }
+            }
+        } catch (e) {
+            console.error('Error loading cached badges:', e);
+        }
+    };
 
     const fetchBadges = async () => {
         try {
             const response = await api.get('/api/user/account/badges');
-            // Merge backend status with frontend metadata (requirements, icons, etc.)
-            const mergedBadges = staticBadges.map(sb => {
-                const fb = response.data.find((b: any) => b.id === sb.id);
-                return {
-                    ...sb,
-                    earned: fb ? fb.earned : false
+            if (response.data) {
+                setFetchedBadges(response.data);
+                // Store with timestamp for TTL check
+                const cacheData = {
+                    timestamp: Date.now(),
+                    data: response.data
                 };
-            });
-            setFetchedBadges(mergedBadges);
+                await AsyncStorage.setItem('cached_badges', JSON.stringify(cacheData));
+            }
         } catch (error) {
             console.error("Error fetching badges:", error);
+            setError("Failed to sync latest badges. Showing cached data.");
         } finally {
             setLoading(false);
         }
     };
 
-    const staticBadges: Badge[] = [
-
-        {
-            id: 'starter',
-            title: 'fare starter',
-            earned: true,
-            requirements: ['1st fare'], // No specific aim requested for logic, usually 1/1
-            description: 'Submit your first fare to unlock this badge.',
-            icon: 'flash-outline'
-        },
-        {
-            id: 'helper',
-            title: 'route helper',
-            earned: true, // Assuming earned for demo, total 5
-            requirements: ['5 routes'],
-            description: 'Confirm or improve 5 routes to help others get to their destination easily.',
-            icon: 'navigate-outline',
-            currentProgress: 5,
-            totalAim: 5
-        },
-        {
-            id: 'dropper',
-            title: 'fare dropper',
-            earned: false,
-            requirements: ['20 fare drops'],
-            description: 'Submit fares, routes, or reports 20 times to unlock this badge.',
-            icon: 'pin-outline',
-            currentProgress: 12, // Mock progress
-            totalAim: 20
-        },
-        {
-            id: 'checker',
-            title: 'fare checker',
-            earned: false,
-            requirements: ['5 checks'],
-            description: 'Verify or confirm 5 fares or routes submitted by others to keep Ferify accurate.',
-            icon: 'checkmark-circle-outline',
-            currentProgress: 2,
-            totalAim: 5
-        },
-        {
-            id: 'report_helper',
-            title: 'report helper',
-            earned: false,
-            requirements: ['20 reports'],
-            description: 'Report incorrect fares or routes 20 times to help improve transport information.',
-            icon: 'megaphone-outline',
-            currentProgress: 8,
-            totalAim: 20
-        },
-        {
-            id: 'mapper',
-            title: 'local mapper',
-            earned: false,
-            requirements: ['10 locations'],
-            description: 'Add or improve 10 routes or stops withing the same areas to unloack this badge.',
-            icon: 'map-outline',
-            currentProgress: 3,
-            totalAim: 10
-        },
-        {
-            id: 'guardian',
-            title: 'route guardian',
-            earned: false,
-            requirements: ['15 verifications'],
-            description: 'Consistently update and maintain routes to unlock this badge.',
-            icon: 'shield-checkmark-outline',
-            currentProgress: 10,
-            totalAim: 15
-        },
-        {
-            id: 'danfo',
-            title: 'danfo master',
-            earned: false,
-            requirements: ['15 danfo fares'],
-            description: 'Submit more Danfo fares than other contributors to unlock this badge.',
-            icon: 'bus-outline',
-            currentProgress: 5,
-            totalAim: 15
-        },
-        {
-            id: 'keke',
-            title: 'keke master',
-            earned: false,
-            requirements: ['15 keke fares'],
-            description: 'Submit more Keke fares than other contributors to unlock this badge.',
-            icon: 'bicycle-outline',
-            currentProgress: 14,
-            totalAim: 15
-        },
-    ];
-
     const calculateProgressWidth = (current: number = 0, total: number = 100): DimensionValue => {
+        if (!total || total === 0) return '0%';
         const percentage = Math.min((current / total) * 100, 100);
         return `${percentage}%` as DimensionValue;
     };

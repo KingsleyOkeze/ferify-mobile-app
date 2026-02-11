@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api, { setToken, setUserData, setRefreshToken } from '@/services/api';
+import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 import { useLoader } from '@/contexts/LoaderContext';
 
@@ -65,6 +66,8 @@ export default function VerifyLoginScreen() {
     };
 
 
+    const { login } = useAuth();
+
     const handleVerify = async (otpCode: string) => {
         showLoader();
         try {
@@ -76,17 +79,11 @@ export default function VerifyLoginScreen() {
 
             console.log("Login verified:", response.data);
 
-            // Save Token
-            if (response.data.accessToken) {
-                await setToken(response.data.accessToken);
-            }
-            if (response.data.refreshToken) {
-                await setRefreshToken(response.data.refreshToken);
-            }
+            const { accessToken, refreshToken, user: userData } = response.data;
 
-            // Save User Data
-            if (response.data.user) {
-                await setUserData(response.data.user);
+            // Use AuthContext to handle storage and state
+            if (userData && accessToken) {
+                await login(userData, accessToken, refreshToken);
             }
 
             // On success, redirect to home

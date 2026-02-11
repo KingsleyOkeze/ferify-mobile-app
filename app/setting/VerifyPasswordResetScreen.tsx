@@ -6,75 +6,101 @@ import {
     TouchableOpacity,
     SafeAreaView,
     TextInput,
-    KeyboardAvoidingView,
     Platform,
+    ScrollView,
     Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import api from '@/services/api';
+import api from '@/services/api'; // Removed setToken/setRefreshToken as not needed for reset
+import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 import { useLoader } from '@/contexts/LoaderContext';
 
-function VerifyPasswordResetScreen() {
+
+export default function VerifyPasswordResetScreen() {
     const router = useRouter();
+    // Retrieve newPassword from params as required for reset flow
     const { newPassword } = useLocalSearchParams<{ newPassword: string }>();
 
-    const [otp, setOtp] = useState(['', '', '', '', '', '']);
-    const [timer, setTimer] = useState(60);
-    const { showLoader, hideLoader } = useLoader();
+    const [otp, setOtp] = useState(['', '', '', '']); // 4 digits
 
+    // Password reset usually starts with timer running
+    const [timer, setTimer] = useState(60);
+
+    const { showLoader, hideLoader } = useLoader();
+    const hasAttemptedSend = useRef(false);
+    const [activeIndex, setActiveIndex] = useState(0);
     const inputRefs = useRef<Array<TextInput | null>>([]);
 
-    // Timer logic
     useEffect(() => {
-        const interval = setInterval(() => {
-            setTimer((prev) => (prev > 0 ? prev - 1 : 0));
-        }, 1000);
+        let interval: any;
+        if (timer > 0) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        }
         return () => clearInterval(interval);
-    }, []);
+    }, [timer]);
 
-    const handleOtpChange = (value: string, index: number) => {
+    // Removed the "auto-send" logic from Signup as it's not standard for this reset flow (user usually initiates from previous screen)
+
+    const handleOtpPress = (digit: string) => {
+        if (activeIndex > 3) return;
+
         const newOtp = [...otp];
-        newOtp[index] = value;
+        newOtp[activeIndex] = digit;
         setOtp(newOtp);
 
-        // Move to next input if value is entered
-        if (value && index < 5) {
-            inputRefs.current[index + 1]?.focus();
+        if (activeIndex < 3) {
+            setActiveIndex(activeIndex + 1);
+        } else {
+            // Auto-verify if last digit is entered
+            handleVerify(newOtp.join(''));
         }
     };
 
-    const handleKeyPress = (e: any, index: number) => {
-        if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
-            inputRefs.current[index - 1]?.focus();
+    const handleOtpDelete = () => {
+
+        const newOtp = [...otp];
+        if (newOtp[activeIndex] !== '') {
+            newOtp[activeIndex] = '';
+        } else if (activeIndex > 0) {
+            newOtp[activeIndex - 1] = '';
+            setActiveIndex(activeIndex - 1);
         }
+        setOtp(newOtp);
     };
 
-    const handleVerify = async () => {
-        const otpCode = otp.join('');
-        if (otpCode.length < 6) return;
+
+    const handleVerify = async (otpCode: string) => {
+        // Validation for 4 digits
+        if (otpCode.length < 4) return;
 
         showLoader();
         try {
-            const response = await api.post('/api/user/account/reset-password/verify', {
+            // 1. Verify Password Reset OTP
+            const response = await api.post("/api/user/account/reset-password/verify", {
                 otp: otpCode,
                 newPassword: newPassword
             });
 
+            console.log("Password Reset verified:", response.data);
+
             if (response.status === 200) {
-                Alert.alert('Success', 'Password updated successfully!', [
+                 Alert.alert('Success', 'Password updated successfully!', [
                     {
                         text: 'OK',
                         onPress: () => {
-                            // Go back to security screen
+                            // Go back to security screen or login
                             router.dismiss(2);
                         }
                     }
                 ]);
             }
+
         } catch (error: any) {
-            console.error('OTP verification error:', error);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to verify code');
+            console.error('Verify OTP error:', error.response?.data || error.message);
+            Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
         } finally {
             hideLoader();
         }
@@ -85,89 +111,79 @@ function VerifyPasswordResetScreen() {
 
         showLoader();
         try {
+            // Resend endpoint for password reset
             await api.post('/api/user/account/reset-password/initiate');
             setTimer(60);
-            Alert.alert('Success', 'A new verification code has been sent to your email.');
+            setOtp(['', '', '', '']);
+            setActiveIndex(0);
+            Alert.alert("Success", "A new code has been sent to your email.");
         } catch (error: any) {
-            console.error('OTP resend error:', error);
+             console.error('OTP resend error:', error);
             Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
         } finally {
             hideLoader();
         }
     };
 
-    const isOtpComplete = otp.every(digit => digit !== '');
-
     return (
         <SafeAreaView style={styles.container}>
-            {/* Header */}
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Ionicons name="arrow-back" size={24} color="#000" />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Verification</Text>
-            </View>
-
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.content}
-            >
-                <View style={styles.textSection}>
-                    <Text style={styles.screenTitle}>Enter code</Text>
-                    <Text style={styles.instructionText}>
-                        We've sent a 6-digit verification code to your email. Enter it below to confirm your password change.
-                    </Text>
+            <View style={{ flex: 1 }}>
+                {/* Back Arrow */}
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                        <Ionicons name="arrow-back" size={24} color="#080808" />
+                    </TouchableOpacity>
                 </View>
 
-                {/* OTP Input Group */}
-                <View style={styles.otpContainer}>
-                    {otp.map((digit, index) => (
-                        <TextInput
-                            key={index}
-                            ref={(ref) => {
-                                inputRefs.current[index] = ref;
-                            }}
-                            style={styles.otpInput}
-                            keyboardType="number-pad"
-                            maxLength={1}
-                            value={digit}
-                            onChangeText={(value) => handleOtpChange(value, index)}
-                            onKeyPress={(e) => handleKeyPress(e, index)}
-                        />
-                    ))}
-                </View>
-
-                {/* Resend Timer */}
-                <View style={styles.resendSection}>
-                    <Text style={styles.timerText}>
-                        Resend code in <Text style={styles.timerBold}>{timer}s</Text>
-                    </Text>
-                    <TouchableOpacity
-                        onPress={handleResend}
-                        disabled={timer > 0}
-                    >
-                        <Text style={[
-                            styles.resendLink,
-                            (timer > 0) && styles.resendLinkDisabled
-                        ]}>
-                            Resend Code
+                <ScrollView
+                    style={{ flex: 1 }}
+                    contentContainerStyle={styles.scrollContent}
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                >
+                    {/* Title and Subtitle */}
+                    <View style={styles.textContainer}>
+                        <Text style={styles.title}>Enter code</Text>
+                        <Text style={styles.subtitle}>
+                             We've sent a 4-digit verification code to your email. Enter it below to confirm your password change.
                         </Text>
-                    </TouchableOpacity>
-                </View>
+                    </View>
+                    {/* OTP Inputs (4 Boxes) */}
+                    <View style={styles.otpContainer}>
+                        {otp.map((digit, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                activeOpacity={1}
+                                style={[
+                                    styles.otpInput,
+                                    digit !== '' && styles.otpInputFilled,
+                                    activeIndex === index && styles.otpInputActive
+                                ]}
+                                onPress={() => setActiveIndex(index)}
+                            >
+                                <Text style={styles.otpInputText}>{digit}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
 
-                <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={[
-                            styles.verifyButton,
-                            !isOtpComplete && styles.verifyButtonDisabled
-                        ]}
-                        disabled={!isOtpComplete}
-                        onPress={handleVerify}
-                    >
-                        <Text style={styles.verifyButtonText}>Verify & Update</Text>
-                    </TouchableOpacity>
-                </View>
-            </KeyboardAvoidingView>
+                    {/* Resend Code (Bottom Left) */}
+                    <View style={styles.footerAction}>
+                        {timer > 0 ? (
+                            <Text style={styles.timerText}>Resend code in <Text style={styles.timerCount}>{timer}s</Text></Text>
+                        ) : (
+                            <TouchableOpacity onPress={handleResend}>
+                                <Text style={styles.resendText}>Resend code</Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                </ScrollView>
+
+                {/* Custom Keyboard */}
+                <CustomNumberKeyboard
+                    onPress={handleOtpPress}
+                    onDelete={handleOtpDelete}
+                />
+            </View>
         </SafeAreaView>
     );
 }
@@ -175,106 +191,88 @@ function VerifyPasswordResetScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
     },
     backButton: {
-        padding: 4,
-        marginRight: 10,
+        width: 40,
+        height: 40,
+        justifyContent: "center",
+        alignItems: "center",
     },
-    headerTitle: {
-        fontSize: 18,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
-        color: '#000',
-    },
-    content: {
-        flex: 1,
-        paddingHorizontal: 20,
+    scrollContent: {
+        paddingHorizontal: 24,
         paddingTop: 20,
+        paddingBottom: 40,
     },
-    textSection: {
+    textContainer: {
         marginBottom: 40,
     },
-    screenTitle: {
+    title: {
         fontSize: 24,
-        fontWeight: 600,
-        fontFamily: 'BrittiSemibold',
-        color: '#000',
-        marginBottom: 10,
+        fontWeight: '600',
+        color: '#080808',
+        marginBottom: 8,
     },
-    instructionText: {
+    subtitle: {
         fontSize: 14,
-        fontFamily: 'BrittiRegular',
-        color: '#666',
-        lineHeight: 20,
+        fontWeight: '400',
+        color: '#393939',
+        lineHeight: 24,
+    },
+    emailText: {
+        fontWeight: '400',
+        fontSize: 14,
+        color: '#393939',
+        paddingLeft: 10
     },
     otpContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 30,
+        width: '100%',
+        marginBottom: 32,
     },
     otpInput: {
-        width: 45,
-        height: 55,
-        borderWidth: 1,
-        borderColor: '#F0F0F0',
-        borderRadius: 8,
-        backgroundColor: '#F9F9F9',
-        textAlign: 'center',
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    resendSection: {
+        width: 74,
+        height: 61,
+        backgroundColor: "#F0F0F0",
+        borderRadius: 12,
+        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 30,
+        borderWidth: 1.5,
+        borderColor: 'transparent',
+    },
+    otpInputFilled: {
+        borderColor: '#080808',
+        backgroundColor: '#F2F3F4',
+    },
+    footerAction: {
+        alignItems: 'flex-start',
+    },
+    resendText: {
+        fontSize: 16,
+        color: '#080808',
+        fontWeight: 700,
+        textDecorationLine: 'underline',
     },
     timerText: {
         fontSize: 14,
-        fontFamily: 'BrittiRegular',
         color: '#666',
-        marginBottom: 8,
     },
-    timerBold: {
-        fontWeight: 600,
-        fontFamily: 'BrittiSemibold',
-        color: '#000',
-    },
-    resendLink: {
-        fontSize: 16,
-        fontWeight: 600,
-        color: '#000',
-        textDecorationLine: 'underline',
-    },
-    resendLinkDisabled: {
-        color: '#CCC',
-    },
-    footer: {
-        marginTop: 'auto',
-        marginBottom: 20,
-    },
-    verifyButton: {
-        height: 50,
-        backgroundColor: '#000',
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    verifyButtonDisabled: {
-        backgroundColor: '#F0F0F0',
-    },
-    verifyButtonText: {
-        fontSize: 16,
+    timerCount: {
         fontWeight: 'bold',
-        color: '#fff',
+        color: '#080808',
+    },
+    otpInputActive: {
+        borderColor: '#080808',
+        borderWidth: 2,
+    },
+    otpInputText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#080808',
     },
 });
-
-export default VerifyPasswordResetScreen;

@@ -1,5 +1,7 @@
 import VoiceSearchModal from "@/components/VoiceSearchModal";
 import ModeOfTransportSelect from "@/components/ModeOfTransportSelect";
+import NotificationPermissionModal from "@/components/NotificationPermissionModal";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState, useEffect } from "react";
 import {
     View,
@@ -24,6 +26,8 @@ import busImage from "../../assets/images/transportation-icons/busImage.png";
 import kekeImage from "../../assets/images/transportation-icons/kekeImage.png";
 import okadaImage from "../../assets/images/transportation-icons/okadaImage.png";
 import { isVoiceAvailable } from '@/utils/voiceUtils';
+import { syncPushTokenWithBackend, setupNotificationListeners } from "@/services/notificationService";
+import { useNotifications } from "@/contexts/NotificationContext";
 
 const getVehicleImage = (type: string) => {
     const mode = type?.toLowerCase();
@@ -34,10 +38,12 @@ const getVehicleImage = (type: string) => {
 
 function HomeScreen() {
     const router = useRouter();
+    const { unreadCount } = useNotifications();
     const [searchText, setSearchText] = useState("");
     const [selectedMode, setSelectedMode] = useState<string | null>(null);
     const [voiceModalVisible, setVoiceModalVisible] = useState(false);
     const [voiceAvailable, setVoiceAvailable] = useState<boolean>(false);
+    const [notificationModalVisible, setNotificationModalVisible] = useState(false);
 
     // Nearby Fares State
     const [nearbyFares, setNearbyFares] = useState<any[]>([]);
@@ -45,12 +51,34 @@ function HomeScreen() {
     const [loadingNearby, setLoadingNearby] = useState(false);
 
     useEffect(() => {
+        // Register for push notifications and sync token
+        syncPushTokenWithBackend();
+
+        // Setup notification listeners
+        const cleanupNotifications = setupNotificationListeners();
+
         // Check voice availability
         const checkVoice = async () => {
             const available = await isVoiceAvailable();
             setVoiceAvailable(available);
         };
         checkVoice();
+
+        // Check Notification Permission Prompt
+        const checkNotificationPrompt = async () => {
+            try {
+                const hasSeen = await AsyncStorage.getItem('HAS_SEEN_NOTIF_PROMPT');
+                if (!hasSeen) {
+                    // Show after 4 seconds
+                    setTimeout(() => {
+                        setNotificationModalVisible(true);
+                    }, 4000);
+                }
+            } catch (e) {
+                console.log("Error checking notification prompt status", e);
+            }
+        };
+        checkNotificationPrompt();
 
         // Initial load
         loadNearbyFares();
@@ -81,6 +109,7 @@ function HomeScreen() {
         return () => {
             socket.disconnect();
             clearInterval(interval);
+            cleanupNotifications();
         };
     }, []);
 
@@ -169,18 +198,36 @@ function HomeScreen() {
     };
 
     const handleSearchPress = () => {
-        // Navigate to RouteSelect modal, passing the selected mode if any
-        router.push({
-            pathname: "/route/RouteSelectScreen",
-            params: selectedMode ? { mode: selectedMode } : {}
+        // Wrap navigation in requestAnimationFrame to ensure touch feedback renders first
+        requestAnimationFrame(() => {
+            // Navigate to RouteSelect modal, passing the selected mode if any
+            router.push({
+                pathname: "/route/RouteSelectScreen",
+                params: selectedMode ? { mode: selectedMode } : {}
+            });
         });
     };
 
     return (
         <View style={{ flex: 1 }}>
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-                {/* Logo */}
-                <Text style={styles.logo}>Ferify</Text>
+                {/* Header: Logo and Notification Bell */}
+                <View style={styles.header}>
+                    <Text style={styles.logo}>Ferify</Text>
+                    <TouchableOpacity
+                        style={styles.notificationButton}
+                        onPress={() => router.push('/notification/NotificationScreen')}
+                    >
+                        <Ionicons name="notifications" size={24} color="#080808" />
+                        {unreadCount > 0 && (
+                            <View style={styles.notificationBadge}>
+                                <Text style={styles.badgeText}>
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                </View>
 
                 {/* Search Bar */}
                 <View style={styles.searchContainer}>
@@ -216,6 +263,11 @@ function HomeScreen() {
                 <VoiceSearchModal
                     visible={voiceModalVisible}
                     onClose={() => setVoiceModalVisible(false)}
+                />
+
+                <NotificationPermissionModal
+                    visible={notificationModalVisible}
+                    onClose={() => setNotificationModalVisible(false)}
                 />
 
                 {/* Mode Selector */}
@@ -263,14 +315,27 @@ function HomeScreen() {
                 </View>
 
                 {/* Shared by commuters near you */}
-                <Text style={styles.sectionTitle}>
-                    {isLocalFeed ? "Shared by commuters near you" : "Recent shared activity"}
-                </Text>
+                <Text style={styles.sectionTitle}>Shared by commuters near you</Text>
 
                 <View style={styles.feedContainer}>
                     {nearbyFares.length === 0 ? (
-                        <View style={{ padding: 20, alignItems: 'center' }}>
-                            <Text style={{ fontFamily: 'BrittiRegular', color: '#666' }}>No fares shared nearby yet.</Text>
+                        <View style={styles.noCommuteDataContainer}>
+                            <Image
+                                source={require("../../assets/images/no-data-images/no_data_found_image.png")}
+                                style={styles.noCommuteDataImage}
+                                resizeMode="contain"
+                            />
+                            <Text style={styles.noCommuteDataTitle}>
+                                No Shared Route
+                            </Text>
+                            <Text style={styles.noCommuteDataDescription}>
+                                When people around you start sharing fares, they'll appear here
+                            </Text>
+                            <TouchableOpacity onPress={() => router.push('../fare-contribution/FareContributionScreen')}>
+                                <Text style={styles.shareDataText}>
+                                    Share Fare
+                                </Text>
+                            </TouchableOpacity>
                         </View>
                     ) : (
                         nearbyFares.map((item, index) => (
@@ -318,7 +383,11 @@ function HomeScreen() {
             <TouchableOpacity
                 style={styles.fab}
                 activeOpacity={0.7}
-                onPress={() => router.push('../fare-contribution/FareContributionScreen')}
+                onPress={() => {
+                    requestAnimationFrame(() => {
+                        router.push('../fare-contribution/FareContributionScreen');
+                    });
+                }}
             >
                 <Ionicons name="add" size={24} color="#FFF" />
             </TouchableOpacity>
@@ -334,12 +403,45 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingTop: 10,
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
     logo: {
         fontFamily: "BrittiBold",
         fontSize: 26,
         fontWeight: 700,
         color: "#080808",
-        marginBottom: 20,
+    },
+    notificationButton: {
+        width: 40,
+        height: 40,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    notificationBadge: {
+        position: 'absolute',
+        top: 4,
+        right: 4,
+        backgroundColor: '#FF3B30',
+        borderRadius: 10,
+        minWidth: 18,
+        height: 18,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 4,
+        borderWidth: 1.5,
+        borderColor: '#FBFBFB',
+        zIndex: 1,
+    },
+    badgeText: {
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontFamily: 'BrittiBold',
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
     searchContainer: {
         flexDirection: "row",
@@ -489,6 +591,40 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
+    },
+    noCommuteDataContainer: {
+        padding: 20,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    noCommuteDataImage: {
+        width: 150,
+        height: 150,
+        marginBottom: 16
+    },
+    noCommuteDataTitle: {
+        fontFamily: 'BrittiSemibold',
+        fontSize: 16,
+        fontWeight: 600,
+        color: '#080808',
+        marginBottom: 8
+    },
+    noCommuteDataDescription: {
+        fontFamily: 'BrittiRegular',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#757575',
+        textAlign: 'center',
+        marginBottom: 20,
+        maxWidth: '80%',
+        lineHeight: 24
+    },
+    shareDataText: {
+        fontFamily: 'BrittiSemibold',
+        fontWeight: '600',
+        fontSize: 16,
+        color: '#080808',
+        textDecorationLine: 'underline'
     },
     fab: {
         position: 'absolute',

@@ -3,10 +3,15 @@ import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { LoaderProvider } from '../contexts/LoaderContext';
+import { AuthProvider } from '../contexts/AuthContext';
+import { NotificationProvider } from '../contexts/NotificationContext';
+import { ToastProvider } from '../contexts/ToastContext';
+import InAppNotification from '@/components/InAppNotification';
+import Toast from '@/components/Toast';
 
 function StackLayout() {
     const insets = useSafeAreaInsets();
-  
+
     useEffect(() => {
         // GoogleSignin.configure({
         //     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
@@ -26,6 +31,8 @@ function StackLayout() {
                 paddingBottom: insets.bottom
             }}
         >
+            <InAppNotification />
+            <Toast />
             <Stack
                 screenOptions={{
                     headerShown: false,
@@ -245,9 +252,15 @@ function StackLayout() {
 export default function RootLayout() {
     return (
         <SafeAreaProvider>
-            <LoaderProvider>
-                <StackLayout />
-            </LoaderProvider>
+            <AuthProvider>
+                <NotificationProvider>
+                    <ToastProvider>
+                        <LoaderProvider>
+                            <StackLayout />
+                        </LoaderProvider>
+                    </ToastProvider>
+                </NotificationProvider>
+            </AuthProvider>
         </SafeAreaProvider>
     );
 }

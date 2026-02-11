@@ -28,7 +28,7 @@ export const requestLocationPermissions = async (): Promise<boolean> => {
  * Fetches the current location and caches it.
  * Uses getLastKnownPositionAsync as a fast fallback.
  */
-export const fetchAndCacheLocation = async (): Promise<LocationData | null> => {
+export const fetchAndCacheLocation = async (maxAge = 10 * 60 * 1000): Promise<LocationData | null> => {
     try {
         const hasPermission = await requestLocationPermissions();
         if (!hasPermission) return null;
@@ -45,8 +45,8 @@ export const fetchAndCacheLocation = async (): Promise<LocationData | null> => {
             // Try to get fast last known position first
             location = await Location.getLastKnownPositionAsync({});
 
-            // If none or too old (e.g. > 10 mins), get fresh
-            if (!location || (Date.now() - location.timestamp > 10 * 60 * 1000)) {
+            // If none or too old (based on maxAge), get fresh
+            if (!location || (Date.now() - location.timestamp > maxAge)) {
                 location = await Location.getCurrentPositionAsync({
                     accuracy: Location.Accuracy.Balanced,
                 });
@@ -112,6 +112,16 @@ export const getCachedLocation = async (): Promise<LocationData | null> => {
  */
 export const syncLocationWithBackend = async (locationData: LocationData): Promise<void> => {
     try {
+        // Check privacy settings before syncing
+        const cachedSettings = await AsyncStorage.getItem('user_privacy_settings');
+        if (cachedSettings) {
+            const parsed = JSON.parse(cachedSettings);
+            if (parsed.shareLocationData === false) {
+                console.log('Location sync skipped due to privacy settings (shareLocationData is false)');
+                return;
+            }
+        }
+
         await api.patch('/api/account/location', {
             latitude: locationData.latitude,
             longitude: locationData.longitude,

@@ -21,7 +21,6 @@ function LocationDataSettingScreen() {
             const cached = await AsyncStorage.getItem('user_privacy_settings');
             if (cached) {
                 const parsed = JSON.parse(cached);
-                // For MVP, we map shareLocationData (boolean) to 'while_using' or 'never'
                 setSelectedOption(parsed.shareLocationData ? 'while_using' : 'never');
             }
         } catch (e) {
