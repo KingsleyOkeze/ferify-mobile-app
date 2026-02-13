@@ -21,6 +21,7 @@ import {
     View,
 } from "react-native";
 import { useLoader } from "@/contexts/LoaderContext";
+import * as Application from 'expo-application';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -38,6 +39,9 @@ export default function LoginScreen() {
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
         androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, // Note: use android debug id for dev and android release id for prod.
         iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+        redirectUri: makeRedirectUri({
+            native: `${Application.applicationId}:/oauth2redirect`,
+        }),
     });
 
     useEffect(() => {
@@ -72,11 +76,25 @@ export default function LoginScreen() {
             const res = await api.post("/api/user/auth/google-login", { idToken });
             console.log("Google Login Backend Success:", res.data);
 
-            const { accessToken, refreshToken, user: userData } = res.data;
+            const { accessToken, refreshToken, user, isNewUser } = res.data;
 
-            if (accessToken && userData) {
-                await login(userData, accessToken, refreshToken);
-                router.replace("/(tabs)/HomeScreen");
+            if (accessToken && user) {
+                await login(user, accessToken, refreshToken);
+            
+                if (isNewUser) {
+                    // If they clicked "Login" but didn't actually have an account,
+                    // send them to finish setting up (e.g., verifying email sign up, choosing a username).
+                    router.replace({
+                        pathname: "/auth/signup/VerifySignupEmailScreen",
+                        params: {
+                            email: user.email.trim(),
+                            autoSend: 'true'
+                        }
+                    });
+                } else {
+                    // Returning user flow
+                    router.replace("/(tabs)/HomeScreen");
+                }
             }
         } catch (error: any) {
             console.error("Google Backend Error:", error.response?.data || error.message);

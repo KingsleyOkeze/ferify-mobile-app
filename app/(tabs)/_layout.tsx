@@ -1,6 +1,8 @@
 import { Tabs } from 'expo-router';
 import {Ionicons, MaterialIcons, Feather, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
 import { View, Text, StyleSheet } from 'react-native';
+import { HomeIcon, DiscoverIcon, AccountIcon } from '@/components/icons/CustomIcons';
+
 
 function TabsLayout() {
     return (
@@ -30,7 +32,7 @@ function TabsLayout() {
                     name="HomeScreen"
                     options={{
                         tabBarIcon: ({ color }) => (
-                            <MaterialIcons name="home" size={24} color={color} />
+                            <HomeIcon size={24} color={color} />
                         ),
                         tabBarLabel: 'Home',
                     }}
@@ -40,7 +42,7 @@ function TabsLayout() {
                     options={{
                         tabBarIcon: ({ color }) => (
                             <View>
-                                <MaterialIcons name="explore" size={24} color={color} />
+                                <DiscoverIcon size={24} color={color} />
                             </View>
                         ),
                         tabBarLabel: 'Discover',
@@ -50,7 +52,7 @@ function TabsLayout() {
                     name="AccountScreen"
                     options={{
                         tabBarIcon: ({ color }) => (
-                            <MaterialIcons name="account-circle" size={24} color={color} />
+                            <AccountIcon size={24} color={color} />
                         ),
                         tabBarLabel: 'Account',
                     }}

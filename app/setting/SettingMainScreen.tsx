@@ -110,7 +110,7 @@ function SettingMainScreen() {
                                     <Text style={styles.itemDescription}>{item.description}</Text>
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color="#999" />
+                            <Ionicons name="chevron-forward" size={16} color="#999" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -196,6 +196,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
+        height: 87
     },
     itemLeft: {
         flexDirection: 'row',

@@ -96,8 +96,8 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginTop: 10,
-        marginBottom: 20,
+        marginTop: 20,
+        marginBottom: 25,
     },
     card: {
         backgroundColor: '#F3F3F3',

@@ -101,10 +101,15 @@ function DiscoverScreen() {
                                 >
                                     {/* 1. Icon View */}
                                     <View style={[styles.recentImage, { justifyContent: 'center', alignItems: 'center' }]}>
-                                        <Ionicons
-                                            name={item.vehicleType === 'bus' ? 'bus' : item.vehicleType === 'keke' ? 'bicycle' : 'car'}
-                                            size={32}
-                                            color="#080808"
+                                        <Image
+                                            source={
+                                                item.vehicleType === 'bus' ? 
+                                                require('../../assets/images/popular-search-icons/busImage.png') : 
+                                                item.vehicleType === 'keke' ? 
+                                                require('../../assets/images/popular-search-icons/kekeImage.png')  : 
+                                                require('../../assets/images/popular-search-icons/okadaImage.png')
+                                            }
+                                            style={styles.icon}
                                         />
                                     </View>
 
@@ -113,12 +118,12 @@ function DiscoverScreen() {
                                         <Text style={styles.recentRoute} numberOfLines={1}>{item.from} - {item.to}</Text>
 
                                         <View style={styles.recentMetaRow}>
-                                            <Ionicons name="time-outline" size={12} color="#666" style={styles.metaIcon} />
+                                            <Ionicons name="time" size={14} color="#757575" style={styles.metaIcon} />
                                             <Text style={styles.recentMetaText}>{item.time}</Text>
                                         </View>
 
                                         <View style={styles.recentMetaRow}>
-                                            <Ionicons name="people-outline" size={12} color="#666" style={styles.metaIcon} />
+                                            <Ionicons name="people-outline" size={14} color="#757575" style={styles.metaIcon} />
                                             <Text style={styles.recentMetaText}>{item.contributors || 1} contributors</Text>
                                         </View>
                                     </View>
@@ -166,10 +171,17 @@ function DiscoverScreen() {
                                 >
                                     {/* Left: Icon */}
                                     <View style={[styles.popularRouteImage, { justifyContent: 'center', alignItems: 'center' }]}>
-                                        <Ionicons
-                                            name={item.vehicleType === 'bus' ? 'bus' : item.vehicleType === 'keke' ? 'bicycle' : 'car'}
-                                            size={32}
-                                            color="#080808"
+                                        <Image
+                                            source={
+                                                item.vehicleType === 'bus' ? 
+                                                require('../../assets/images/popular-search-icons/busImage.png') : 
+                                                item.vehicleType === 'keke' ? 
+                                                require('../../assets/images/popular-search-icons/kekeImage.png')  : 
+                                                require('../../assets/images/popular-search-icons/okadaImage.png')
+                                            }
+                                            style={styles.icon}
+                                            // size={32}
+                                            // color="#080808"
                                         />
                                     </View>
 
@@ -194,11 +206,14 @@ function DiscoverScreen() {
                 {showInsights && insights.length > 0 && (
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Tips & Insight</Text>
-                        <View style={styles.verticalList}>
+                        <View style={styles.tipListContainer}>
                             {insights.map((item) => (
                                 <TouchableOpacity key={item.id} style={styles.tipCard}>
                                     <View style={styles.tipIconContainer}>
-                                        <Ionicons name="sparkles" size={24} color="#014C1D" />
+                                        <Image 
+                                            source={require('../../assets/images/popular-search-icons/alert_icon.png')} 
+                                            style={styles.tipIcon}
+                                        />
                                     </View>
                                     <View style={styles.tipContent}>
                                         <Text style={styles.tipTitle}>{item.title}</Text>
@@ -216,8 +231,11 @@ function DiscoverScreen() {
                         <Image source={shineIcon} style={styles.promoImage} />
                     </View>
                     <View style={styles.promoContent}>
-                        <Text style={styles.promoTitle}>Contribution Leaderboard</Text>
-                        <Text style={styles.promoBody}>See top contributors and earn badges!</Text>
+                        <Text style={styles.promoTitle}>Safety First</Text>
+                        <Text style={styles.promoBody}>
+                            Always sit properly in vehicles, avoid overloading, 
+                            and keep your valuables secure.
+                        </Text>
                     </View>
                 </TouchableOpacity>
 
@@ -244,13 +262,14 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 4,
+        marginBottom: 20,
     },
     headerSubtitle: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
+        marginBottom: 24
     },
     section: {
         marginBottom: 24,
@@ -258,7 +277,8 @@ const styles = StyleSheet.create({
     sectionHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 12,
+        marginBottom: 15,
+        // backgroundColor: 'red'
     },
     sectionTitle: {
         fontSize: 16,
@@ -267,7 +287,6 @@ const styles = StyleSheet.create({
         color: '#000000',
         marginRight: 10,
         paddingHorizontal: 20,
-        marginBottom: 16,
     },
 
     horizontalScroll: {
@@ -288,6 +307,10 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
     },
+    // firstCard: {
+    //     borderTopWidth: 1,
+    //     borderTopColor: '#DADADA',
+    // },
     recentImage: {
         width: 60,
         height: 60,
@@ -295,21 +318,23 @@ const styles = StyleSheet.create({
         marginRight: 12,
         backgroundColor: '#F5F5F5',
         borderRadius: 3.56,
+        alignSelf: 'flex-start',
     },
     recentDetails: {
         flex: 1,
+        // backgroundColor: 'green',
+        height: '100%'
     },
     recentRoute: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 6,
+        marginBottom: 16,
     },
     recentMetaRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 4,
     },
     metaIcon: {
         marginRight: 4,
@@ -319,6 +344,7 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
+        lineHeight: 24
     },
     recentPriceContainer: {
         paddingLeft: 8,
@@ -328,8 +354,13 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
+        minHeight: '100%'
     },
-
+    icon: {
+        width: 72,
+        height: 72,
+        borderRadius: 3.56
+    },
     // Popular Searches Styles
     hotBadge: {
         backgroundColor: '#2A7FFF',
@@ -383,9 +414,12 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 10,
         backgroundColor: '#FFFFFF',
+        borderTopWidth: 1,
+        borderTopColor: '#DADADA',
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         gap: 16,
+        // marginBottom: 30
     },
     popularRouteCard: {
         flexDirection: 'row',
@@ -443,6 +477,13 @@ const styles = StyleSheet.create({
     },
 
     // Tips & Insight Styles
+    tipListContainer: {
+        paddingVertical: 16,
+        paddingHorizontal: 10,
+        backgroundColor: '#FFFFFF',
+        gap: 16,
+        borderWidth: 0
+    },
     tipCard: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -476,14 +517,14 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 4,
+        marginBottom: 10,
     },
     tipBody: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
-        lineHeight: 18,
+        lineHeight: 20,
     },
 
     // Promo Card (Broken Border)
@@ -517,13 +558,14 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular',
         fontWeight: 400,
         color: '#080808',
-        marginBottom: 4,
+        marginBottom: 5,
     },
     promoBody: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
+        lineHeight: 20
     },
 });
 

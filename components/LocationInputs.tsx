@@ -103,7 +103,6 @@ const styles = StyleSheet.create({
     },
     locationContainer: {
         position: 'relative',
-        paddingHorizontal: 20,
         backgroundColor: '#FBFBFB'
     },
     locationInput: {

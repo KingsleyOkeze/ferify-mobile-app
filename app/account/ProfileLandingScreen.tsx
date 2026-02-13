@@ -38,14 +38,7 @@ function ProfileLandingScreen() {
             description: 'Badges and milestones earned',
             image: require('../../assets/images/profile-icons/achievements_icon.png'),
             onPress: () => { router.push('../achievement/AchievementsScreen') },
-        },
-        {
-            id: 'settings',
-            title: 'Settings',
-            description: 'App preferences and account settings',
-            image: require('../../assets/images/profile-icons/settings_icon.png'),
-            onPress: () => { router.push('../setting/SettingMainScreen') },
-        },
+        }
     ];
 
     const getInitials = (first: string, last: string) => {
@@ -126,6 +119,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
+        marginLeft: -4,
         marginBottom: 10,
     },
     headerTitle: {
@@ -208,7 +202,7 @@ const styles = StyleSheet.create({
         color: '#080808',
     },
     menuContainer: {
-        marginTop: 20,
+        marginTop: 33,
     },
     menuItem: {
         flexDirection: 'row',
@@ -220,7 +214,8 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderTopColor: '#DADADA',
         borderBottomWidth: 1,
-        borderBottomColor: '#DADADA'
+        borderBottomColor: '#DADADA',
+        height: 87
     },
     itemLeft: {
         flexDirection: 'row',

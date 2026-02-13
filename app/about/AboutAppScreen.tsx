@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 12,
+        marginBottom: 20,
     },
     detailsBox: {
         backgroundColor: '#F3F3F3',

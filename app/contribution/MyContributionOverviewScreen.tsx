@@ -188,7 +188,7 @@ function MyContributionOverviewScreen() {
                                 </View>
                             </View>
                             {/* Arrow without tail - Chevron Forward matches description best */}
-                            <Ionicons name="chevron-forward" size={8} color="#080808" />
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -210,14 +210,13 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginTop: 10,
         marginBottom: 15,
     },
     headerSubtitle: {
@@ -316,6 +315,7 @@ const styles = StyleSheet.create({
         borderTopColor: '#F0F0F0',
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
+        height: 87
     },
     // firstMenuItem: {
     // },

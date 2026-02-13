@@ -91,14 +91,14 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 30, // Space below title
+        paddingBottom: 30, 
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 16, // Space between back arrow and title
+        marginBottom: 25, 
     },
     headerTitle: {
-        fontSize: 28, // Prominent title
+        fontSize: 28, 
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',

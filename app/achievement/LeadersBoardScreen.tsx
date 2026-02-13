@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
         height: 24,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: -8,
+        marginLeft: -4,
     },
     title: {
         fontSize: 24,

@@ -22,6 +22,8 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import { makeRedirectUri } from "expo-auth-session";
 import Constants from "expo-constants";
+import * as Application from 'expo-application';
+
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -40,11 +42,15 @@ export default function SignUpScreen() {
 
     // Validation State
     const [isEmailValid, setIsEmailValid] = useState(false);
+    
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
         androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, // Note: use android debug id for dev and android release id for prod.
         iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+        redirectUri: makeRedirectUri({
+            native: `${Application.applicationId}:/oauth2redirect`,
+        }),
     });
 
     useEffect(() => {
@@ -80,14 +86,20 @@ export default function SignUpScreen() {
             setIsLoading(true);
             const res = await api.post("/api/user/auth/google-login", { idToken });
 
-            // Save the JWT access token
-            if (!res.data?.accessToken) {
-                throw new Error("No access token from server");
-            }
+            if (res.status === 200) {
+                const { accessToken, refreshToken, user, isNewUser } = res.data;
 
-            const userData = res.data.user || { id: res.data.userId, email: res.data.email };
-            await login(userData, res.data.accessToken, res.data.refreshToken);
-            router.replace("/(tabs)/HomeScreen");
+                // Update Auth Context
+                await login(user, accessToken, refreshToken);
+
+                if (isNewUser) {
+                    // If they are new, take them to onboarding screen
+                    router.replace("/auth/onboarding/OnboardingScreen");
+                } else {
+                    // If they already existed, go straight home
+                    router.replace("/(tabs)/HomeScreen");
+                }
+            }
 
         } catch (err: any) {
             console.error("Backend Google Login Error:", err);

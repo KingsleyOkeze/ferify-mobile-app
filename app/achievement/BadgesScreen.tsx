@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 24,
-        paddingTop: 16,
+        paddingTop: 10,
         paddingBottom: 24,
     },
     backButton: {
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
         height: 24,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: -8,
+        marginLeft: -4,
     },
     title: {
         fontSize: 24,

@@ -180,16 +180,16 @@ function AccountDetailsScreen() {
                             <View style={styles.avatarPlaceholder}>
                                 <ActivityIndicator color="#2E7D32" />
                             </View>
-                        ) : userData.profilePhoto ? (
-                            <Image source={{ uri: userData.profilePhoto }} style={styles.avatarImage} />
+                        ) : user?.profilePhoto ? (
+                            <Image source={{ uri: user?.profilePhoto }} style={styles.avatarImage} />
                         ) : (
                             <View style={[
                                 styles.avatarPlaceholder,
                                 // @ts-ignore
-                                userData.avatarColor && { backgroundColor: userData.avatarColor }
+                                user?.avatarColor && { backgroundColor: user?.avatarColor }
                             ]}>
                                 <Text style={styles.avatarInitials}>
-                                    {getInitials(userData.firstName || 'U', userData.lastName || 'N')}
+                                    {getInitials(user?.firstName || 'U', user?.lastName || 'N')}
                                 </Text>
                             </View>
                         )}
@@ -374,6 +374,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         paddingTop: 10,
         paddingBottom: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: '#EAECF1',
     },
     headerButton: {
         padding: 4,
@@ -394,7 +396,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         marginTop: 15,
         marginLeft: 20,
-        marginBottom: 20,
+        marginBottom: 25,
     },
     avatarContainer: {
         alignItems: 'center',
@@ -447,12 +449,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
-        borderBottomColor: '#E3E3E3',
+        borderBottomColor: '#DADADA',
         height: 87
     },
     firstListItem: {
         borderTopWidth: 1,
-        borderTopColor: '#E3E3E3',
+        borderTopColor: '#DADADA',
     },
     itemTextContainer: {
         flex: 1,
@@ -601,8 +603,8 @@ const styles = StyleSheet.create({
         width: 60,
         height: 60,
         borderRadius: 30,
-        borderWidth: 2,
-        borderColor: '#fff',
+        borderWidth: 1,
+        borderColor: '#DADADA',
         elevation: 3,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },

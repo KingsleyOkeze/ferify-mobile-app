@@ -300,7 +300,19 @@ function FareContributionScreen() {
                 showsVerticalScrollIndicator={false}
             >
                 {/* Title Section */}
-                <Text style={styles.title}>Update fare</Text>
+                <Text style={styles.title}>
+                    {
+                        from && to ? (
+                            <Text style={styles.title}>
+                                Confirm fare
+                            </Text>
+                        ) : (
+                            <Text style={styles.title}>
+                                Update fare
+                            </Text>
+                        )
+                    }
+                </Text>
                 <Text style={styles.subtitle}>Help others know the correct price</Text>
 
                 {/* Location Inputs - Only show if we're NOT in confirmation mode */}

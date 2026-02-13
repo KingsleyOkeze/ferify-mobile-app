@@ -12,16 +12,6 @@ import Toast from '@/components/Toast';
 function StackLayout() {
     const insets = useSafeAreaInsets();
 
-    useEffect(() => {
-        // GoogleSignin.configure({
-        //     webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        //     offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-        //     forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-        //     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID, // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
-        //     profileImageSize: 150,
-        // });
-    }, []);
-
     return (
         <View
             style={{

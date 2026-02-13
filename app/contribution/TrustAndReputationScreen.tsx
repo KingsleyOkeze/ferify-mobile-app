@@ -135,15 +135,14 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        padding: 4,
-        marginBottom: 20,
+        marginBottom: 25,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
         color: '#080808',
         fontFamily: 'BrittiSemibold',
-        marginBottom: 4,
+        marginBottom: 10,
     },
     headerSubtitle: {
         fontSize: 14,

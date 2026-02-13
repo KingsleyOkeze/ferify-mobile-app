@@ -289,33 +289,35 @@ function RouteSelectScreen() {
                             </View>
 
                             {/* Replaced input section with LocationInputs component */}
-                            <LocationInputs
-                                fromLocation={fromLocation}
-                                toLocation={toLocation}
-                                fromFocused={fromFocused}
-                                toFocused={toFocused}
-                                fromResult={!!fromResult}           // boolean
-                                onFromChange={(text) => handleSearch(text, 'from')}
-                                onToChange={(text) => handleSearch(text, 'to')}
-                                onFromFocus={() => {
-                                    setFromFocused(true);
-                                    setActiveInput('from');
-                                }}
-                                onToFocus={() => {
-                                    setToFocused(true);
-                                    setActiveInput('to');
-                                }}
-                                onFromBlur={() => setFromFocused(false)}
-                                onToBlur={() => setToFocused(false)}
-                                onFromSubmit={handleFromSubmit}
-                                onToSubmit={handleToSubmit}
-                                toInputRef={toInputRef}
-                            />
+                            <View style={styles.locationInputContainer}>
+                                <LocationInputs
+                                    fromLocation={fromLocation}
+                                    toLocation={toLocation}
+                                    fromFocused={fromFocused}
+                                    toFocused={toFocused}
+                                    fromResult={!!fromResult}           // boolean
+                                    onFromChange={(text) => handleSearch(text, 'from')}
+                                    onToChange={(text) => handleSearch(text, 'to')}
+                                    onFromFocus={() => {
+                                        setFromFocused(true);
+                                        setActiveInput('from');
+                                    }}
+                                    onToFocus={() => {
+                                        setToFocused(true);
+                                        setActiveInput('to');
+                                    }}
+                                    onFromBlur={() => setFromFocused(false)}
+                                    onToBlur={() => setToFocused(false)}
+                                    onFromSubmit={handleFromSubmit}
+                                    onToSubmit={handleToSubmit}
+                                    toInputRef={toInputRef}
+                                />
+                            </View>
 
                             <View style={styles.modeOfTransportContainer}>
                                 {showTransportSelector && (
                                     <View style={styles.modeSection}>
-                                        <Text style={styles.sectionTitle}>Select transport mode</Text>
+                                        {/* <Text style={styles.sectionTitle}>Select transport mode</Text> */}
                                         <ModeOfTransportSelect
                                             selectedMode={selectedMode}
                                             onSelect={setSelectedMode}
@@ -407,6 +409,10 @@ const styles = StyleSheet.create({
     closeButton: { 
         padding: 4 
     },
+    locationInputContainer: {
+        paddingHorizontal: 20,
+        paddingBottom: 5
+    },
     modeSection: { 
         paddingHorizontal: 20, 
         marginBottom: 24 
@@ -420,7 +426,7 @@ const styles = StyleSheet.create({
     },
 
     modeOfTransportContainer: {
-        // backgroundColor: 'green'
+        marginTop: 12
     }
 });
 

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ferify-mobile-app",
+    "name": "Ferify",
     "slug": "ferify-mobile-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "ferifymobileapp",
+    "scheme": "com.ferify.app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -37,6 +37,18 @@
         }
       ],
       "expo-web-browser",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "enableAndroidX": true,
+            "enableJetifier": true,
+            "packagingOptions": {
+              "pickFirst": ["**/libc++_shared.so"]
+            }
+          }
+        }
+      ],
       [
         "@react-native-voice/voice",
         {

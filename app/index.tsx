@@ -66,13 +66,13 @@ export default function Index() {
     }
 
     // Stage 3: Final Destination
-    // return (
-    //     <Redirect
-    //         href={isAuthenticated ? "/(tabs)/HomeScreen" : "/auth/onboarding/OnboardingScreen"}
-    //     />
-    // );
-
     return (
-        <Redirect href="./auth/login/LoginScreen" />
+        <Redirect
+            href={isAuthenticated ? "/(tabs)/HomeScreen" : "/auth/onboarding/OnboardingScreen"}
+        />
     );
+
+    // return (
+    //     <Redirect href="/(tabs)/HomeScreen" />
+    // );
 }

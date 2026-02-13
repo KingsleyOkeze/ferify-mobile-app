@@ -40,7 +40,7 @@ export default function NotificationScreen() {
 
     const getIconForType = (type: Notification['type']) => {
         if (type === 'fare_verified') {
-            return { image: require('../../assets/images/notification-icons/fare-verified-icon.png') };
+            return { image: require('../../assets/images/notification-icons/fare_verified_icon.png') };
         }
         if (type === 'fare_confirmed') {
             return { image: require('../../assets/images/notification-icons/fare-verified-icon.png') };
@@ -51,6 +51,9 @@ export default function NotificationScreen() {
         if (type === 'feature_update') {
             return { image: require('../../assets/images/notification-icons/new-feature-update-icon.png') };
         }
+        // if (type === 'earned_badge') {
+        //     return { image: require('../../assets/images/notification-icons/earned_badge_icon.png') };
+        // }
         // Default for 'general' and any other types
         return { image: require('../../assets/images/notification-icons/new-feature-update-icon.png') };
     };

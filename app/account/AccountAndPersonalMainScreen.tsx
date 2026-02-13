@@ -123,6 +123,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
+        height: 79
     },
     disabledMenuItem: {
         backgroundColor: '#F9F9F9', // Light background for disabled state

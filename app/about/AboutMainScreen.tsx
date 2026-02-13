@@ -33,7 +33,7 @@ function AboutMainScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons 
                         name="arrow-back" 
-                        size={14} 
+                        size={24} 
                         color="#080808" 
                     />
                 </TouchableOpacity>
@@ -76,8 +76,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        padding: 4,
-        marginBottom: 10,
+        marginBottom: 20,
     },
     headerTitle: {
         fontFamily: 'BrittiSemibold',

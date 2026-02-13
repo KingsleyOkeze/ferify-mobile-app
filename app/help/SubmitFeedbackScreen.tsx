@@ -129,10 +129,11 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 25,
     },
     backButton: {
         alignSelf: 'flex-start',
+        marginLeft: -4,
         marginBottom: 20,
     },
     headerTitle: {
