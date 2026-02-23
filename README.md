@@ -1,50 +1,71 @@
-# Welcome to your Expo app 👋
+# Ferify Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+The Ferify mobile application is a powerful, community-driven tool built with React Native and Expo. It allows users to browse transport routes, contribute verified fare information, and stay updated with real-time notifications.
 
-## Get started
+## Key Features
 
-1. Install dependencies
+- **Real-time Notifications**: Integrated via Socket.io for instant updates on fare verifications and system status.
+- **Fare Contribution Flow**: Step-by-step UI for users to suggest and verify transport fares.
+- **Smart Route Selection**: Interactive route selection with community-backed fare data.
+- **Account Management**: Comprehensive user profiles, including contribution history and achievements.
+- **Leaderboards & Achievements**: Gamified experience to encourage community participation.
+- **Universal Search**: Unified search for destinations and transport options.
 
+## Technology Stack
+
+- **Framework**: [Expo](https://expo.dev) / React Native
+- **Navigation**: [Expo Router](https://docs.expo.dev/router/introduction) (File-based)
+- **State Management**: React Context API
+- **Real-time**: [Socket.io-client](https://socket.io/docs/v4/client-api/)
+- **Networking**: Axios
+- **Icons**: Ionicons (@expo/vector-icons)
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (Latest LTS)
+- npm or yarn
+- Expo Go app on your phone (for testing)
+
+### Installation
+
+1. Clone the repository and navigate to the mobile app directory:
+   ```bash
+   cd ferify-mobile-app
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
-
-   ```bash
-   npx expo start
+3. Configure environment variables:
+   Create a `.env` file in the root of the mobile app directory and add your server URL:
+   ```env
+   EXPO_PUBLIC_SERVER_URL=http://your-server-ip:5000
    ```
 
-In the output, you'll find options to open the app in a
+### Running the App
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
+Start the development server:
 ```bash
-npm run reset-project
+npm start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+- Press **`a`** for Android
+- Press **`i`** for iOS
+- Scan the QR code with your phone's camera (iOS) or the Expo Go app (Android) to run on a physical device.
 
-## Learn more
+## Project Structure
 
-To learn more about developing your project with Expo, look at the following resources:
+- `app/`: Contains the main screens and file-based routing logic.
+- `components/`: Reusable UI components.
+- `contexts/`: Global state providers (Auth, Notifications, etc.).
+- `services/`: API configuration and service layers.
+- `assets/`: Images, animations, and sound files.
+- `utils/`: Helper functions and constants.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Contributing
 
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Please ensure you follow the coding standards and styling guidelines established in the project. Run `npm run lint` before committing your changes.

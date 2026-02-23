@@ -11,10 +11,12 @@ import {
     ActivityIndicator
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import api from '@/services/api';
 import { STORAGE_KEYS, CACHE_TTL as TTL_CONSTANTS } from '@/constants/storage';
 import { cacheHelper } from '@/utils/cache';
+import { RefreshControl } from 'react-native';
+import { useCallback } from 'react';
 
 
 // Badge Images Mapping
@@ -42,10 +44,19 @@ export default function AchievementsScreen() {
     const [error, setError] = React.useState<string | null>(null);
     const [badges, setBadges] = React.useState<any[]>([]);
 
+    const [refreshing, setRefreshing] = React.useState(false);
+
+    // Initial load from cache
     React.useEffect(() => {
         loadCachedData();
-        fetchData();
     }, []);
+
+    // Fetch in background every time screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            fetchData();
+        }, [])
+    );
 
     const loadCachedData = async () => {
         try {
@@ -93,8 +104,14 @@ export default function AchievementsScreen() {
             setError("Sync failed. Using cached data.");
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchData();
+    }, []);
 
     // Levels logic: Determine which levels are earned based on achievementData.level
     const levels = Array.from({ length: 5 }, (_, i) => ({
@@ -122,6 +139,13 @@ export default function AchievementsScreen() {
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#080808']}
+                    />
+                }
             >
                 {loading ? (
                     <ActivityIndicator size="large" color="#080808" style={{ marginTop: 40 }} />

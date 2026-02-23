@@ -57,7 +57,7 @@ function VerifyForgotPasswordOtpScreen() {
 
         setIsLoading(true);
         try {
-            const response = await api.post('/api/user/auth/register/verify-forgot-password-otp', {
+            const response = await api.post('/api/user/auth/verify-forgot-password-otp', {
                 email,
                 otp: otpCode
             });
@@ -67,7 +67,7 @@ function VerifyForgotPasswordOtpScreen() {
                 // Navigate to a final reset screen (can reuse PasswordResetScreen logic if it handles token)
                 // For cleanlyness, we'll use a specific screen or pass special params
                 router.push({
-                    pathname: './CompleteForgotPasswordScreen',
+                    pathname: '/auth/forgot-password/CompleteForgotPasswordScreen',
                     params: { token, email }
                 });
             }
@@ -84,7 +84,7 @@ function VerifyForgotPasswordOtpScreen() {
 
         setIsResending(true);
         try {
-            await api.post('/api/user/auth/register/forgot-password', { email });
+            await api.post('/api/user/auth/forgot-password', { email });
             setTimer(60);
             Alert.alert('Success', 'A new verification code has been sent to your email.');
         } catch (error: any) {
@@ -123,7 +123,7 @@ function VerifyForgotPasswordOtpScreen() {
                     {otp.map((digit, index) => (
                         <TextInput
                             key={index}
-                            ref={(ref) => (inputRefs.current[index] = ref)}
+                            ref={(ref) => { inputRefs.current[index] = ref; }}
                             style={styles.otpInput}
                             keyboardType="number-pad"
                             maxLength={1}

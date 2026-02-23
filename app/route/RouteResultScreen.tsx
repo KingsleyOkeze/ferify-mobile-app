@@ -243,7 +243,11 @@ function RouteResultScreen() {
                                 style={styles.verifyButton}
                                 onPress={() => router.push({
                                     pathname: "/fare-contribution/FareContributionScreen",
-                                    params: { from: from || "Not specified", to: to || "Not specified" }
+                                    params: {
+                                        from: from || "Not specified",
+                                        to: to || "Not specified",
+                                        contributionType: 'route_confirmation'
+                                    }
                                 })}
                             >
                                 <Text style={styles.verifyButtonText}>Verify & Earn</Text>

@@ -13,11 +13,12 @@ import {
     DimensionValue,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import api from '@/services/api';
 import { STORAGE_KEYS, CACHE_TTL as TTL_CONSTANTS } from '@/constants/storage';
 import { cacheHelper } from '@/utils/cache';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, RefreshControl } from 'react-native';
+import { useCallback } from 'react';
 
 // Badge Images Mapping
 const badgeImages: any = {
@@ -80,12 +81,21 @@ export default function BadgesScreen() {
     const [fetchedBadges, setFetchedBadges] = useState<Badge[]>([]);
     const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
 
+    const [refreshing, setRefreshing] = useState(false);
+
     const [error, setError] = useState<string | null>(null);
 
+    // Initial load from cache
     React.useEffect(() => {
         loadCachedBadges();
-        fetchBadges();
     }, []);
+
+    // Fetch in background every time screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            fetchBadges();
+        }, [])
+    );
 
     const loadCachedBadges = async () => {
         try {
@@ -114,8 +124,14 @@ export default function BadgesScreen() {
             setError("Failed to sync latest badges. Showing cached data.");
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        fetchBadges();
+    }, []);
 
     const calculateProgressWidth = (current: number = 0, total: number = 100): DimensionValue => {
         if (!total || total === 0) return '0%';
@@ -138,6 +154,13 @@ export default function BadgesScreen() {
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#080808']}
+                    />
+                }
             >
                 {loading ? (
                     <ActivityIndicator size="large" color="#080808" style={{ marginTop: 40 }} />

@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { cacheHelper } from '@/utils/cache';
+import { STORAGE_KEYS, CACHE_TTL } from '@/constants/storage';
 import TrustAndReputationIcon from '../../assets/images/my-contributions-icons/trust-and-reputation-icons/trust_and_reputation_icon.png';
 
 function TrustAndReputationScreen() {
@@ -22,10 +23,9 @@ function TrustAndReputationScreen() {
 
     const loadCachedData = async () => {
         try {
-            const cached = await AsyncStorage.getItem('user_trust_overview');
+            const cached = await cacheHelper.get<any>(STORAGE_KEYS.TRUST_OVERVIEW, CACHE_TTL.LONG);
             if (cached) {
-                const parsed = JSON.parse(cached);
-                setTrustScore(parsed.trustScore || 0);
+                setTrustScore(cached.trustScore || 0);
             }
         } catch (e) {
             console.error('Error loading cached trust data:', e);
@@ -38,7 +38,7 @@ function TrustAndReputationScreen() {
             const response = await api.get('/api/user/contribution/trust');
             if (response.data) {
                 setTrustScore(response.data.trustScore);
-                await AsyncStorage.setItem('user_trust_overview', JSON.stringify(response.data));
+                await cacheHelper.set(STORAGE_KEYS.TRUST_OVERVIEW, response.data);
             }
         } catch (error) {
             console.error('Error fetching trust data:', error);
@@ -63,12 +63,12 @@ function TrustAndReputationScreen() {
         {
             id: 'accuracy',
             text: 'Consistent fare accuracy',
-            image: require('../../assets/images/my-contributions-icons/trust-and-reputation-icons/contribution_icon.png'),  
+            image: require('../../assets/images/my-contributions-icons/trust-and-reputation-icons/contribution_icon.png'),
         },
         {
             id: 'rejected',
             text: 'Recent rejected updates',
-            image: require('../../assets/images/my-contributions-icons/trust-and-reputation-icons/recent_rejected_icon.png'),  
+            image: require('../../assets/images/my-contributions-icons/trust-and-reputation-icons/recent_rejected_icon.png'),
         },
     ];
 

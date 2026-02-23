@@ -31,7 +31,7 @@ function CompleteForgotPasswordScreen() {
 
         setIsLoading(true);
         try {
-            const response = await api.post('/api/user/auth/register/reset-password', {
+            const response = await api.post('/api/user/auth/reset-password', {
                 token,
                 newPassword
             });
@@ -42,7 +42,7 @@ function CompleteForgotPasswordScreen() {
                         text: 'Login',
                         onPress: () => {
                             // Go back to login screen (assuming it will be implemented or redirect to onboarding)
-                            router.replace('/auth/OnboardingScreen');
+                            router.replace('/auth/onboarding/OnboardingScreen');
                         }
                     }
                 ]);

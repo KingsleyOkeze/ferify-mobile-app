@@ -9,10 +9,12 @@ import {
     Animated,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter, useFocusEffect } from 'expo-router';
 import api from '@/services/api';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, RefreshControl } from 'react-native';
+import { useCallback } from 'react';
+import { cacheHelper } from '@/utils/cache';
+import { STORAGE_KEYS, CACHE_TTL } from '@/constants/storage';
 
 export default function LeadersBoardScreen() {
     const router = useRouter();
@@ -21,24 +23,26 @@ export default function LeadersBoardScreen() {
     const [loading, setLoading] = useState(true);
     const [leaderboard, setLeaderboard] = useState<any[]>([]);
 
+    const [refreshing, setRefreshing] = useState(false);
+
+    // Initial load from cache
     React.useEffect(() => {
         loadCachedLeaderboard();
-        fetchLeaderboard();
-    }, [activeToggle]);
+    }, []);
+
+    // Fetch in background every time screen is focused
+    useFocusEffect(
+        useCallback(() => {
+            fetchLeaderboard();
+        }, [activeToggle])
+    );
 
     const loadCachedLeaderboard = async () => {
         try {
-            const cachedString = await AsyncStorage.getItem('cached_leaderboard');
-            if (cachedString) {
-                const cached = JSON.parse(cachedString);
-
-                const CACHE_TTL = 24 * 60 * 60 * 1000;
-                const isFresh = cached.timestamp && (Date.now() - cached.timestamp < CACHE_TTL);
-
-                if (cached.data) {
-                    setLeaderboard(cached.data);
-                    if (isFresh) setLoading(false);
-                }
+            const cachedData = await cacheHelper.get<any[]>(STORAGE_KEYS.LEADERBOARD, CACHE_TTL.LONG);
+            if (cachedData) {
+                setLeaderboard(cachedData);
+                setLoading(false);
             }
         } catch (e) {
             console.error('Error loading cached leaderboard:', e);
@@ -65,18 +69,20 @@ export default function LeadersBoardScreen() {
 
             setLeaderboard(mappedData);
 
-            // Cache with timestamp
-            const cacheData = {
-                timestamp: Date.now(),
-                data: mappedData
-            };
-            await AsyncStorage.setItem('cached_leaderboard', JSON.stringify(cacheData));
+            // Cache data
+            await cacheHelper.set(STORAGE_KEYS.LEADERBOARD, mappedData);
         } catch (error) {
             console.error("Error fetching leaderboard:", error);
         } finally {
             setLoading(false);
+            setRefreshing(false);
         }
     };
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        fetchLeaderboard();
+    }, [activeToggle]);
 
     const handleToggle = (choice: 'week' | 'month') => {
         setActiveToggle(choice);
@@ -152,6 +158,13 @@ export default function LeadersBoardScreen() {
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        colors={['#080808']}
+                    />
+                }
             >
                 {loading ? (
                     <ActivityIndicator size="large" color="#080808" style={{ marginTop: 40 }} />

@@ -11,8 +11,9 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { cacheHelper } from '@/utils/cache';
+import { STORAGE_KEYS, CACHE_TTL } from '@/constants/storage';
 
 const noContributionImage = require('../../assets/images/no-data-images/no_contribution_image.png');
 
@@ -52,10 +53,9 @@ function MyContributionOverviewScreen() {
 
     const loadCachedStats = async () => {
         try {
-            const cached = await AsyncStorage.getItem('user_contribution_stats');
+            const cached = await cacheHelper.get<any>(STORAGE_KEYS.CONTRIBUTION_STATS, CACHE_TTL.LONG);
             if (cached) {
-                const parsed = JSON.parse(cached);
-                updateStatsArray(parsed);
+                updateStatsArray(cached);
             }
         } catch (e) {
             console.error('Error loading cached stats:', e);
@@ -69,7 +69,7 @@ function MyContributionOverviewScreen() {
             if (response.data && response.data.stats) {
                 const freshStats = response.data.stats;
                 updateStatsArray(freshStats);
-                await AsyncStorage.setItem('user_contribution_stats', JSON.stringify(freshStats));
+                await cacheHelper.set(STORAGE_KEYS.CONTRIBUTION_STATS, freshStats);
             }
         } catch (error) {
             console.error('Error fetching contribution stats:', error);

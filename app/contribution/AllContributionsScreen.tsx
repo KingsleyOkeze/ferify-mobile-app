@@ -16,6 +16,8 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import api from '@/services/api';
+import { cacheHelper } from '@/utils/cache';
+import { STORAGE_KEYS, CACHE_TTL } from '@/constants/storage';
 import busImage from '@/assets/images/transportation-icons/busImage.png';
 import kekeImage from '@/assets/images/transportation-icons/kekeImage.png';
 import okadaImage from '@/assets/images/transportation-icons/okadaImage.png';
@@ -37,6 +39,23 @@ function AllContributionsScreen() {
     const [activeTab, setActiveTab] = useState<TabType>('fares');
     const [isLoading, setIsLoading] = useState(false);
     const [historyData, setHistoryData] = useState<any[]>([]);
+
+    // Initial load from cache
+    React.useEffect(() => {
+        loadCachedHistory();
+    }, [activeTab]);
+
+    const loadCachedHistory = async () => {
+        try {
+            const cacheKey = `${STORAGE_KEYS.CONTRIBUTION_HISTORY}_${activeTab}`;
+            const cachedData = await cacheHelper.get<any[]>(cacheKey, CACHE_TTL.LONG);
+            if (cachedData) {
+                setHistoryData(cachedData);
+            }
+        } catch (e) {
+            console.error('Error loading cached history:', e);
+        }
+    };
 
     const tabs: { id: TabType; label: string }[] = [
         { id: 'fares', label: 'Fares' },
@@ -72,6 +91,9 @@ function AllContributionsScreen() {
                     })
                 }));
                 setHistoryData(mappedHistory);
+                // Cache data
+                const cacheKey = `${STORAGE_KEYS.CONTRIBUTION_HISTORY}_${activeTab}`;
+                await cacheHelper.set(cacheKey, mappedHistory);
             } else {
                 setHistoryData([]);
             }

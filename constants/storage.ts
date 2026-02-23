@@ -11,6 +11,9 @@ export const STORAGE_KEYS = {
     USER_ACHIEVEMENTS: 'cache_user_achievements',
     LEADERBOARD: 'cache_leaderboard',
     BADGES: 'cache_badges',
+    CONTRIBUTION_STATS: 'cache_contribution_stats',
+    CONTRIBUTION_HISTORY: 'cache_contribution_history',
+    TRUST_OVERVIEW: 'cache_trust_overview',
 
     // Saved Routes
     HOME_ADDRESS: 'home_address',

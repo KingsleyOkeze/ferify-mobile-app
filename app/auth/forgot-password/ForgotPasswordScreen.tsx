@@ -29,12 +29,12 @@ function ForgotPasswordScreen() {
         setIsLoading(true);
         try {
             // Using the auth endpoint for non-logged in users
-            const response = await api.post('/api/user/auth/register/forgot-password', { email });
+            const response = await api.post('/api/user/auth/forgot-password', { email });
             if (response.status === 200) {
                 // Navigate to a dedicated verification screen for auth flow
                 // Or reuse the existing one if adapted, but cleaner to have separate ones for auth vs settings
                 router.push({
-                    pathname: '/auth/VerifyForgotPasswordOtpScreen',
+                    pathname: '/auth/forgot-password/VerifyForgotPasswordOtpScreen',
                     params: { email }
                 });
             }

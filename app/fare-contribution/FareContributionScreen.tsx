@@ -25,6 +25,8 @@ import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCachedLocation } from '@/services/locationService';
 import { useLoader } from '@/contexts/LoaderContext';
+import { cacheHelper } from '@/utils/cache';
+import { STORAGE_KEYS } from '@/constants/storage';
 
 
 const { height } = Dimensions.get('window');
@@ -75,7 +77,7 @@ const predefinedConditions: ConditionOption[] = [
 
 function FareContributionScreen() {
     const router = useRouter();
-    const { from, to } = useLocalSearchParams();
+    const { from, to, contributionType } = useLocalSearchParams();
 
     // Form state
     const [fromLocation, setFromLocation] = useState('');
@@ -241,13 +243,21 @@ function FareContributionScreen() {
                     timeOfDay: selectedTime,
                     conditions: selectedConditions,
                     notes: notes,
-                    location: location
+                    location: location,
+                    contributionType: contributionType || 'fare_submission'
                 };
 
 
                 const response = await api.post('/api/fare/submit', payload);
 
                 console.log('Fare submitted successfully:', response.data);
+
+                // Invalidate achievement related caches to force fresh fetch
+                await Promise.all([
+                    cacheHelper.remove(STORAGE_KEYS.BADGES),
+                    cacheHelper.remove(STORAGE_KEYS.USER_ACHIEVEMENTS),
+                    cacheHelper.remove(STORAGE_KEYS.LEADERBOARD)
+                ]);
 
                 // Show success modal
                 hideLoader();
