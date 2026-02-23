@@ -8,8 +8,10 @@ import {
     Modal,
     Animated,
     Dimensions,
+    Image,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 
 const { height } = Dimensions.get('window');
 
@@ -22,8 +24,8 @@ interface SuccessModalProps {
 const SuccessModal: React.FC<SuccessModalProps> = ({
     visible,
     onClose,
-    onClaimReward,
 }) => {
+    const router = useRouter();
     const [slideAnim] = useState(new Animated.Value(height));
 
     useEffect(() => {
@@ -75,22 +77,35 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
                         { transform: [{ translateY: slideAnim }] }
                     ]}
                 >
-                    <TouchableOpacity activeOpacity={1}>
-                        {/* Green Check Badge */}
-                        <View style={styles.successBadgeContainer}>
-                            <View style={styles.successBadge}>
-                                <Ionicons name="checkmark" size={40} color="#fff" />
+                    <TouchableOpacity activeOpacity={1} style={styles.modalInner}>
+                        {/* Close Button */}
+                        <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+                            <Ionicons name="close" size={24} color="#080808" />
+                        </TouchableOpacity>
+
+                        {/* Point Earned Section */}
+                        <View style={styles.scoreContainer}>
+                            <View style={styles.iconWrapper}>
+                                <Image
+                                    source={require('@/assets/images/modal-icons/point_earned_icon.png')}
+                                    style={styles.pointIcon}
+                                    resizeMode="contain"
+                                />
                             </View>
+                            <Text style={styles.pointsText}>+1</Text>
                         </View>
 
-                        <Text style={styles.successTitle}>Thanks! Your fare has been submitted.</Text>
+                        <Text style={styles.successTitle}>Thanks! You've just earned 1 point.</Text>
                         <Text style={styles.successSubtitle}>Your update helped others move better.</Text>
 
                         <TouchableOpacity
-                            style={styles.claimRewardButton}
-                            onPress={onClaimReward}
+                            style={styles.backButton}
+                            onPress={() => {
+                                handleClose();
+                                router.replace('/(tabs)/HomeScreen');
+                            }}
                         >
-                            <Text style={styles.claimRewardButtonText}>Claim Reward</Text>
+                            <Text style={styles.backButtonText}>Back</Text>
                         </TouchableOpacity>
                     </TouchableOpacity>
                 </Animated.View>
@@ -102,15 +117,15 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
 const styles = StyleSheet.create({
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: '#0A0A0A66',
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: '#fff',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        paddingTop: 24,
-        paddingBottom: 32,
+        backgroundColor: '#FBFBFB',
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
+        minHeight: 335,
+        // paddingBottom: 32,
         paddingHorizontal: 20,
         maxHeight: height * 0.7,
     },
@@ -118,52 +133,74 @@ const styles = StyleSheet.create({
         paddingVertical: 40,
         alignItems: 'center',
     },
-    successBadgeContainer: {
+    modalInner: {
+        width: '100%',
         alignItems: 'center',
-        marginBottom: 24,
     },
-    successBadge: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#4CAF50',
+    closeButton: {
+        position: 'absolute',
+        top: -15,
+        right: 0,
+        zIndex: 10,
+    },
+    scoreContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 20,
+        marginBottom: 24,
+        gap: 8,
+    },
+    iconWrapper: {
+        width: 64,
+        height: 64,
         justifyContent: 'center',
         alignItems: 'center',
-        borderWidth: 4,
-        borderColor: '#fff',
-        shadowColor: '#4CAF50',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-        borderStyle: 'solid',
+    },
+    pointIcon: {
+        width: 64,
+        height: 52,
+    },
+    pointsText: {
+        fontSize: 18,
+        fontWeight: 600,
+        color: '#080808',
+        fontFamily: 'BrittiSemibold',
     },
     successTitle: {
         fontSize: 20,
-        fontWeight: '700',
-        color: '#000',
+        fontWeight: 600,
+        color: '#080808',
         textAlign: 'center',
-        marginBottom: 12,
+        marginBottom: 15,
         paddingHorizontal: 20,
+        width: '100%',
+        fontFamily: 'BrittiSemibold',
     },
     successSubtitle: {
-        fontSize: 15,
-        color: '#666',
+        fontSize: 14,
+        fontWeight: 400,
+        color: '#616161',
         textAlign: 'center',
-        marginBottom: 32,
+        marginBottom: 40,
         paddingHorizontal: 20,
+        fontFamily: 'BrittiRegular',
     },
-    claimRewardButton: {
-        backgroundColor: '#000',
-        borderRadius: 12,
-        paddingVertical: 16,
-        paddingHorizontal: 48,
+    backButton: {
+        backgroundColor: '#080808',
+        borderRadius: 100,
         alignItems: 'center',
+        width: 165.5,
+        height: 48,
+        alignSelf: 'center',
+        justifyContent: 'center',
     },
-    claimRewardButtonText: {
+    backButtonText: {
         fontSize: 16,
         fontWeight: '600',
         color: '#fff',
+        textAlign: 'center',
+        fontFamily: 'BrittiSemibold',
     },
 });
 

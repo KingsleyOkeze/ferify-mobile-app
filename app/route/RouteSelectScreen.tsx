@@ -126,7 +126,7 @@ function RouteSelectScreen() {
                     fromId: from.place_id,
                     toId: to.place_id,
                     mode: mode,
-                    fareData: JSON.stringify(response.data)
+                    fareData: JSON.stringify(response?.data)
                 }
             });
         } catch (error: any) {
@@ -406,23 +406,23 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#000000'
     },
-    closeButton: { 
-        padding: 4 
+    closeButton: {
+        padding: 4
     },
     locationInputContainer: {
         paddingHorizontal: 20,
         paddingBottom: 5
     },
-    modeSection: { 
-        paddingHorizontal: 20, 
-        marginBottom: 24 
+    modeSection: {
+        paddingHorizontal: 20,
+        marginBottom: 24
     },
-    sectionTitle: { 
-        fontSize: 16, 
-        fontWeight: 600, 
-        color: '#000', 
+    sectionTitle: {
+        fontSize: 16,
+        fontWeight: 600,
+        color: '#000',
         marginTop: 12,
-        marginBottom: 12 
+        marginBottom: 12
     },
 
     modeOfTransportContainer: {

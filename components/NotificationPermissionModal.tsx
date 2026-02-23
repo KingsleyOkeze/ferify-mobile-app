@@ -12,9 +12,10 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 
-const STORAGE_KEY = 'HAS_SEEN_NOTIF_PROMPT';
+const STORAGE_KEY = STORAGE_KEYS.HAS_SEEN_NOTIF_PROMPT;
 
 interface NotificationPermissionModalProps {
     visible: boolean;
@@ -45,7 +46,7 @@ export default function NotificationPermissionModal({ visible, onClose }: Notifi
             }
 
             // Mark as seen regardless of outcome so we don't nag
-            await AsyncStorage.setItem(STORAGE_KEY, 'true');
+            await cacheHelper.setRaw(STORAGE_KEY, 'true');
             onClose();
 
         } catch (error) {
@@ -55,7 +56,7 @@ export default function NotificationPermissionModal({ visible, onClose }: Notifi
     };
 
     const handleClose = async () => {
-        await AsyncStorage.setItem(STORAGE_KEY, 'true');
+        await cacheHelper.setRaw(STORAGE_KEY, 'true');
         onClose();
     };
 
@@ -78,9 +79,17 @@ export default function NotificationPermissionModal({ visible, onClose }: Notifi
                     <View style={styles.content}>
                         <Text style={styles.title}>Enable Push Notification</Text>
 
-                        <Text style={styles.description}>
-                            Notification help you know when fares changes and when other commuters update prices around you. Together we keep Ferify accurate
-                        </Text>
+                        <View style={styles.descriptionContainer}>
+                            <Text style={[styles.descriptionText, { width: '100%' }]}>
+                                Notification help you know when fares changes 
+                            </Text>
+                            <Text style={[styles.descriptionText, { width: '90%', alignSelf: 'center' }]}>
+                                and when other commuters update prices
+                            </Text>
+                            <Text style={[styles.descriptionText, { width: '100%' }]}>
+                                around you. Together we keep Ferify accurate
+                            </Text>                        
+                        </View>
 
                         <View style={styles.buttonGroup}>
                             <TouchableOpacity style={styles.notNowButton} onPress={handleClose}>
@@ -109,7 +118,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
         paddingBottom: 40,
-        paddingHorizontal: 24,
+        paddingHorizontal: 17,
         paddingTop: 16,
         width: '100%',
         minHeight: 304,
@@ -140,13 +149,19 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignItems: 'center',
     },
-    description: {
+    descriptionContainer: {
+        fontSize: 16,
+        fontFamily: 'BrittiRegular',
+        color: '#666666',
+        marginBottom: 38,
+        width: '100%',
+        textAlign: 'center'
+    },
+    descriptionText: {
         fontSize: 16,
         fontFamily: 'BrittiRegular',
         color: '#666666',
         lineHeight: 22,
-        marginBottom: 32,
-        width: '95%',
         textAlign: 'center'
     },
     buttonGroup: {

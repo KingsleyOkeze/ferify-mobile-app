@@ -12,8 +12,9 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { STORAGE_KEYS, CACHE_TTL as TTL_CONSTANTS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 
 
 // Badge Images Mapping
@@ -48,38 +49,20 @@ export default function AchievementsScreen() {
 
     const loadCachedData = async () => {
         try {
-            const [achStr, lbStr, badgesStr] = await Promise.all([
-                AsyncStorage.getItem('cached_achievements'),
-                AsyncStorage.getItem('cached_leaderboard'),
-                AsyncStorage.getItem('cached_badges')
+            const CACHE_TTL = TTL_CONSTANTS.LONG; // 24 hours
+
+            const [achData, lbData, badgesData] = await Promise.all([
+                cacheHelper.get<any>(STORAGE_KEYS.USER_ACHIEVEMENTS, CACHE_TTL),
+                cacheHelper.get<any[]>(STORAGE_KEYS.LEADERBOARD, CACHE_TTL),
+                cacheHelper.get<any[]>(STORAGE_KEYS.BADGES, CACHE_TTL)
             ]);
 
-            const CACHE_TTL = 24 * 60 * 60 * 1000;
-            const now = Date.now();
+            if (achData) setAchievementData(achData);
+            if (lbData) setLeaderboardData(lbData);
+            if (badgesData) setBadges(badgesData.slice(0, 3));
 
-            let hasValidCache = false;
-
-            if (achStr) {
-                const cached = JSON.parse(achStr);
-                const isFresh = cached.timestamp && (now - cached.timestamp < CACHE_TTL);
-                if (cached.data) {
-                    setAchievementData(cached.data);
-                    if (isFresh) hasValidCache = true;
-                }
-            }
-
-            if (lbStr) {
-                const cached = JSON.parse(lbStr);
-                if (cached.data) setLeaderboardData(cached.data);
-            }
-
-            if (badgesStr) {
-                const cached = JSON.parse(badgesStr);
-                if (cached.data) setBadges(cached.data.slice(0, 3));
-            }
-
-            // Only stop loading if we have "fresh enough" data
-            if (hasValidCache) {
+            // If we have achievement data, we can at least show something
+            if (achData) {
                 setLoading(false);
             }
         } catch (e) {
@@ -95,16 +78,15 @@ export default function AchievementsScreen() {
                 api.get('/api/user/account/badges')
             ]);
 
-            const now = Date.now();
             setAchievementData(achResponse.data);
             setLeaderboardData(lbResponse.data.slice(0, 3));
             setBadges(badgesResponse.data.slice(0, 3));
 
-            // Cache with timestamps
+            // Cache data
             await Promise.all([
-                AsyncStorage.setItem('cached_achievements', JSON.stringify({ timestamp: now, data: achResponse.data })),
-                AsyncStorage.setItem('cached_leaderboard', JSON.stringify({ timestamp: now, data: lbResponse.data.slice(0, 3) })),
-                AsyncStorage.setItem('cached_badges', JSON.stringify({ timestamp: now, data: badgesResponse.data }))
+                cacheHelper.set(STORAGE_KEYS.USER_ACHIEVEMENTS, achResponse.data),
+                cacheHelper.set(STORAGE_KEYS.LEADERBOARD, lbResponse.data.slice(0, 3)),
+                cacheHelper.set(STORAGE_KEYS.BADGES, badgesResponse.data)
             ]);
         } catch (error) {
             console.error("Error fetching achievement data:", error);
@@ -260,7 +242,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#393939',
-        marginBottom: 4,
+        marginBottom: 10,
     },
     subtitle: {
         fontSize: 14,

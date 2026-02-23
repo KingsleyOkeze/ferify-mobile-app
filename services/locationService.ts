@@ -1,8 +1,9 @@
 import * as Location from 'expo-location';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api, { getToken } from './api';
+import { STORAGE_KEYS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 
-const LOCATION_CACHE_KEY = 'user_current_location';
+const LOCATION_CACHE_KEY = STORAGE_KEYS.CURRENT_LOCATION;
 
 export interface LocationData {
     latitude: number;
@@ -25,6 +26,19 @@ export const requestLocationPermissions = async (): Promise<boolean> => {
 };
 
 /**
+ * Gets the current location permission status without prompting the user.
+ */
+export const getLocationPermissionStatus = async (): Promise<'granted' | 'denied' | 'undetermined'> => {
+    try {
+        const { status } = await Location.getForegroundPermissionsAsync();
+        return status;
+    } catch (error) {
+        console.error('Error getting location permission status:', error);
+        return 'undetermined';
+    }
+};
+
+/**
  * Fetches the current location and caches it.
  * Uses getLastKnownPositionAsync as a fast fallback.
  */
@@ -36,7 +50,7 @@ export const fetchAndCacheLocation = async (maxAge = 10 * 60 * 1000): Promise<Lo
         // Check if location services are enabled
         const enabled = await Location.hasServicesEnabledAsync();
         if (!enabled) {
-            console.warn('Location services are disabled.');
+            console.log('Location services are disabled.');
             return await getCachedLocation(); // Return last cached if available
         }
 
@@ -80,7 +94,7 @@ export const fetchAndCacheLocation = async (maxAge = 10 * 60 * 1000): Promise<Lo
             console.warn('Failed to reverse geocode location:', e);
         }
 
-        await AsyncStorage.setItem(LOCATION_CACHE_KEY, JSON.stringify(locationData));
+        await cacheHelper.set(LOCATION_CACHE_KEY, locationData);
 
         // Sync with backend if authenticated
         const token = await getToken();
@@ -100,8 +114,7 @@ export const fetchAndCacheLocation = async (maxAge = 10 * 60 * 1000): Promise<Lo
  */
 export const getCachedLocation = async (): Promise<LocationData | null> => {
     try {
-        const cached = await AsyncStorage.getItem(LOCATION_CACHE_KEY);
-        return cached ? JSON.parse(cached) : null;
+        return await cacheHelper.get<LocationData>(LOCATION_CACHE_KEY, Infinity); // TTL handled at call site or not at all here
     } catch (error) {
         console.error('Error getting cached location:', error);
         return null;
@@ -113,10 +126,9 @@ export const getCachedLocation = async (): Promise<LocationData | null> => {
 export const syncLocationWithBackend = async (locationData: LocationData): Promise<void> => {
     try {
         // Check privacy settings before syncing
-        const cachedSettings = await AsyncStorage.getItem('user_privacy_settings');
+        const cachedSettings = await cacheHelper.get<{ shareLocationData: boolean }>(STORAGE_KEYS.PRIVACY_SETTINGS, Infinity);
         if (cachedSettings) {
-            const parsed = JSON.parse(cachedSettings);
-            if (parsed.shareLocationData === false) {
+            if (cachedSettings.shareLocationData === false) {
                 console.log('Location sync skipped due to privacy settings (shareLocationData is false)');
                 return;
             }

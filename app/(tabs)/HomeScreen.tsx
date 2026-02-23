@@ -1,7 +1,8 @@
 import VoiceSearchModal from "@/components/VoiceSearchModal";
 import ModeOfTransportSelect from "@/components/ModeOfTransportSelect";
 import NotificationPermissionModal from "@/components/NotificationPermissionModal";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 import React, { useState, useEffect } from "react";
 import {
     View,
@@ -67,7 +68,7 @@ function HomeScreen() {
         // Check Notification Permission Prompt
         const checkNotificationPrompt = async () => {
             try {
-                const hasSeen = await AsyncStorage.getItem('HAS_SEEN_NOTIF_PROMPT');
+                const hasSeen = await cacheHelper.getRaw(STORAGE_KEYS.HAS_SEEN_NOTIF_PROMPT);
                 if (!hasSeen) {
                     // Show after 4 seconds
                     setTimeout(() => {
@@ -144,7 +145,6 @@ function HomeScreen() {
     const FEATURED_CARDS = [
         {
             id: '1',
-            title: 'Just finished a trip?',
             description: 'Share your fare to help other commuters plan better.',
             buttonText: 'Share Fare',
             backgroundColor: '#014C1D',
@@ -153,21 +153,11 @@ function HomeScreen() {
         },
         {
             id: '2',
-            title: 'Get Real Estimates',
             description: 'Check what others paid for your route before moving.',
             buttonText: 'Check Fares',
-            backgroundColor: '#080808',
-            image: require("../../assets/images/estimate.png"),
-            onPress: () => { }
-        },
-        {
-            id: '3',
-            title: 'Save Time',
-            description: 'Quickly find previous routes and their price trends.',
-            buttonText: 'Explore',
-            backgroundColor: '#009688',
-            image: require("../../assets/images/speed.png"),
-            onPress: () => { }
+            backgroundColor: '#2A7FFF',
+            image: require("../../assets/images/contributeAndEarnImage.png"),
+            onPress: () => router.push('../route/RouteSelectScreen')
         }
     ];
 
@@ -244,12 +234,22 @@ function HomeScreen() {
                         />
                     </TouchableOpacity>
 
-                    <TouchableOpacity onPress={() => {
-                        if (!voiceAvailable) {
+                    <TouchableOpacity onPress={async () => {
+                        // Re-check availability on press if it was false
+                        let isAvail = voiceAvailable;
+                        if (!isAvail) {
+                            isAvail = await isVoiceAvailable();
+                            setVoiceAvailable(isAvail);
+                        }
+
+                        if (!isAvail) {
                             Alert.alert(
                                 "Voice Search Unavailable",
-                                "Voice search requires a custom development build and is not available in Expo Go.",
-                                [{ text: "OK" }]
+                                "Voice search requires a custom development build. If you are on one, please ensure microphone permissions are granted.",
+                                [
+                                    { text: "Cancel", style: "cancel" },
+                                    { text: "Try Anyway", onPress: () => setVoiceModalVisible(true) }
+                                ]
                             );
                         } else {
                             setVoiceModalVisible(true);
@@ -297,7 +297,6 @@ function HomeScreen() {
                         renderItem={({ item }) => (
                             <View style={[styles.featureCard, { backgroundColor: item.backgroundColor, width: CARD_WIDTH }]}>
                                 <View style={styles.cardLeft}>
-                                    {/* <Text style={styles.cardTitle}>{item.title}</Text> */}
                                     <Text style={styles.cardDescription}>{item.description}</Text>
                                     <TouchableOpacity style={styles.shareButton} onPress={item.onPress}>
                                         <Text style={styles.shareButtonText}>{item.buttonText}</Text>
@@ -471,7 +470,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 600,
         fontFamily: 'BrittiBold',
-        marginBottom: 10,
+        marginBottom: 18,
         color: "#080808",
         marginTop: 25,
     },
@@ -508,11 +507,10 @@ const styles = StyleSheet.create({
     shareButton: {
         backgroundColor: "#FFFFFF",
         borderRadius: 58,
-        paddingHorizontal: 10,
         paddingVertical: 6,
         alignSelf: "flex-start",
         height: 37,
-        width: 92,
+        width: 98,
         justifyContent: 'center',
         alignItems: 'center'
     },

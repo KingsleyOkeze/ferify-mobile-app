@@ -12,13 +12,12 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import { logout } from '@/services/api';
+import LogoutModal from '@/components/modals/LogoutModal';
 import { Alert } from 'react-native';
 
 function SettingMainScreen() {
     const router = useRouter();
     const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
-    const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const settingsItems = [
         {
@@ -26,6 +25,7 @@ function SettingMainScreen() {
             title: 'App appearance',
             description: 'Dark mode, light mode, system default',
             image: require('../../assets/images/settings-icons/app_appearance_icon.png'),
+            disabled: true,
             onPress: () => {
                 // Future implementation
             }
@@ -59,20 +59,6 @@ function SettingMainScreen() {
         },
     ];
 
-    const handleLogout = async () => {
-        setIsLoggingOut(true);
-        try {
-            await logout();
-            setIsLogoutModalVisible(false);
-            router.replace('/auth/login/LoginScreen');
-        } catch (error) {
-            console.error('Logout failed:', error);
-            Alert.alert('Logout Error', 'There was a problem signing you out. Please try again.');
-        } finally {
-            setIsLoggingOut(false);
-        }
-    };
-
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
@@ -91,69 +77,41 @@ function SettingMainScreen() {
                             key={item.id}
                             style={[
                                 styles.listItem,
-                                // index === 0 && styles.firstListItem // Border top for first item
+                                item.disabled && styles.disabledItem
                             ]}
                             onPress={item.onPress}
+                            disabled={item.disabled}
+                            activeOpacity={item.disabled ? 1 : 0.7}
                         >
                             <View style={styles.itemLeft}>
                                 <Image
                                     source={item.image}
-                                    style={styles.itemImage}
+                                    style={[styles.itemImage, item.disabled && { opacity: 0.5 }]}
                                 />
                                 <View style={styles.textContainer}>
                                     <Text style={[
                                         styles.itemTitle,
-                                        item.isDestructive && styles.destructiveText
+                                        item.isDestructive && styles.destructiveText,
+                                        item.disabled && styles.disabledText
                                     ]}>
                                         {item.title}
                                     </Text>
-                                    <Text style={styles.itemDescription}>{item.description}</Text>
+                                    <Text style={[styles.itemDescription, item.disabled && styles.disabledText]}>
+                                        {item.description}
+                                    </Text>
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} color="#999" />
+                            {!item.disabled && <Ionicons name="chevron-forward" size={16} color="#999" />}
                         </TouchableOpacity>
                     ))}
                 </View>
             </ScrollView>
 
             {/* Logout Confirmation Modal */}
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isLogoutModalVisible}
-                onRequestClose={() => setIsLogoutModalVisible(false)}
-            >
-                <Pressable
-                    style={styles.modalOverlay}
-                    onPress={() => setIsLogoutModalVisible(false)}
-                >
-                    <Pressable style={styles.modalContent}>
-                        {/* <Text style={styles.modalTitle}>Confirm Logout</Text> */}
-                        <Text style={styles.modalDescription}>
-                            Are you sure you want to logout?
-                        </Text>
-
-                        <View style={styles.modalButtonRow}>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.confirmLogoutButton, isLoggingOut && { opacity: 0.7 }]}
-                                onPress={handleLogout}
-                                disabled={isLoggingOut}
-                            >
-                                <Text style={styles.confirmLogoutButtonText}>
-                                    {isLoggingOut ? 'Logging out...' : 'Yes I do'}
-                                </Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelModalButton]}
-                                onPress={() => setIsLogoutModalVisible(false)}
-                            >
-                                <Text style={styles.cancelModalButtonText}>Cancel</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Pressable>
-                </Pressable>
-            </Modal>
+            <LogoutModal
+                isVisible={isLogoutModalVisible}
+                onClose={() => setIsLogoutModalVisible(false)}
+            />
         </SafeAreaView>
     );
 }
@@ -224,6 +182,13 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
+    },
+    disabledItem: {
+        backgroundColor: '#F9F9F9',
+        opacity: 0.8,
+    },
+    disabledText: {
+        color: '#BDBDBD',
     },
     destructiveText: {
         color: 'red',

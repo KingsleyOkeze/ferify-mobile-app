@@ -5,15 +5,27 @@ import { Platform } from 'react-native';
 import api from './api';
 import { router } from 'expo-router';
 
+/**
+ * Gets the current notification permission status.
+ */
+export const getNotificationPermissionStatus = async (): Promise<'granted' | 'denied' | 'undetermined'> => {
+    try {
+        const { status } = await Notifications.getPermissionsAsync();
+        return status;
+    } catch (error) {
+        console.error('Error getting notification permission status:', error);
+        return 'undetermined';
+    }
+};
+
 // Configure how notifications are handled when the app is open
 Notifications.setNotificationHandler({
     handleNotification: async () => ({
         shouldShowAlert: true,
         shouldPlaySound: true,
-        shouldSetBadge: false,
+        shouldSetBadge: true,
         shouldShowBanner: true,
         shouldShowList: true,
-        sound: 'notification.mp3', // Custom sound (place file in assets/sounds/)
     }),
 });
 
@@ -34,7 +46,15 @@ export const registerForPushNotificationsAsync = async () => {
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
         if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
+            const { status } = await Notifications.requestPermissionsAsync({
+                ios: {
+                    allowAlert: true,
+                    allowBadge: true,
+                    allowSound: true,
+                    allowDisplayInNotificationCenter: true,
+                    allowAnnouncements: true,
+                },
+            });
             finalStatus = status;
         }
         if (finalStatus !== 'granted') {
@@ -43,11 +63,15 @@ export const registerForPushNotificationsAsync = async () => {
         }
 
         // This is the Expo Push Token
-        token = (await Notifications.getExpoPushTokenAsync({
-            projectId: 'e4f4dbf3-bf02-44d2-a560-b5168fc6e2f8' // Actual projectId from app.json
-        })).data;
-
-        console.log('Expo Push Token:', token);
+        try {
+            token = (await Notifications.getExpoPushTokenAsync({
+                projectId: 'e4f4dbf3-bf02-44d2-a560-b5168fc6e2f8' // Actual projectId from app.json
+            })).data;
+            console.log('Expo Push Token:', token);
+        } catch (e: any) {
+            console.warn('Could not fetch push token. This is expected on simulators or if push credentials are not set up.');
+            // We don't throw or return error here normally, we just return undefined token
+        }
     } else {
         console.log('Must use physical device for Push Notifications');
     }

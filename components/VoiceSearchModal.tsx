@@ -19,7 +19,10 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 // @ts-ignore
-import Voice, { SpeechResultsEvent, SpeechErrorEvent } from '@react-native-voice/voice';
+import {
+    ExpoSpeechRecognitionModule,
+    useSpeechRecognitionEvent,
+} from "expo-speech-recognition";
 
 // --- COMPONENTS ---
 
@@ -96,22 +99,54 @@ export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalP
     const [partialResults, setPartialResults] = useState<string[]>([]);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
-    useEffect(() => {
-        // Setup Voice Listeners
-        Voice.onSpeechStart = onSpeechStart;
-        Voice.onSpeechEnd = onSpeechEnd;
-        Voice.onSpeechResults = onSpeechResults;
-        Voice.onSpeechError = onSpeechError;
+    useSpeechRecognitionEvent("start", () => {
+        setMode('listening');
+    });
 
+    useSpeechRecognitionEvent("end", () => {
+        // Transition to processing while we wait for final results (if not already handled)
+        setMode(prev => prev === 'error' ? 'error' : 'processing');
+    });
+
+    useSpeechRecognitionEvent("result", (event) => {
+        console.log('Voice results:', event.results);
+        if (event.results && event.results.length > 0) {
+            const bestMatch = event.results[0]?.transcript;
+            if (bestMatch) {
+                setPartialResults([bestMatch]);
+                setMode('processing');
+
+                if (event.isFinal) {
+                    // Quick delay to show processing state, then navigate
+                    setTimeout(() => {
+                        onClose();
+                        router.push({
+                            pathname: "/route/RouteSelectScreen",
+                            params: {
+                                initialTo: bestMatch
+                            }
+                        });
+                    }, 1000);
+                }
+            }
+        }
+    });
+
+    useSpeechRecognitionEvent("error", (event) => {
+        console.error('Voice error:', event.error, event.message);
+        if (event.error !== 'aborted') {
+            handleError("We couldn't hear you. Try again.");
+        }
+    });
+
+    useEffect(() => {
         if (visible) {
             startListening();
         } else {
             stopListening();
         }
-
         return () => {
-            // Cleanup listeners
-            Voice.destroy().then(Voice.removeAllListeners);
+            stopListening();
         };
     }, [visible]);
 
@@ -120,7 +155,17 @@ export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalP
         setErrorMessage('');
         setPartialResults([]);
         try {
-            await Voice.start('en-US');
+            const result = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+            if (!result.granted) {
+                handleError('Microphone permission not granted.');
+                return;
+            }
+
+            ExpoSpeechRecognitionModule.start({
+                lang: "en-US",
+                interimResults: true,
+                continuous: false,
+            });
         } catch (e: any) {
             console.error('Voice start error', e);
             handleError('Could not start microphone. ' + (e.message || ''));
@@ -129,50 +174,9 @@ export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalP
 
     const stopListening = async () => {
         try {
-            await Voice.stop();
-            await Voice.destroy();
+            ExpoSpeechRecognitionModule.stop();
         } catch (e) {
             console.error('Voice stop error', e);
-        }
-    };
-
-    const onSpeechStart = () => {
-        setMode('listening');
-    };
-
-    const onSpeechEnd = () => {
-        // Transition to processing while we wait for final results
-        setMode('processing');
-    };
-
-    const onSpeechResults = (e: SpeechResultsEvent) => {
-        // We got results!
-        console.log('Voice results:', e.value);
-        if (e.value && e.value.length > 0) {
-            const bestMatch = e.value[0];
-            setPartialResults(e.value);
-            setMode('processing');
-
-            // Quick delay to show processing state, then navigate
-            setTimeout(() => {
-                onClose();
-                // Navigate to RouteSelect with the search query
-                router.push({
-                    pathname: "../app/route/RouteSelect",
-                    params: {
-                        initialTo: bestMatch
-                    }
-                });
-            }, 1000);
-        }
-    };
-
-    const onSpeechError = (e: SpeechErrorEvent) => {
-        console.error('Voice error:', e);
-        // Only show error if it's not a "no match" or "cancel" type that we can ignore
-        // '7' is often 'No match', '5' is 'Client side error'
-        if (e.error?.message) {
-            handleError("We couldn't hear you. Try again.");
         }
     };
 
@@ -182,9 +186,7 @@ export default function VoiceSearchModal({ visible, onClose }: VoiceSearchModalP
     };
 
     const handleRetry = () => {
-        stopListening().then(() => {
-            startListening();
-        });
+        startListening();
     };
 
     return (

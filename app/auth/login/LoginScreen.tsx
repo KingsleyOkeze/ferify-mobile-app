@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import { useLoader } from "@/contexts/LoaderContext";
 import * as Application from 'expo-application';
+import { getAndroidClientId, getWebClientId, getIosClientId } from "../../../utils/googleAuth";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -36,11 +37,12 @@ export default function LoginScreen() {
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, // Note: use android debug id for dev and android release id for prod.
-        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+        webClientId: getWebClientId(),
+        androidClientId: getAndroidClientId(), // Note: use android debug id for dev and android release id for prod.
+        iosClientId: getIosClientId(),
         redirectUri: makeRedirectUri({
-            native: `${Application.applicationId}:/oauth2redirect`,
+            // native: `${Application.applicationId}:/oauth2redirect`,
+            native: "com.ferify.app://",
         }),
     });
 
@@ -80,7 +82,7 @@ export default function LoginScreen() {
 
             if (accessToken && user) {
                 await login(user, accessToken, refreshToken);
-            
+
                 if (isNewUser) {
                     // If they clicked "Login" but didn't actually have an account,
                     // send them to finish setting up (e.g., verifying email sign up, choosing a username).
@@ -282,6 +284,7 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     header: {
+        marginTop: 10,
         marginBottom: 10,
         marginLeft: -10,
         paddingHorizontal: 24,
@@ -344,6 +347,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         color: "#080808",
+        fontFamily: "BrittiRegular"
     },
     eyeIcon: {
         padding: 4,

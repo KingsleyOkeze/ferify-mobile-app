@@ -9,6 +9,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import MyCustomSplashScreen from "./auth/onboarding/SplashScreen";
 import InAppNotification from "@/components/InAppNotification";
 import { View } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from "@/constants/storage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,17 +30,38 @@ export default function Index() {
 
     const [isReady, setIsReady] = useState(false);
     const { isAuthenticated, loading: authLoading } = useAuth();
+    const [hasLaunched, setHasLaunched] = useState<boolean>(false);
+    const [checkingLaunch, setCheckingLaunch] = useState<boolean>(true);
+
+    useEffect(() => {
+        async function checkLaunchStatus() {
+            try {
+                const launched = await AsyncStorage.getItem(STORAGE_KEYS.HAS_LAUNCHED);
+                if (launched === 'true') {
+                    setHasLaunched(true);
+                }
+            } catch (error) {
+                console.error("Error checking launch status:", error);
+            } finally {
+                setCheckingLaunch(false);
+            }
+        }
+        checkLaunchStatus();
+    }, []);
 
     useEffect(() => {
         async function loadApp() {
             try {
+                // Wait for launch check to complete
+                if (checkingLaunch) return;
+
                 // If auth is no longer loading, we check if location needs fetching
                 if (!authLoading && isAuthenticated) {
                     // Don't await this, so we don't block the splash screen if location hangs or prompts permission
                     fetchAndCacheLocation().catch(err => console.warn("Background location fetch failed:", err));
                 }
 
-                if (!authLoading) {
+                if (!authLoading && !checkingLaunch) {
                     // Keep the custom splash visible for a bit for aesthetics
                     await new Promise(resolve => setTimeout(resolve, 2000));
                     setIsReady(true);
@@ -55,22 +78,27 @@ export default function Index() {
         }
 
         loadApp();
-    }, [fontsLoaded, fontError, authLoading, isAuthenticated]);
+    }, [fontsLoaded, fontError, authLoading, isAuthenticated, checkingLaunch]);
 
     // Stage 1: Native Splash (shows while fonts are loading)
     if (!fontsLoaded && !fontError) return null;
 
-    // Stage 2: Custom Splash (shows while auth/location is being checked)
-    if (!isReady || authLoading) {
+    // Stage 2: Custom Splash (shows while auth/location/launch check is being checked)
+    if (!isReady || authLoading || checkingLaunch) {
         return <MyCustomSplashScreen />;
     }
 
     // Stage 3: Final Destination
-    return (
-        <Redirect
-            href={isAuthenticated ? "/(tabs)/HomeScreen" : "/auth/onboarding/OnboardingScreen"}
-        />
-    );
+    // If authenticated -> Home
+    // If not authenticated BUT has launched before -> Login
+    // If not authenticated AND first launch -> Onboarding
+    const targetRoute = isAuthenticated
+        ? "/(tabs)/HomeScreen"
+        : hasLaunched
+            ? "/auth/login/LoginScreen"
+            : "/auth/onboarding/OnboardingScreen";
+
+    return <Redirect href={targetRoute} />;
 
     // return (
     //     <Redirect href="/(tabs)/HomeScreen" />

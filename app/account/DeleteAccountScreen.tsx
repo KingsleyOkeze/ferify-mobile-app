@@ -14,12 +14,14 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import api, { logout } from '../../services/api';
+import api from '../../services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLoader } from '@/contexts/LoaderContext';
 
 export default function DeleteAccountScreen() {
     const router = useRouter();
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const { logout } = useAuth();
     const { showLoader, hideLoader } = useLoader();
 
     const handleDeleteAccount = async () => {
@@ -28,7 +30,7 @@ export default function DeleteAccountScreen() {
             await api.delete('/api/user/account/delete-account');
             setIsModalVisible(false);
             // Logout and clear tokens locally, then navigate to login
-            await logout(false);
+            await logout();
             router.replace('/auth/login/LoginScreen');
         } catch (error: any) {
             console.error('Failed to delete account:', error);
@@ -40,9 +42,9 @@ export default function DeleteAccountScreen() {
     };
 
     const deleteItems = [
-        "your profile and username",
-        "contribution history (fares, routes, reports)",
-        "points, bades and achievements"
+        "Your profile and username",
+        "Contribution history (fares, routes, reports)",
+        "Points, badges and achievements"
     ];
 
     return (
@@ -116,6 +118,12 @@ export default function DeleteAccountScreen() {
                     onPress={() => setIsModalVisible(false)}
                 >
                     <Pressable style={styles.modalContent}>
+                        <TouchableOpacity
+                            style={styles.closeModalButton}
+                            onPress={() => setIsModalVisible(false)}
+                        >
+                            <Ionicons name="close-outline" size={24} color="#080808" />
+                        </TouchableOpacity>
                         <View style={styles.modalHandle} />
 
                         <View style={styles.modalIconContainer}>
@@ -178,12 +186,14 @@ const styles = StyleSheet.create({
         color: '#080808',
         marginBottom: 12,
         paddingHorizontal: 24,
+        fontFamily: 'BrittiSemibold'
     },
     subtitle: {
         fontSize: 16,
         color: '#393939',
         lineHeight: 24,
         paddingHorizontal: 24,
+        fontFamily: 'BrittiRegular'
     },
     listSection: {
         marginBottom: 32,
@@ -194,6 +204,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         marginBottom: 20,
         paddingHorizontal: 24,
+        fontFamily: 'BrittiSemibold'
     },
     listContainer: {
         width: '100%',
@@ -204,6 +215,7 @@ const styles = StyleSheet.create({
         height: 61,
         backgroundColor: '#FFFFFF',
         paddingHorizontal: 24,
+        fontFamily: 'BrittiRegular'
     },
     firstListItem: {
         borderTopWidth: 1.5,
@@ -238,6 +250,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         marginBottom: 16,
         paddingHorizontal: 24,
+        fontFamily: 'BrittiSemibold'
     },
     whatStaysContent: {
         borderTopWidth: 1.5,
@@ -253,6 +266,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         fontWeight: 400,
         lineHeight: 22,
+        fontFamily: 'BrittiRegular'
     },
     deleteButton: {
         backgroundColor: '#FF3B30',
@@ -267,6 +281,7 @@ const styles = StyleSheet.create({
         color: '#FBFBFB',
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold'
     },
     modalOverlay: {
         flex: 1,
@@ -281,7 +296,14 @@ const styles = StyleSheet.create({
         paddingTop: 12,
         paddingBottom: 40,
         alignItems: 'center',
-        height: 347
+        height: 347,
+        position: 'relative'
+    },
+    closeModalButton: {
+        position: 'absolute',
+        top: 15,
+        right: 20,
+        zIndex: 10,
     },
     modalHandle: {
         width: 40,
@@ -308,6 +330,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         color: '#080808',
         marginBottom: 12,
+        fontFamily: 'BrittiSemibold'
     },
     modalDescription: {
         fontSize: 14,
@@ -316,6 +339,7 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         marginBottom: 32,
         paddingHorizontal: 10,
+        fontFamily: 'BrittiRegular'
     },
     modalButtonRow: {
         flexDirection: 'row',
@@ -342,10 +366,12 @@ const styles = StyleSheet.create({
         color: '#212121',
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold'
     },
     confirmDeleteButtonText: {
         color: '#FBFBFB',
         fontSize: 16,
         fontWeight: 600,
+        fontFamily: 'BrittiSemibold'
     },
 });

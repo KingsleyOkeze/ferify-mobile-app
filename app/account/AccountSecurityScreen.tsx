@@ -6,6 +6,7 @@ import {
     TouchableOpacity,
     SafeAreaView,
     ScrollView,
+    Image
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -17,20 +18,15 @@ function AccountSecurityScreen() {
         {
             id: 'password',
             title: 'Change password',
-            icon: 'key-outline',
+            image: require('../../assets/images/settings-icons/change_password_icon.png'),
             onPress: () => { router.push('../setting/PasswordResetScreen') },
         },
         {
-            id: '2fa',
-            title: 'Two-factor authentication',
-            icon: 'shield-checkmark-outline',
+            id: 'devices',
+            title: 'Devices',
+            image: require('../../assets/images/settings-icons/device_icon.png'),
             onPress: () => { },
-        },
-        {
-            id: 'biometric',
-            title: 'Face ID / Touch ID',
-            icon: 'finger-print-outline',
-            onPress: () => { },
+            disabled: true,
         },
     ];
 
@@ -51,16 +47,21 @@ function AccountSecurityScreen() {
                             key={item.id}
                             style={[
                                 styles.menuItem,
-                                index === 0 && styles.firstMenuItem
+                                index === 0 && styles.firstMenuItem,
+                                item.disabled && styles.disabledMenuItem
                             ]}
                             onPress={item.onPress}
+                            disabled={item.disabled}
+                            activeOpacity={item.disabled ? 1 : 0.7}
                         >
-                            <View style={styles.itemLeft}>
-                                <Ionicons name={item.icon as any} size={24} color="#333" style={styles.itemIcon} />
+                            <View style={[styles.itemLeft, item.disabled && { opacity: 0.5 }]}>
+                                <Image source={item.image} style={styles.itemIcon} />
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                             </View>
                             {/* Arrow without tail: Chevron Forward */}
-                            <Ionicons name="chevron-forward" size={20} color="#999" />
+                            {!item.disabled && (
+                                <Ionicons name="chevron-forward" size={20} color="#999" />
+                            )}
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -72,16 +73,15 @@ function AccountSecurityScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingTop: 16,
         paddingBottom: 20,
     },
     backButton: {
         alignSelf: 'flex-start',
-        padding: 4,
         marginBottom: 10,
     },
     headerTitle: {
@@ -101,13 +101,14 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingVertical: 18,
         paddingHorizontal: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
+        height: 72.29
     },
     firstMenuItem: {
         borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
+        borderTopColor: '#DADADA',
     },
     itemLeft: {
         flexDirection: 'row',
@@ -116,11 +117,16 @@ const styles = StyleSheet.create({
     },
     itemIcon: {
         marginRight: 16,
+        width: 34.29,
+        height: 34.29
     },
     itemTitle: {
         fontSize: 16,
         fontWeight: '600',
         color: '#000',
+    },
+    disabledMenuItem: {
+        backgroundColor: '#F9F9F9',
     },
 });
 

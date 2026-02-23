@@ -10,6 +10,12 @@ web-build/
 expo-env.d.ts
 
 # Native
+# Keep folders, ignore build artifacts
+android/build/
+android/app/build/
+android/.gradle/
+ios/build/
+ios/Pods/
 .kotlin/
 *.orig.*
 *.jks

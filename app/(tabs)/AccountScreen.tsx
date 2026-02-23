@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -11,16 +11,54 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
+import { STORAGE_KEYS, CACHE_TTL as TTL_CONSTANTS } from '@/constants/storage';
+import api from '@/services/api';
+import { cacheHelper } from '@/utils/cache';
+
+// Cache settings
+const ACHIEVEMENT_CACHE_KEY = STORAGE_KEYS.USER_ACHIEVEMENTS;
+const CACHE_TTL = TTL_CONSTANTS.SHORT;
 
 function MainAccountProfileScreen() {
     const router = useRouter();
     const { user } = useAuth();
+    const [trustLevel, setTrustLevel] = useState<string | null>(null);
 
-    const getInitials = (fullName?: string) => {
-        if (!fullName) return "??";
-        const parts = fullName.split(' ');
-        if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-        return fullName.substring(0, 2).toUpperCase();
+    useEffect(() => {
+        const fetchAchievements = async () => {
+            if (!user) return;
+
+            try {
+                // Check cache first
+                const data = await cacheHelper.get<{ trustLevel: string }>(`${ACHIEVEMENT_CACHE_KEY}_${user.id}`, CACHE_TTL);
+                if (data) {
+                    setTrustLevel(data.trustLevel);
+                    return;
+                }
+
+                // If no cache or expired, fetch from backend
+                const response = await api.get('/api/user/account/achievements');
+                if (response.data) {
+                    setTrustLevel(response.data.trustLevel);
+                    // Save to cache
+                    await cacheHelper.set(`${ACHIEVEMENT_CACHE_KEY}_${user.id}`, response.data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch trust level:', error);
+            }
+        };
+
+        fetchAchievements();
+    }, [user]);
+
+    const getBadgeText = () => {
+        if (!trustLevel || trustLevel === 'Bronze') return "Member";
+        return `${trustLevel} Contributor`;
+    };
+
+    const getInitials = (first?: string, last?: string) => {
+        if (!first && !last) return "??";
+        return `${(first || '').charAt(0)}${(last || '').charAt(0)}`.toUpperCase();
     };
 
     const menuItems = [
@@ -69,12 +107,12 @@ function MainAccountProfileScreen() {
                 {/* Profile Section */}
                 <View style={styles.profileSection}>
                     <View style={styles.avatarContainer}>
-                        <Text style={styles.avatarText}>{getInitials(user?.fullName || user?.firstName)}</Text>
+                        <Text style={styles.avatarText}>{getInitials(user?.firstName, user?.lastName)}</Text>
                     </View>
 
                     <Text style={styles.userName}>{user?.fullName || user?.firstName || 'User'}</Text>
                     <Text style={styles.userHandle}>@{user?.username || 'user'}</Text>
-                    <Text style={styles.userBadge}>Member</Text>
+                    <Text style={styles.userBadge}>{getBadgeText()}</Text>
 
                     <TouchableOpacity
                         style={styles.viewProfileButton}
@@ -148,21 +186,21 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000000',
-        marginBottom: 5,
+        marginBottom: 10,
     },
     userHandle: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 9,
+        marginBottom: 10,
     },
     userBadge: {
         fontSize: 15,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#646464',
-        marginBottom: 16,
+        marginBottom: 20,
     },
     viewProfileButton: {
         backgroundColor: '#F0F0F0',

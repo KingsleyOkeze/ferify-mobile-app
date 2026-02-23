@@ -11,9 +11,10 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import api from '@/services/api';
+import { STORAGE_KEYS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 
 function SavedRoutesScreen() {
     const router = useRouter();
@@ -26,8 +27,8 @@ function SavedRoutesScreen() {
         setIsLoading(true);
         try {
             // Try to load from storage first for immediate display
-            const storedHome = await AsyncStorage.getItem('home_address');
-            const storedWork = await AsyncStorage.getItem('work_address');
+            const storedHome = await cacheHelper.getRaw(STORAGE_KEYS.HOME_ADDRESS);
+            const storedWork = await cacheHelper.getRaw(STORAGE_KEYS.WORK_ADDRESS);
             if (storedHome) setHomeAddress(storedHome);
             if (storedWork) setWorkAddress(storedWork);
 
@@ -40,18 +41,18 @@ function SavedRoutesScreen() {
 
                 if (home) {
                     setHomeAddress(home.address);
-                    await AsyncStorage.setItem('home_address', home.address);
+                    await cacheHelper.setRaw(STORAGE_KEYS.HOME_ADDRESS, home.address);
                 } else {
                     setHomeAddress('Add home address');
-                    await AsyncStorage.removeItem('home_address');
+                    await cacheHelper.remove(STORAGE_KEYS.HOME_ADDRESS);
                 }
 
                 if (work) {
                     setWorkAddress(work.address);
-                    await AsyncStorage.setItem('work_address', work.address);
+                    await cacheHelper.setRaw(STORAGE_KEYS.WORK_ADDRESS, work.address);
                 } else {
                     setWorkAddress('Add work address');
-                    await AsyncStorage.removeItem('work_address');
+                    await cacheHelper.remove(STORAGE_KEYS.WORK_ADDRESS);
                 }
             }
         } catch (error) {

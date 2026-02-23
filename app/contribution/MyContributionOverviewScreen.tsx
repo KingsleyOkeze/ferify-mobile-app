@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#000000',
-        marginBottom: 4,
+        marginBottom: 8,
     },
     itemDescription: {
         fontSize: 14,

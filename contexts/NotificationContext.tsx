@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { io, Socket } from 'socket.io-client';
-import api from '@/services/api';
+import api, { getToken } from '@/services/api';
 import * as Notifications from 'expo-notifications';
 import { Audio } from 'expo-av';
 import { useAuth } from './AuthContext';
@@ -112,33 +113,89 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
+        let isMounted = true;
+
         if (isAuthenticated && user?.id) {
             fetchNotifications();
 
             const serverUrl = process.env.EXPO_PUBLIC_SERVER_URL || '';
-            const newSocket = io(serverUrl, {
-                path: '/api/notification/socket.io', // Proxy path
-                transports: ['websocket']
-            });
+            const initSocket = async () => {
+                const token = await getToken();
 
-            newSocket.on('connect', () => {
-                console.log('Connected to notification socket');
-                newSocket.emit('join', user.id);
-            });
+                // Avoid creating multiple sockets if one exists and is connected
+                if (socket?.connected) return;
 
-            newSocket.on('new_notification', (notification: Notification) => {
-                console.log('New notification received:', notification);
-                setNotifications(prev => [notification, ...prev]);
-                setUnreadCount(prev => prev + 1);
-                setActiveInAppNotification(notification);
-                playNotificationSound(); // Play sound when notification arrives
-            });
+                // If socket exists but disconnected, just update token and connect
+                if (socket) {
+                    socket.auth = { token };
+                    socket.io.opts.query = { token };
+                    socket.connect();
+                    return;
+                }
 
-            setSocket(newSocket);
+                const newSocket = io(serverUrl, {
+                    path: '/api/notification/socket.io',
+                    transports: ['websocket'],
+                    query: {
+                        token: token
+                    },
+                    auth: {
+                        token: token
+                    },
+                    reconnection: true,             // Enable auto-reconnection
+                    reconnectionAttempts: 5,        // Limit attempts
+                    reconnectionDelay: 1000,        // Wait 1s before retrying
+                });
+
+                newSocket.on('connect', () => {
+                    console.log('✅ Notification socket connected successfully (transport:', newSocket.io.engine.transport.name, ')');
+                    newSocket.emit('join', user.id);
+                });
+
+                newSocket.on('connect_error', (error: any) => {
+                    console.error('❌ Notification socket connection error:', error.message, error.description || '', error.context || '');
+                });
+
+                newSocket.on('new_notification', (notification: Notification) => {
+                    console.log('🔔 New notification received:', notification);
+                    if (isMounted) {
+                        setNotifications(prev => [notification, ...prev]);
+                        setUnreadCount(prev => prev + 1);
+                        setActiveInAppNotification(notification);
+
+                        if (user?.notificationSettings?.notificationSound !== false) {
+                            playNotificationSound();
+                        }
+                    }
+                });
+
+                if (isMounted) setSocket(newSocket);
+            };
+
+            initSocket();
+
+            // Handle App State (Background/Foreground)
+            const subscription = AppState.addEventListener('change', async (nextAppState: AppStateStatus) => {
+                if (nextAppState === 'active') {
+                    console.log('📱 App resumed, checking socket connection...');
+                    fetchNotifications(); // Refresh notifications
+
+                    if (socket && !socket.connected) {
+                        console.log('🔄 Reconnecting socket with fresh token...');
+                        const freshToken = await getToken();
+                        socket.auth = { token: freshToken };
+                        socket.io.opts.query = { token: freshToken };
+                        socket.connect();
+                    }
+                }
+            });
 
             return () => {
-                newSocket.disconnect();
-                setSocket(null);
+                isMounted = false;
+                subscription.remove();
+                if (socket) {
+                    socket.disconnect();
+                }
             };
         } else {
             setNotifications([]);

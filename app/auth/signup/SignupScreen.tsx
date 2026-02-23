@@ -23,6 +23,7 @@ import * as Google from "expo-auth-session/providers/google";
 import { makeRedirectUri } from "expo-auth-session";
 import Constants from "expo-constants";
 import * as Application from 'expo-application';
+import { getAndroidClientId, getWebClientId, getIosClientId } from "../../../utils/googleAuth";
 
 
 WebBrowser.maybeCompleteAuthSession();
@@ -42,14 +43,15 @@ export default function SignUpScreen() {
 
     // Validation State
     const [isEmailValid, setIsEmailValid] = useState(false);
-    
+
 
     const [request, response, promptAsync] = Google.useAuthRequest({
-        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID, // Note: use android debug id for dev and android release id for prod.
-        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+        webClientId: getWebClientId(),
+        androidClientId: getAndroidClientId(), // Note: use android debug id for dev and android release id for prod.
+        iosClientId: getIosClientId(),
         redirectUri: makeRedirectUri({
-            native: `${Application.applicationId}:/oauth2redirect`,
+            // native: `${Application.applicationId}:/oauth2redirect`,
+            native: "com.ferify.app://",
         }),
     });
 

@@ -13,6 +13,12 @@ export interface UserData {
     location?: string;
     profilePhoto?: string | null;
     avatarColor?: string;
+    notificationSettings?: {
+        communityActivity: boolean;
+        tipsAndInsight: boolean;
+        notificationSound: boolean;
+    };
+    createdAt?: string;
 }
 
 interface AuthContextType {
@@ -66,7 +72,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = async () => {
         try {
-            // Optional: notify backend
             const refreshToken = await getRefreshToken();
             if (refreshToken) {
                 await api.post('/api/user/auth/logout', { refreshToken }).catch(e => console.error('Logout notify failed:', e));

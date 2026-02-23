@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Platform, DeviceEventEmitter } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@/constants/storage';
 
 // Base URL configuration
 const BASE_URL = process.env.EXPO_PUBLIC_SERVER_URL;
@@ -17,7 +18,7 @@ const api = axios.create({
 // Token Management Helpers
 export const setToken = async (token: string) => {
     try {
-        await AsyncStorage.setItem('auth_token', token);
+        await AsyncStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
     } catch (error) {
         console.error('Error saving token:', error);
     }
@@ -25,7 +26,7 @@ export const setToken = async (token: string) => {
 
 export const getToken = async () => {
     try {
-        return await AsyncStorage.getItem('auth_token');
+        return await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
     } catch (error) {
         console.error('Error getting token:', error);
         return null;
@@ -34,7 +35,7 @@ export const getToken = async () => {
 
 export const removeToken = async () => {
     try {
-        await AsyncStorage.removeItem('auth_token');
+        await AsyncStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
     } catch (error) {
         console.error('Error removing token:', error);
     }
@@ -42,7 +43,7 @@ export const removeToken = async () => {
 
 export const setRefreshToken = async (token: string) => {
     try {
-        await AsyncStorage.setItem('auth_refresh_token', token);
+        await AsyncStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, token);
     } catch (error) {
         console.error('Error saving refresh token:', error);
     }
@@ -50,7 +51,7 @@ export const setRefreshToken = async (token: string) => {
 
 export const getRefreshToken = async () => {
     try {
-        return await AsyncStorage.getItem('auth_refresh_token');
+        return await AsyncStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
     } catch (error) {
         console.error('Error getting refresh token:', error);
         return null;
@@ -59,7 +60,7 @@ export const getRefreshToken = async () => {
 
 export const removeRefreshToken = async () => {
     try {
-        await AsyncStorage.removeItem('auth_refresh_token');
+        await AsyncStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
     } catch (error) {
         console.error('Error removing refresh token:', error);
     }
@@ -77,11 +78,17 @@ export interface UserData {
     location?: string;
     profilePhoto?: string | null;
     avatarColor?: string;
+    notificationSettings?: {
+        communityActivity: boolean;
+        tipsAndInsight: boolean;
+        notificationSound: boolean;
+    };
+    createdAt?: string;
 }
 
 export const setUserData = async (userData: UserData) => {
     try {
-        await AsyncStorage.setItem('auth_user_data', JSON.stringify(userData));
+        await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(userData));
     } catch (error) {
         console.error('Error saving user data:', error);
     }
@@ -89,7 +96,7 @@ export const setUserData = async (userData: UserData) => {
 
 export const getUserData = async (): Promise<UserData | null> => {
     try {
-        const data = await AsyncStorage.getItem('auth_user_data');
+        const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
         return data ? JSON.parse(data) : null;
     } catch (error) {
         console.error('Error getting user data:', error);
@@ -99,7 +106,7 @@ export const getUserData = async (): Promise<UserData | null> => {
 
 export const removeUserData = async () => {
     try {
-        await AsyncStorage.removeItem('auth_user_data');
+        await AsyncStorage.removeItem(STORAGE_KEYS.USER_DATA);
     } catch (error) {
         console.error('Error removing user data:', error);
     }
@@ -183,14 +190,16 @@ api.interceptors.response.use(
             let msg = 'An unexpected error occurred.';
 
             if (status >= 500) msg = 'Server error. Please try again later.';
-            else if (status === 404) msg = 'Requested resource not found.';
+            // else if (status === 404) msg = 'Requested resource not found.';
             else if (status === 403) msg = 'You do not have permission to do this.';
             else if (status === 401) msg = 'Session expired. Please login again.';
             else if (status === 400) msg = 'Invalid request. Please check your input.';
             else if (status === 402) msg = 'Payment required.';
             else if (status === 429) msg = 'Too many requests. Please slow down.';
 
-            DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: `${msg} (${status})` });
+            if (status !== 404) {
+                DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: `${msg} (${status})` });
+            }
         } else if (isNetworkError || error.code === 'ERR_NETWORK') {
             // This usually means the client is offline OR the server is completely unreachable
             DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: 'Network error. Please check your internet connection.' });

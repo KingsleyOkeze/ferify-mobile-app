@@ -6,18 +6,24 @@ import {
     Image,
     TouchableOpacity,
     Dimensions,
-    SafeAreaView,
+    SafeAreaView
 } from "react-native";
 import { useRouter } from "expo-router";
 import { fetchAndCacheLocation } from "@/services/locationService";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from "@/constants/storage";
 
 const { width } = Dimensions.get("window");
-
 
 const slides = [
     {
         id: 0,
-        title: "Step out ready and prepared, every single day",
+        title1: "Step out ready and",
+        title2: "prepared, every",
+        title3: "single day",
+        title1Width: '85%',
+        title2Width: '75%',
+        title3Width: '65%',
         subtitle: "Get fare estimate for every stop your route, so you're never stranded.",
         images: [
             require("../../../assets/images/onboarding/handFareCheckImage.png"),
@@ -27,8 +33,13 @@ const slides = [
         ],
     },
     {
-        id: 1, // IDs should remain sequential for simplicity if needed
-        title: "Share the fare, earn points, and help the next person",
+        id: 1,
+        title1: "Share the fare, earn",
+        title2: "points, and help the",
+        title3: "next person",
+        title1Width: '95%',
+        title2Width: '95%',
+        title3Width: '85%',
         subtitle: "Your small update makes transport easier for thousands of others",
         images: require("../../../assets/images/onboarding/rewardImage.png"),
     },
@@ -85,10 +96,11 @@ export default function OnboardingScreen() {
         }
     };
 
-    const skip = () => {
+    const skip = async () => {
         if (step < slides.length - 1) {
             setStep(step + 1);
         } else {
+            await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
             router.push("/auth/signup/SignupScreen");
         }
     };
@@ -140,14 +152,23 @@ export default function OnboardingScreen() {
                             key={i}
                             style={[
                                 styles.dot,
-                                { backgroundColor: i === step ? "#000" : "#D3D3D3" },
+                                i === step ? styles.activeDot : styles.inactiveDot
                             ]}
                         />
                     ))}
                 </View>
-
-                <Text style={styles.title}>{slides[step].title}</Text>
-                <Text style={styles.subtitle}>{slides[step].subtitle}</Text>
+                <Text style={[styles.title, { width: (slides[step] as any).title1Width }]}>
+                    {slides[step].title1}
+                </Text>
+                <Text style={[styles.title, { width: (slides[step] as any).title2Width }]}>
+                    {slides[step].title2}
+                </Text>
+                <Text style={[styles.title, { width: (slides[step] as any).title3Width }]}>
+                    {slides[step].title3}
+                </Text>
+                <Text style={styles.subtitle}>
+                    {slides[step].subtitle}
+                </Text>
 
                 {/* Bottom Buttons Row */}
                 <View style={styles.buttonRow}>
@@ -156,6 +177,7 @@ export default function OnboardingScreen() {
                         onPress={async () => {
                             console.log('Login clicked - triggering location fetch');
                             fetchAndCacheLocation(); // Non-blocking
+                            await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
                             router.push("/auth/login/LoginScreen");
                         }}
                     >
@@ -167,6 +189,7 @@ export default function OnboardingScreen() {
                         onPress={async () => {
                             console.log('Get Started clicked - triggering location fetch');
                             fetchAndCacheLocation(); // Non-blocking
+                            await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
                             router.push("/auth/signup/SignupScreen");
                         }}
                     >
@@ -181,13 +204,15 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#FBFBFB",
+        // backgroundColor: 'red'
+        position: 'relative'
     },
     topHeader: {
         flexDirection: "row",
         justifyContent: "flex-end",
         paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingTop: 20,
         zIndex: 10,
     },
     imageArea: {
@@ -206,17 +231,22 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
+        height: 6,
+        borderRadius: 100,
+    },
+    activeDot: {
+        width: 21,
+        backgroundColor: "#080808",
+    },
+    inactiveDot: {
+        width: 6,
+        backgroundColor: "#D9D9D9",
     },
     title: {
         fontFamily: "BrittiBold",
         fontSize: 24,
         fontWeight: 700,
-        width: '77%',
         textAlign: "center",
-        marginBottom: 12,
         color: "#080808",
     },
     subtitle: {
@@ -228,13 +258,17 @@ const styles = StyleSheet.create({
         textAlign: "center",
         lineHeight: 22,
         marginBottom: 40,
+        paddingTop: 10,
         paddingHorizontal: 10,
     },
     buttonRow: {
         flexDirection: "row",
         width: "100%",
         gap: 12,
-        paddingBottom: 20,
+        paddingVertical: 10,
+        // backgroundColor: 'green',
+        position: 'absolute',
+        bottom: 0
     },
     btn: {
         flex: 1,

@@ -9,32 +9,49 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useFocusEffect } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 import api from '@/services/api';
+import { getLocationPermissionStatus } from '@/services/locationService';
 
 function LocationDataSettingScreen() {
     const router = useRouter();
     const [selectedOption, setSelectedOption] = useState('while_using');
 
-    const loadCachedSettings = async () => {
+    const syncSettingsWithOS = async () => {
         try {
-            const cached = await AsyncStorage.getItem('user_privacy_settings');
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                setSelectedOption(parsed.shareLocationData ? 'while_using' : 'never');
+            const status = await getLocationPermissionStatus();
+
+            // If OS permission is denied, the effective state is 'never'
+            if (status === 'denied') {
+                setSelectedOption('never');
+                return true; // Handled
             }
+            return false; // Continue with backend/cache sync
         } catch (e) {
-            console.error('Error loading cached settings:', e);
+            console.error('Error syncing with OS permissions:', e);
+            return false;
         }
     };
 
-    const fetchPrivacySettings = async () => {
+    const loadSettings = async () => {
+        // 1. Check OS Permissions first (Highest Priority)
+        const isHandledByOS = await syncSettingsWithOS();
+        if (isHandledByOS) return;
+
+        // 2. Load from Cache
+        const cached = await cacheHelper.get<{ shareLocationData: boolean }>(STORAGE_KEYS.PRIVACY_SETTINGS, Infinity);
+        if (cached) {
+            setSelectedOption(cached.shareLocationData ? 'while_using' : 'never');
+        }
+
+        // 3. Fetch fresh from Backend
         try {
             const response = await api.get('/api/user/privacy');
             if (response.data && response.data.privacy) {
                 const { shareLocationData } = response.data.privacy;
                 setSelectedOption(shareLocationData ? 'while_using' : 'never');
-                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+                await cacheHelper.set(STORAGE_KEYS.PRIVACY_SETTINGS, response.data.privacy);
             }
         } catch (error) {
             console.error('Error fetching privacy settings:', error);
@@ -43,8 +60,7 @@ function LocationDataSettingScreen() {
 
     useFocusEffect(
         useCallback(() => {
-            loadCachedSettings();
-            fetchPrivacySettings();
+            loadSettings();
         }, [])
     );
 
@@ -58,7 +74,7 @@ function LocationDataSettingScreen() {
                 shareLocationData: isSharing
             });
             if (response.data && response.data.privacy) {
-                await AsyncStorage.setItem('user_privacy_settings', JSON.stringify(response.data.privacy));
+                await cacheHelper.set(STORAGE_KEYS.PRIVACY_SETTINGS, response.data.privacy);
             }
         } catch (error) {
             console.error('Error updating location preference:', error);

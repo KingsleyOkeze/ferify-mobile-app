@@ -15,6 +15,8 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import RouteFromAndTo from '@/components/RouteFromAndTo';
 import busImage from '../../assets/images/transportation-icons/busImage.png';
+import kekeImage from '../../assets/images/transportation-icons/kekeImage.png';
+import okadaImage from '../../assets/images/transportation-icons/okadaImage.png';
 
 // Import the no data image
 const noDataImage = require('../../assets/images/no-data-images/no_data_found_image.png');
@@ -23,6 +25,13 @@ const noDataImage = require('../../assets/images/no-data-images/no_data_found_im
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
     UIManager.setLayoutAnimationEnabledExperimental(true);
 }
+
+const getVehicleImage = (type: string) => {
+    const mode = type?.toLowerCase();
+    if (mode === 'keke') return kekeImage;
+    if (mode === 'bike' || mode === 'okada') return okadaImage;
+    return busImage;
+};
 
 // Mock Data for Route Breakdown (Fallback if data exists but structure is empty)
 const mockRouteLegs = [
@@ -39,26 +48,26 @@ function RouteResultScreen() {
 
     // Parse fareData to check if we have results
     let hasData = false;
+    let estimate: any = null;
     if (fareData && fareData !== 'null' && fareData !== 'undefined') {
         try {
-            const parsed = JSON.parse(fareData as string);
-            hasData = !!parsed;
+            estimate = JSON.parse(fareData as string);
+            hasData = !!estimate;
         } catch (e) {
             hasData = false;
         }
     }
 
-    // For now, if hasData is true, we still use mock data for display 
-    // because full integration isn't the current task, just the empty state.
-    // But we flip the logic: If NO data, show empty state. 
-    // If YES data (or mock default in dev), show content.
-    // NOTE: To test empty state, pass fareData=null navigation.
-
-    // START UPDATE: Use the parsed logic or fallback to mock if you want to force test 
-    // For this specific task, if `fareData` is passed as null string, we treat as empty.
     const showEmptyState = !hasData;
 
-    // Use mock legs if we decide to show content (and haven't fully wired real data display yet)
+    // Reliability mapping
+    const getReliabilityText = (score: string) => {
+        if (score === 'High') return 'Highly Reliable';
+        if (score === 'Medium') return 'Moderately Reliable';
+        return 'Low Reliability';
+    };
+
+    // Use mock legs for the hidden breakdown section
     const routeLegs = mockRouteLegs;
 
     const toggleBreakdown = () => {
@@ -119,36 +128,50 @@ function RouteResultScreen() {
                                 <View style={styles.summaryTopRow}>
                                     <View>
                                         <Text style={styles.summaryLabel}>Estimated Fare</Text>
-                                        <Text style={styles.summaryPrice}>₦1,000 - ₦1,800</Text>
+                                        <Text style={styles.summaryPrice}>
+                                            ₦{estimate?.minFare?.toLocaleString()} - ₦{estimate?.maxFare?.toLocaleString()}
+                                        </Text>
                                     </View>
-                                    <Image source={busImage} style={styles.transportIconLarge} resizeMode="contain" />
+                                    <Image
+                                        source={getVehicleImage(estimate?.vehicleType)}
+                                        style={styles.transportIconLarge}
+                                        resizeMode="contain"
+                                    />
                                 </View>
 
                                 {/* Bottom Row: Reliability & Contributors */}
                                 <View style={styles.summaryBottomRow}>
                                     <View style={styles.badgeContainer}>
                                         <Ionicons name="shield-checkmark" size={16} color="#757575" style={styles.badgeIcon} />
-                                        <Text style={styles.badgeText}>Highly Reliable</Text>
+                                        <Text style={styles.badgeText}>{getReliabilityText(estimate?.reliabilityScore)}</Text>
                                     </View>
                                     <View style={styles.badgeContainer}>
                                         <Ionicons name="people" size={16} color="#757575" style={styles.badgeIcon} />
-                                        <Text style={styles.badgeText}>24 Contributors</Text>
+                                        <Text style={styles.badgeText}>{estimate?.contributorCount || 0} Contributors</Text>
                                     </View>
                                 </View>
                             </View>
 
-                            {/* Show Fare Breakdown Toggle */}
-                            <TouchableOpacity style={styles.breakdownToggle} onPress={toggleBreakdown}>
-                                <Text style={styles.breakdownToggleText}>Show Fare Breakdown</Text>
-                                <Ionicons
-                                    name={breakdownVisible ? "chevron-up" : "chevron-down"}
-                                    size={20}
-                                    color="#080808"
-                                />
-                            </TouchableOpacity>
+                            {/* Show Fare Breakdown Toggle (Disabled) */}
+                            <View style={styles.disabledBreakdownWrapper}>
+                                <TouchableOpacity
+                                    style={styles.breakdownToggleDisabled}
+                                    onPress={() => { }}
+                                    activeOpacity={1}
+                                    disabled={true}
+                                >
+                                    <Text style={styles.breakdownToggleTextDisabled}>Show Fare Breakdown</Text>
+                                    <Ionicons
+                                        name="chevron-down"
+                                        size={20}
+                                        color="#A0A0A0"
+                                    />
+                                </TouchableOpacity>
+                                <Text style={styles.comingSoonText}>Coming Soon</Text>
+                            </View>
 
-                            {/* Expandable Content */}
-                            {breakdownVisible && (
+                            {/* Expandable Content (Currently Hidden) */}
+                            {false && breakdownVisible && (
                                 <View style={styles.breakdownContainer}>
                                     {/* Progress Line (Left) */}
                                     <View style={styles.progressContainer}>
@@ -212,9 +235,10 @@ function RouteResultScreen() {
 
                         {/* Fixed Bottom Buttons - Only show if has data? Or maybe allow manual verify even if empty? */}
                         <View style={styles.footer}>
-                            <TouchableOpacity style={styles.mapButton}>
-                                <Text style={styles.mapButtonText}>Go to Map</Text>
-                            </TouchableOpacity>
+                            <View style={styles.mapButtonDisabled}>
+                                <Text style={styles.mapButtonTextDisabled}>Go to Map</Text>
+                                <Text style={styles.mapComingSoonText}>Soon</Text>
+                            </View>
                             <TouchableOpacity
                                 style={styles.verifyButton}
                                 onPress={() => router.push({
@@ -289,12 +313,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 20,
         minHeight: 154,
-        // Shadow
-        // shadowColor: '#000',
-        // shadowOffset: { width: 0, height: 2 },
-        // shadowOpacity: 0.05,
-        // shadowRadius: 8,
-        // elevation: 2,
         borderWidth: 1,
         borderColor: '#EBEDEF',
         justifyContent: 'space-between',
@@ -329,7 +347,6 @@ const styles = StyleSheet.create({
     badgeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        // justifyContent: 'space-between',
         backgroundColor: '#F9F9F9',
         paddingHorizontal: 8,
         paddingVertical: 4,
@@ -352,11 +369,38 @@ const styles = StyleSheet.create({
         marginBottom: 30,
         marginLeft: 'auto'
     },
+    disabledBreakdownWrapper: {
+        alignItems: 'flex-end',
+        marginBottom: 30,
+    },
+    breakdownToggleDisabled: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 8,
+        opacity: 0.6,
+    },
     breakdownToggleText: {
         color: '#080808',
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         fontSize: 14,
+        marginRight: 4,
+    },
+    breakdownToggleTextDisabled: {
+        color: '#A0A0A0',
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
+        fontSize: 14,
+        marginRight: 4,
+    },
+    comingSoonText: {
+        fontSize: 10,
+        color: '#A0A0A0',
+        fontFamily: 'BrittiRegular',
+        marginTop: 4,
         marginRight: 4,
     },
     breakdownContainer: {
@@ -484,7 +528,6 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     mapButton: {
-        // flex: 1,
         width: '48%',
         backgroundColor: '#F0F0F0',
         height: 50,
@@ -492,10 +535,32 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    mapButtonDisabled: {
+        width: '48%',
+        backgroundColor: '#F5F5F5',
+        height: 50,
+        borderRadius: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        opacity: 0.6,
+    },
     mapButtonText: {
         color: '#080808',
         fontSize: 16,
         fontWeight: '600',
+    },
+    mapButtonTextDisabled: {
+        color: '#A0A0A0',
+        fontSize: 14,
+        fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
+    },
+    mapComingSoonText: {
+        fontSize: 8,
+        color: '#A0A0A0',
+        fontFamily: 'BrittiRegular',
+        position: 'absolute',
+        bottom: 6,
     },
     verifyButton: {
         // flex: 1,

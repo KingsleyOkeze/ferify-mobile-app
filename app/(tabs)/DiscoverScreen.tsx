@@ -14,7 +14,6 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import mapImage from '../../assets/images/popular-search-icons/map_icon.png'
 import shareLocationHand from '../../assets/images/popular-search-icons/share_location_hand_icon.png'
 import alertIcon from '../../assets/images/popular-search-icons/alert_icon.png'
@@ -103,11 +102,11 @@ function DiscoverScreen() {
                                     <View style={[styles.recentImage, { justifyContent: 'center', alignItems: 'center' }]}>
                                         <Image
                                             source={
-                                                item.vehicleType === 'bus' ? 
-                                                require('../../assets/images/popular-search-icons/busImage.png') : 
-                                                item.vehicleType === 'keke' ? 
-                                                require('../../assets/images/popular-search-icons/kekeImage.png')  : 
-                                                require('../../assets/images/popular-search-icons/okadaImage.png')
+                                                item.vehicleType === 'bus' ?
+                                                    require('../../assets/images/popular-search-icons/busImage.png') :
+                                                    item.vehicleType === 'keke' ?
+                                                        require('../../assets/images/popular-search-icons/kekeImage.png') :
+                                                        require('../../assets/images/popular-search-icons/okadaImage.png')
                                             }
                                             style={styles.icon}
                                         />
@@ -159,7 +158,7 @@ function DiscoverScreen() {
                 {/* Popular Route Today */}
                 {popularRoutes.length > 0 && (
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Popular routes today</Text>
+                        <Text style={[styles.sectionTitle, { marginBottom: 12 }]}>Popular routes today</Text>
                         <View style={styles.verticalList}>
                             {popularRoutes.map((item, index) => (
                                 <TouchableOpacity
@@ -173,28 +172,33 @@ function DiscoverScreen() {
                                     <View style={[styles.popularRouteImage, { justifyContent: 'center', alignItems: 'center' }]}>
                                         <Image
                                             source={
-                                                item.vehicleType === 'bus' ? 
-                                                require('../../assets/images/popular-search-icons/busImage.png') : 
-                                                item.vehicleType === 'keke' ? 
-                                                require('../../assets/images/popular-search-icons/kekeImage.png')  : 
-                                                require('../../assets/images/popular-search-icons/okadaImage.png')
+                                                item.vehicleType === 'bus' ?
+                                                    require('../../assets/images/popular-search-icons/busImage.png') :
+                                                    item.vehicleType === 'keke' ?
+                                                        require('../../assets/images/popular-search-icons/kekeImage.png') :
+                                                        require('../../assets/images/popular-search-icons/okadaImage.png')
                                             }
                                             style={styles.icon}
-                                            // size={32}
-                                            // color="#080808"
                                         />
                                     </View>
 
                                     {/* Middle: Details */}
                                     <View style={styles.popularRouteDetails}>
-                                        <Text style={styles.popularRouteText}>{item.route}</Text>
-                                        <Text style={styles.popularRoutePrice}>{item.priceRange}</Text>
-                                        <Text style={styles.popularRouteTime}>{item.time}</Text>
-                                    </View>
+                                        <View style={styles.popularRowHeader}>
+                                            <Text style={styles.popularRouteText} numberOfLines={1}>{item.route}</Text>
+                                            {/* Right: Points Moved to Top */}
+                                            <View style={styles.pointsBadge}>
+                                                <Text style={styles.pointsText}>+{item.points} pts</Text>
+                                            </View>
+                                        </View>
 
-                                    {/* Right: Points */}
-                                    <View style={styles.pointsBadge}>
-                                        <Text style={styles.pointsText}>+{item.points} pts</Text>
+                                        <View style={styles.popularMetaColumn}>
+                                            <Text style={styles.popularPriceText}>{item.priceRange}</Text>
+                                            <View style={styles.popularTimeRow}>
+                                                <Ionicons name="time-outline" size={14} color="#757575" style={styles.metaIcon} />
+                                                <Text style={styles.popularMetaText}>{item.time}</Text>
+                                            </View>
+                                        </View>
                                     </View>
                                 </TouchableOpacity>
                             ))}
@@ -205,13 +209,13 @@ function DiscoverScreen() {
                 {/* Tips & Insight */}
                 {showInsights && insights.length > 0 && (
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Tips & Insight</Text>
+                        <Text style={[styles.sectionTitle, { marginBottom: 12 }]}>Tips & Insight</Text>
                         <View style={styles.tipListContainer}>
                             {insights.map((item) => (
                                 <TouchableOpacity key={item.id} style={styles.tipCard}>
                                     <View style={styles.tipIconContainer}>
-                                        <Image 
-                                            source={require('../../assets/images/popular-search-icons/alert_icon.png')} 
+                                        <Image
+                                            source={require('../../assets/images/popular-search-icons/alert_icon.png')}
                                             style={styles.tipIcon}
                                         />
                                     </View>
@@ -233,7 +237,7 @@ function DiscoverScreen() {
                     <View style={styles.promoContent}>
                         <Text style={styles.promoTitle}>Safety First</Text>
                         <Text style={styles.promoBody}>
-                            Always sit properly in vehicles, avoid overloading, 
+                            Always sit properly in vehicles, avoid overloading,
                             and keep your valuables secure.
                         </Text>
                     </View>
@@ -253,7 +257,7 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     header: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 20,
         paddingBottom: 10,
     },
@@ -290,7 +294,7 @@ const styles = StyleSheet.create({
     },
 
     horizontalScroll: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingRight: 10,
     },
 
@@ -380,7 +384,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#FAFAFA',
-        marginHorizontal: 20,
+        marginHorizontal: 16,
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
@@ -424,40 +428,52 @@ const styles = StyleSheet.create({
     popularRouteCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        width: '100%',
-        borderRadius: 12,
         paddingVertical: 16,
         paddingHorizontal: 12,
+        width: '100%',
         borderBottomWidth: 1,
-        borderColor: '#F0F0F0',
+        borderBottomColor: '#DADADA',
     },
     popularRouteImage: {
-        width: 50,
-        height: 50,
+        width: 60,
+        height: 60,
         resizeMode: 'contain',
-        backgroundColor: '#F5F5F5',
-        borderRadius: 8,
         marginRight: 12,
+        backgroundColor: '#F5F5F5',
+        borderRadius: 3.56,
+        alignSelf: 'flex-start',
     },
     popularRouteDetails: {
         flex: 1,
     },
+    popularRowHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 8,
+    },
     popularRouteText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 4,
+        flex: 1,
     },
-    popularRoutePrice: {
+    popularMetaColumn: {
+        marginTop: 4,
+    },
+    popularPriceText: {
         fontSize: 14,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 2,
+        marginBottom: 4,
     },
-    popularRouteTime: {
+    popularTimeRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    popularMetaText: {
         fontSize: 12,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
@@ -479,7 +495,7 @@ const styles = StyleSheet.create({
     // Tips & Insight Styles
     tipListContainer: {
         paddingVertical: 16,
-        paddingHorizontal: 10,
+        paddingHorizontal: 16,
         backgroundColor: '#FFFFFF',
         gap: 16,
         borderWidth: 0
@@ -531,7 +547,7 @@ const styles = StyleSheet.create({
     promoCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginHorizontal: 10,
+        marginHorizontal: 16,
         padding: 20,
         borderRadius: 16,
         borderWidth: 1,

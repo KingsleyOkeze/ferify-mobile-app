@@ -17,6 +17,8 @@ import { Alert, ActivityIndicator } from 'react-native';
 
 import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLoader } from '@/contexts/LoaderContext';
+import LogoutModal from '@/components/modals/LogoutModal';
 
 // Fallback user data
 const DEFAULT_USER_DATA = {
@@ -46,7 +48,7 @@ function AccountDetailsScreen() {
     const [showAvatarModal, setShowAvatarModal] = useState(false);
     const [showColorPicker, setShowColorPicker] = useState(false);
     const [isLogoutModalVisible, setIsLogoutModalVisible] = useState(false);
-    const [uploading, setUploading] = useState(false);
+    const { showLoader, hideLoader } = useLoader();
 
     React.useEffect(() => {
         // Refresh when entering screen to ensure data is fresh
@@ -92,7 +94,7 @@ function AccountDetailsScreen() {
     };
 
     const uploadImage = async (uri: string) => {
-        setUploading(true);
+        showLoader();
         try {
             const formData = new FormData();
             const filename = uri.split('/').pop() || 'photo.jpg';
@@ -116,12 +118,12 @@ function AccountDetailsScreen() {
             console.error('Error uploading image:', error);
             Alert.alert('Error', 'Failed to upload image. Please try again.');
         } finally {
-            setUploading(false);
+            hideLoader();
         }
     };
 
     const handleSelectColor = async (color: string) => {
-        setUploading(true);
+        showLoader();
         try {
             const response = await api.put('/api/user/account/update-profile', {
                 profilePhoto: null, // Clear photo
@@ -134,15 +136,9 @@ function AccountDetailsScreen() {
         } catch (error) {
             console.error('Error updating avatar color:', error);
         } finally {
-            setUploading(false);
+            hideLoader();
             setShowColorPicker(false);
         }
-    };
-
-    const handleLogout = async () => {
-        setIsLogoutModalVisible(false);
-        await logout();
-        router.replace('/auth/login/LoginScreen');
     };
 
     const personalInfoItems = [
@@ -154,7 +150,8 @@ function AccountDetailsScreen() {
     ];
 
     const getInitials = (first?: string, last?: string) => {
-        return `${(first || 'U').charAt(0)}${(last || 'N').charAt(0)}`;
+        if (!first && !last) return "??";
+        return `${(first || '').charAt(0)}${(last || '').charAt(0)}`.toUpperCase();
     };
 
     return (
@@ -176,11 +173,7 @@ function AccountDetailsScreen() {
                 {/* Avatar Section */}
                 <View style={styles.avatarContainer}>
                     <View style={styles.avatarWrapper}>
-                        {uploading ? (
-                            <View style={styles.avatarPlaceholder}>
-                                <ActivityIndicator color="#2E7D32" />
-                            </View>
-                        ) : user?.profilePhoto ? (
+                        {user?.profilePhoto ? (
                             <Image source={{ uri: user?.profilePhoto }} style={styles.avatarImage} />
                         ) : (
                             <View style={[
@@ -189,14 +182,13 @@ function AccountDetailsScreen() {
                                 user?.avatarColor && { backgroundColor: user?.avatarColor }
                             ]}>
                                 <Text style={styles.avatarInitials}>
-                                    {getInitials(user?.firstName || 'U', user?.lastName || 'N')}
+                                    {getInitials(user?.firstName, user?.lastName)}
                                 </Text>
                             </View>
                         )}
                         <TouchableOpacity
                             style={styles.editIconContainer}
                             onPress={() => setShowAvatarModal(true)}
-                            disabled={uploading}
                         >
                             <Ionicons name="pencil" size={14} color="#fff" />
                         </TouchableOpacity>
@@ -324,40 +316,10 @@ function AccountDetailsScreen() {
             </Modal>
 
             {/* Logout Confirmation Modal */}
-            <Modal
-                animationType="fade"
-                transparent={true}
-                visible={isLogoutModalVisible}
-                onRequestClose={() => setIsLogoutModalVisible(false)}
-            >
-                <Pressable
-                    style={styles.centeredModalOverlay}
-                    onPress={() => setIsLogoutModalVisible(false)}
-                >
-                    <Pressable style={styles.centeredModalContent}>
-                        <Text style={styles.confirmModalTitle}>Confirm Logout</Text>
-                        <Text style={styles.confirmModalDescription}>
-                            Are you sure you want to logout? You'll need to sign in again to access your account.
-                        </Text>
-
-                        <View style={styles.modalButtonRow}>
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.confirmLogoutButton]}
-                                onPress={handleLogout}
-                            >
-                                <Text style={styles.confirmLogoutButtonText}>yes i do</Text>
-                            </TouchableOpacity>
-
-                            <TouchableOpacity
-                                style={[styles.modalButton, styles.cancelModalButton]}
-                                onPress={() => setIsLogoutModalVisible(false)}
-                            >
-                                <Text style={styles.cancelModalButtonText}>Cancel</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Pressable>
-                </Pressable>
-            </Modal>
+            <LogoutModal
+                isVisible={isLogoutModalVisible}
+                onClose={() => setIsLogoutModalVisible(false)}
+            />
         </SafeAreaView>
     );
 }

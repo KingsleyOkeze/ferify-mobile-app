@@ -1,8 +1,10 @@
 /**
  * Voice Utility - Checks if voice recognition is available
- * @react-native-voice/voice requires a custom development build
+ * expo-speech-recognition requires a custom development build
  * and will not work in Expo Go
  */
+
+import { ExpoSpeechRecognitionModule } from "expo-speech-recognition";
 
 let voiceAvailable: boolean | null = null;
 
@@ -13,18 +15,9 @@ export const isVoiceAvailable = async (): Promise<boolean> => {
     }
 
     try {
-        // Try to import the voice module
-        const Voice = require('@react-native-voice/voice').default;
-
-        // Check if the module is properly initialized
-        if (!Voice || typeof Voice.start !== 'function') {
-            voiceAvailable = false;
-            return false;
-        }
-
         // Try to check if speech recognition is available
-        const available = await Voice.isAvailable();
-        voiceAvailable = available === 1 || available === true;
+        const available = await ExpoSpeechRecognitionModule.isRecognitionAvailable();
+        voiceAvailable = available;
         return voiceAvailable;
     } catch (error) {
         console.log('Voice recognition not available:', error);

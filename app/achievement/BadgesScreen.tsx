@@ -14,8 +14,9 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { STORAGE_KEYS, CACHE_TTL as TTL_CONSTANTS } from '@/constants/storage';
+import { cacheHelper } from '@/utils/cache';
 import { ActivityIndicator } from 'react-native';
 
 // Badge Images Mapping
@@ -88,24 +89,12 @@ export default function BadgesScreen() {
 
     const loadCachedBadges = async () => {
         try {
-            const cachedString = await AsyncStorage.getItem('cached_badges');
-            if (cachedString) {
-                const cached = JSON.parse(cachedString);
+            const CACHE_TTL = TTL_CONSTANTS.LONG; // 24 hours
+            const cachedData = await cacheHelper.get<Badge[]>(STORAGE_KEYS.BADGES, CACHE_TTL);
 
-                // Industry standard: Check if cache is within TTL (24 hours)
-                const CACHE_TTL = 24 * 60 * 60 * 1000;
-                const isStale = !cached.timestamp || (Date.now() - cached.timestamp > CACHE_TTL);
-
-                if (cached.data) {
-                    setFetchedBadges(cached.data);
-                    // Only stop loading if we have valid data (stale or fresh)
-                    setLoading(false);
-                }
-
-                if (isStale) {
-                    console.log('[CACHE] Badges cache is stale or missing timestamp. Revalidating...');
-                    // If it's stale, fetchBadges (already called in useEffect) will handle it
-                }
+            if (cachedData) {
+                setFetchedBadges(cachedData);
+                setLoading(false);
             }
         } catch (e) {
             console.error('Error loading cached badges:', e);
@@ -118,11 +107,7 @@ export default function BadgesScreen() {
             if (response.data) {
                 setFetchedBadges(response.data);
                 // Store with timestamp for TTL check
-                const cacheData = {
-                    timestamp: Date.now(),
-                    data: response.data
-                };
-                await AsyncStorage.setItem('cached_badges', JSON.stringify(cacheData));
+                await cacheHelper.set(STORAGE_KEYS.BADGES, response.data);
             }
         } catch (error) {
             console.error("Error fetching badges:", error);
@@ -220,8 +205,8 @@ export default function BadgesScreen() {
                             {selectedBadge?.description}
                         </Text>
 
-                        {/* Progress Bar (Except for Starter) */}
-                        {selectedBadge && selectedBadge.id !== 'starter' && selectedBadge.totalAim && (
+                        {/* Progress Bar (Only if NOT earned) */}
+                        {selectedBadge && !selectedBadge.earned && selectedBadge.totalAim && (
                             <View style={styles.progressContainer}>
                                 <View style={styles.progressBarBackground}>
                                     <View
@@ -235,6 +220,16 @@ export default function BadgesScreen() {
                                     {selectedBadge.currentProgress || 0}/{selectedBadge.totalAim}
                                 </Text>
                             </View>
+                        )}
+
+                        {/* Okay Button (Only when earned) */}
+                        {selectedBadge?.earned && (
+                            <TouchableOpacity
+                                style={styles.okayButton}
+                                onPress={() => setSelectedBadge(null)}
+                            >
+                                <Text style={styles.okayButtonText}>Okay</Text>
+                            </TouchableOpacity>
                         )}
                     </Pressable>
                 </Pressable>
@@ -389,6 +384,23 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
+        paddingBottom: 5,
+        height: 18
+    },
+    okayButton: {
+        backgroundColor: '#080808',
+        borderRadius: 100,
+        height: 48,
+        width: 165.5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    okayButtonText: {
+        color: '#FBFBFB',
+        fontSize: 16,
+        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
 
 });

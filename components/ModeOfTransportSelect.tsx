@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#FBFBFB',
     },
     card: {
         alignItems: 'center',
@@ -53,14 +53,14 @@ const styles = StyleSheet.create({
         borderRadius: 18,
         shadowOpacity: 0.2,
         shadowRadius: 4,
-        width: 108,
+        width: '32.5%',
         height: 129,
         borderWidth: 1,
         borderColor: 'transparent', // Default transparent border
     },
     cardSelected: {
-        borderColor: '#000', // Black border when selected
-        backgroundColor: '#fff',
+        borderColor: '#080808', // Black border when selected
+        // backgroundColor: '#fff',
     },
     image: {
         width: '100%',

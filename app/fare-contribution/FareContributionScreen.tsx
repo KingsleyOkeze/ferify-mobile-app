@@ -16,7 +16,6 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import TimeSelectionModal from './TimeSelectionModal';
 import SuccessModal from './SuccessModal';
-import RewardsModal from './RewardsModal';
 import ModeOfTransportSelect from '../../components/ModeOfTransportSelect';
 import LocationInputs from '../../components/LocationInputs';
 import LocationRecommendation from '../../components/LocationRecommendation'; // Added
@@ -114,7 +113,6 @@ function FareContributionScreen() {
     const [vehicleModalVisible, setVehicleModalVisible] = useState(false);
     const [conditionsModalVisible, setConditionsModalVisible] = useState(false);
     const [successModalVisible, setSuccessModalVisible] = useState(false);
-    const [rewardsModalVisible, setRewardsModalVisible] = useState(false);
 
     // Search State
     const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
@@ -266,7 +264,7 @@ function FareContributionScreen() {
 
     const handleClaimReward = () => {
         setSuccessModalVisible(false);
-        setRewardsModalVisible(true);
+        // router.replace('/(tabs)/HomeScreen');
     };
 
     const getConditionsDisplay = () => {
@@ -351,11 +349,13 @@ function FareContributionScreen() {
                   Otherwise show the form content.
                 */}
                 {(recommendations.length > 0 || isSearching) ? (
-                    <LocationRecommendation
-                        isSearching={isSearching}
-                        recommendations={recommendations}
-                        onSelect={handleSelectRecommendation}
-                    />
+                    <View style={{ marginTop: 20 }}>
+                        <LocationRecommendation
+                            isSearching={isSearching}
+                            recommendations={recommendations}
+                            onSelect={handleSelectRecommendation}
+                        />
+                    </View>
                 ) : (
                     <>
                         {/* Fare Amount */}
@@ -374,7 +374,7 @@ function FareContributionScreen() {
 
                         {/* Quick Select Chips */}
                         <View style={styles.quickSelectContainer}>
-                            {[100, 200, 300, 400, 500].map((amount) => (
+                            {[100, 200, 400, 500, 1000].map((amount) => (
                                 <TouchableOpacity
                                     key={amount}
                                     style={styles.quickSelectChip}
@@ -472,12 +472,6 @@ function FareContributionScreen() {
                 onClose={() => setSuccessModalVisible(false)}
                 onClaimReward={handleClaimReward}
             />
-
-            {/* Rewards Modal */}
-            <RewardsModal
-                visible={rewardsModalVisible}
-                onClose={() => setRewardsModalVisible(false)}
-            />
         </SafeAreaView>
     );
 }
@@ -499,7 +493,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     scrollContent: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 24,
         paddingBottom: 40,
     },
@@ -545,12 +539,12 @@ const styles = StyleSheet.create({
     quickSelectContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 10,
+        gap: 5,
     },
     quickSelectChip: {
+        height: 37,
         paddingHorizontal: 20,
         paddingVertical: 10,
-        backgroundColor: '#EBEDEF',
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#EBEDEF',
