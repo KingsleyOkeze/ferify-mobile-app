@@ -16,18 +16,18 @@ function AboutHowItWorksScreen() {
     const steps = [
         {
             id: '1',
-            title: 'Search & Discover',
-            description: 'Find routes, check estimated fares, and see what others are paying in real-time.',
+            title: 'Search your route',
+            description: "Enter where you're going from and to.",
         },
         {
             id: '2',
-            title: 'Contribute Fares',
-            description: 'Share your own commute costs to help the community stay updated on price changes.',
+            title: 'See real fares',
+            description: 'View community verified fare ranges.',
         },
         {
             id: '3',
-            title: 'Earn & Level Up',
-            description: 'Get recognized as a trusted contributor and earn badges for helping others.',
+            title: 'Contribute & earn',
+            description: 'Confirm fares & earn points.',
         },
     ];
 
@@ -38,7 +38,7 @@ function AboutHowItWorksScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>How it work</Text>
+                <Text style={styles.headerTitle}>How it works</Text>
                 <TouchableOpacity onPress={() => router.dismiss()} style={styles.headerButton}>
                     <Ionicons name="close" size={24} color="#000" />
                 </TouchableOpacity>
@@ -69,14 +69,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
@@ -88,22 +88,22 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     contentContainer: {
-        paddingHorizontal: 20,
-        marginTop: 10,
+        paddingHorizontal: 16,
+        marginTop: 32,
     },
     pageTitle: {
         fontSize: 24,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginTop: 20,
-        marginBottom: 25,
+        marginBottom: 24,
+        lineHeight: 19.2
     },
     card: {
         backgroundColor: '#F3F3F3',
         borderRadius: 8,
-        padding: 20,
-        marginBottom: 16,
+        padding: 12,
+        marginBottom: 10,
         borderWidth: 1,
         borderColor: '#F3F3F3',
     },
@@ -112,14 +112,15 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 8,
+        marginBottom: 2,
+        lineHeight: 24
     },
     cardDescription: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
-        lineHeight: 20,
+        lineHeight: 24,
     },
 });
 

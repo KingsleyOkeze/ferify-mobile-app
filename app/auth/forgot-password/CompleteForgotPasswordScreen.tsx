@@ -10,14 +10,15 @@ import {
     KeyboardAvoidingView,
     Platform,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '@/services/api';
+import { useToast } from '@/contexts/ToastContext';
 
 function CompleteForgotPasswordScreen() {
     const router = useRouter();
+    const { showToast } = useToast();
     const { token, email } = useLocalSearchParams<{ token: string; email: string }>();
 
     const [newPassword, setNewPassword] = useState('');
@@ -37,19 +38,13 @@ function CompleteForgotPasswordScreen() {
             });
 
             if (response.status === 200) {
-                Alert.alert('Success', 'Password reset successfully! You can now log in with your new password.', [
-                    {
-                        text: 'Login',
-                        onPress: () => {
-                            // Go back to login screen (assuming it will be implemented or redirect to onboarding)
-                            router.replace('/auth/onboarding/OnboardingScreen');
-                        }
-                    }
-                ]);
+                showToast('success', 'Password reset successfully! You can now log in with your new password.');
+                // Redirection after showing toast
+                router.replace('/auth/login/LoginScreen');
             }
         } catch (error: any) {
             console.error('Password reset error:', error);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to reset password');
+            showToast('error', error.response?.data?.error || 'Failed to reset password');
         } finally {
             setIsLoading(false);
         }
@@ -127,7 +122,7 @@ function CompleteForgotPasswordScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',

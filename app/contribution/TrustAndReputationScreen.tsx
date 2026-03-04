@@ -129,20 +129,20 @@ const styles = StyleSheet.create({
         backgroundColor: "#FBFBFB",
     },
     header: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 25,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
         color: '#080808',
         fontFamily: 'BrittiSemibold',
-        marginBottom: 10,
+        marginBottom: 24,
     },
     headerSubtitle: {
         fontSize: 14,
@@ -155,24 +155,23 @@ const styles = StyleSheet.create({
     },
     scoreContainer: {
         alignItems: 'center',
-        paddingVertical: 30,
-        paddingHorizontal: 40,
+        paddingVertical: 20,
+        paddingHorizontal: 12,
         // borderBottomWidth: 1,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#DADADA',
-        marginBottom: 30,
+        marginBottom: 32,
         backgroundColor: '#FFFFFF',
-        marginHorizontal: 20,
+        marginHorizontal: 12,
     },
     scoreIconContainer: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: '#FFF9C4', // Light Yellow bg for medal
+        width: 54,
+        height: 54,
+        borderRadius: 40, 
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 20,
     },
     scoreIcon: {
         width: 54,
@@ -180,6 +179,7 @@ const styles = StyleSheet.create({
     },
     scoreLabel: {
         fontSize: 12,
+        lineHeight: 24,
         fontWeight: 400,
         color: '#080808',
         marginBottom: 8,
@@ -197,10 +197,10 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        lineHeight: 20
+        lineHeight: 24
     },
     listContainer: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
     },
     listTitle: {
         fontSize: 16,
@@ -224,10 +224,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 10,
     },
-    // firstListItem: {
-    //     borderTopWidth: 1,
-    //     borderTopColor: '#F0F0F0',
-    // },
     itemIcon: {
         marginRight: 16,
         borderRadius: 50,

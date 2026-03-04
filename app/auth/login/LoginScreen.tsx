@@ -279,32 +279,32 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        // paddingTop: 10,
         paddingBottom: 20,
     },
     header: {
         marginTop: 10,
-        marginBottom: 10,
+        marginBottom: 24,
         marginLeft: -10,
         paddingHorizontal: 24,
     },
     backButton: {
-        padding: 5,
+        // padding: 5,
     },
     topContent: {
         flex: 1,
     },
     textContainer: {
         alignItems: "flex-start",
-        marginBottom: 32,
+        marginBottom: 24,
     },
     title: {
         fontSize: 24,
         fontWeight: 700,
         fontFamily: "BrittiBold",
         color: "#080808",
-        marginBottom: 8,
+        marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
@@ -312,6 +312,7 @@ const styles = StyleSheet.create({
         color: "#393939",
         textAlign: "left",
         lineHeight: 22,
+        fontFamily: 'BrittiRegular'
     },
     formContainer: {
         flex: 1,
@@ -324,7 +325,7 @@ const styles = StyleSheet.create({
         fontWeight: "500",
         color: "#080808",
         marginTop: 5,
-        marginBottom: 10,
+        marginBottom: 8,
         marginLeft: 4,
     },
     inputWrapper: {
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 10,
+        // marginTop: 10,
     },
     disabledButton: {
         backgroundColor: "#CECECE",
@@ -370,7 +371,7 @@ const styles = StyleSheet.create({
     },
     forgotPasswordContainer: {
         alignItems: "flex-end",
-        marginTop: 12,
+        marginTop: 8,
     },
     forgotPasswordText: {
         color: "#393939",
@@ -380,7 +381,7 @@ const styles = StyleSheet.create({
     separatorContainer: {
         flexDirection: "row",
         alignItems: "center",
-        marginVertical: 30,
+        marginVertical: 24,
     },
     separatorLine: {
         flex: 1,
@@ -418,7 +419,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         color: "#6B6B6B",
         textAlign: "center",
-        marginTop: 24,
+        marginTop: 12,
         lineHeight: 18,
         width: '90%',
         alignSelf: 'center'

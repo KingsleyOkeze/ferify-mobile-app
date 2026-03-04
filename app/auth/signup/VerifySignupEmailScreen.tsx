@@ -152,7 +152,7 @@ export default function VerifySignupEmailScreen() {
                 >
                     {/* Title and Subtitle */}
                     <View style={styles.textContainer}>
-                        <Text style={styles.title}>Email verification</Text>
+                        <Text style={styles.title}>Enter the code</Text>
                         <Text style={styles.subtitle}>
                             We'll send a code of verification to <Text style={styles.emailText}>{email}</Text>
                         </Text>
@@ -211,26 +211,29 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: "center",
         alignItems: "center",
+        marginLeft: -16
     },
     scrollContent: {
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         paddingTop: 20,
         paddingBottom: 40,
     },
     textContainer: {
-        marginBottom: 40,
+        marginBottom: 24,
     },
     title: {
         fontSize: 24,
         fontWeight: '600',
         color: '#080808',
         marginBottom: 8,
+        fontFamily: 'BrittiSemiold'
     },
     subtitle: {
         fontSize: 14,
         fontWeight: '400',
         color: '#393939',
         lineHeight: 24,
+        fontFamily: 'BrittiRegular'
     },
     emailText: {
         fontWeight: '400',
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        marginBottom: 32,
+        marginBottom: 12,
     },
     otpInput: {
         width: 74,
@@ -266,10 +269,12 @@ const styles = StyleSheet.create({
         color: '#080808',
         fontWeight: 700,
         textDecorationLine: 'underline',
+        fontFamily: 'BrittiSemiold'
     },
     timerText: {
         fontSize: 14,
         color: '#666',
+        fontFamily: 'BrittiRegular'
     },
     timerCount: {
         fontWeight: 'bold',

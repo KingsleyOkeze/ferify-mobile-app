@@ -8,7 +8,6 @@ import {
     TouchableOpacity,
     SafeAreaView,
 } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { useNotifications } from '@/contexts/NotificationContext';
 import { useRouter } from 'expo-router';
 

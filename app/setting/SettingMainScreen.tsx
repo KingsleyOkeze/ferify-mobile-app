@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
@@ -144,7 +144,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderTopWidth: 1,
         borderTopColor: '#DADADA',
-        // paddingHorizontal: 20, // Optional: keeping it flush or padded
     },
     listItem: {
         flexDirection: 'row',
@@ -210,12 +209,6 @@ const styles = StyleSheet.create({
         width: '80%',
         maxWidth: 256,
     },
-    // modalTitle: {
-    //     fontSize: 16,
-    //     fontWeight: 400,
-    //     color: '#080808',
-    //     marginBottom: 12,
-    // },
     modalDescription: {
         fontSize: 16,
         fontWeight: 400,

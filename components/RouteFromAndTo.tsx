@@ -7,26 +7,26 @@ interface RouteFromAndToProps {
     to: string;
 }
 
-const RouteFromAndTo: React.FC<RouteFromAndToProps> = ({ from, to }) => {
+export default function RouteFromAndTo({ from, to }: RouteFromAndToProps) {
     return (
         <View style={styles.container}>
             <View style={styles.contentWrapper}>
-                <Text 
-                    style={styles.locationText} 
-                    numberOfLines={1} 
+                <Text
+                    style={styles.locationText}
+                    numberOfLines={1}
                     ellipsizeMode="tail"
                 >
                     {from}
                 </Text>
-                <View style={styles.separatorContainer}><Image 
-                        source={require('../assets/images/routes-icons/from_to_icon.png')} 
-                        style={styles.arrowIcon} 
-                    />
+                <View style={styles.separatorContainer}><Image
+                    source={require('../assets/images/routes-icons/from_to_icon.png')}
+                    style={styles.arrowIcon}
+                />
                 </View>
 
-                <Text 
+                <Text
                     style={styles.locationText}
-                    numberOfLines={1} 
+                    numberOfLines={1}
                     ellipsizeMode="tail"
                 >
                     {to}
@@ -39,12 +39,11 @@ const RouteFromAndTo: React.FC<RouteFromAndToProps> = ({ from, to }) => {
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#000000',
-        borderRadius: 100,
-        paddingHorizontal: 16,
+        borderRadius: 30,
+        paddingHorizontal: 20,
         height: 44,
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: 10,
         overflow: 'hidden',
     },
     contentWrapper: {
@@ -55,21 +54,22 @@ const styles = StyleSheet.create({
     },
     locationText: {
         color: '#FFFFFF',
-        fontSize: 14,
+        fontSize: 16,
+        fontFamily: 'BrittiSemibold',
         fontWeight: '600',
-
-        flex: 1,              
-        flexShrink: 1,        
+        lineHeight: 24,
+        flex: 1,
+        flexShrink: 1,
         textAlign: 'center',
     },
     separatorContainer: {
-        paddingHorizontal: 8,        
+        paddingHorizontal: 8,
         justifyContent: 'center',
         alignItems: 'center',
     },
     arrowIcon: {
         width: 40,
+        height: 1
     }
 });
 
-export default RouteFromAndTo;

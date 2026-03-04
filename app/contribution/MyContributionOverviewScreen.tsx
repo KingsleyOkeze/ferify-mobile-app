@@ -93,7 +93,7 @@ function MyContributionOverviewScreen() {
     );
 
     // Check if user has any contributions (if any value is not '0')
-    const hasContributions = stats.some(stat => stat.value !== '0' && stat.value !== 0 && stat.value !== '0.0');
+    const hasContributions = stats.some(stat => stat.value !== '0' && stat.value !== '0.0');
 
 
     const menuItems = [
@@ -204,20 +204,20 @@ const styles = StyleSheet.create({
         paddingTop: 4,
     },
     header: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 15,
+        marginBottom: 24,
     },
     headerSubtitle: {
         fontSize: 14,
@@ -232,8 +232,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        marginBottom: 30,
+        paddingHorizontal: 16,
+        marginBottom: 32,
     },
     statCard: {
         width: '48%',
@@ -257,8 +257,9 @@ const styles = StyleSheet.create({
         marginRight: 6,
     },
     cardTitle: {
-        fontSize: 12,
-        fontWeight: '600',
+        fontSize: 14,
+        lineHeight: 24,
+        fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#080808',
         flex: 1, // Allow text to wrap if needed
@@ -308,8 +309,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
-        paddingHorizontal: 20,
+        // paddingVertical: 18,
+        paddingHorizontal: 16,
         backgroundColor: '#fff',
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',

@@ -109,7 +109,7 @@ export default function LeadersBoardScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
                     <Ionicons name="arrow-back" size={24} color="#080808" />
                 </TouchableOpacity>
-                <Text style={styles.title}>Leaderboard</Text>
+                <Text style={styles.title}>Leaderboards</Text>
             </View>
 
             {/* Toggle Section */}
@@ -178,10 +178,10 @@ export default function LeadersBoardScreen() {
                                     </View>
                                     <View>
                                         <Text style={styles.rankingName}>{item.name}</Text>
-                                        <Text style={[styles.rankingName, { fontSize: 12, color: '#666', fontWeight: '400' }]}>{item.title}</Text>
+                                        <Text style={[styles.rankingName, { fontSize: 14, color: '#757575', fontWeight: '400', lineHeight: 24 }]}>{item.title}</Text>
                                     </View>
                                 </View>
-                                <Text style={styles.rankingCount}>{item.count}</Text>
+                                <Text style={styles.rankingCount}>+{item.count}</Text>
                             </View>
                         ))}
                     </View>
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         paddingBottom: 8,
     },
     backButton: {
-        marginBottom: 20,
+        marginBottom: 24,
         width: 24,
         height: 24,
         justifyContent: 'center',
@@ -220,7 +220,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         marginTop: 24,
         marginBottom: 32,
-        height: 44
+        width: 300,
+        height: 44,
+        marginLeft: 'auto',
+        marginRight: 'auto',
     },
     toggleContainer: {
         flexDirection: 'row',
@@ -245,7 +248,8 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     toggleText: {
-        fontSize: 15,
+        fontSize: 14,
+        lineHeight: 16,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
     },
@@ -259,11 +263,12 @@ const styles = StyleSheet.create({
     },
     rankingHeader: {
         paddingHorizontal: 24,
-        marginBottom: 16,
+        marginBottom: 10,
     },
     rankingTitle: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 600,
+        lineHeight: 24,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
@@ -282,8 +287,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 14,
-        paddingHorizontal: 16,
+        height: 68,
+        paddingHorizontal: 12,
         marginBottom: 10,
         borderRadius: 8,
         backgroundColor: '#F3F3F3',
@@ -299,16 +304,19 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 12,
+        marginRight: 10,
     },
     rankingName: {
-        fontSize: 15,
+        fontSize: 14,
         fontWeight: 600,
+        marginBottom: 2,
+        lineHeight: 24,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     rankingCount: {
         fontSize: 14,
+        lineHeight: 24,
         color: '#1B9E4B',
         fontWeight: 400,
         fontFamily: 'BrittiRegular',

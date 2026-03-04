@@ -70,13 +70,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontFamily: 'BrittiSemibold',
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 600,
         fontFamily: 'BrittiRegular',
-        color: '#000',
+        color: '#080808',
     },
 });
 

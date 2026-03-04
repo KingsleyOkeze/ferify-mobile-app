@@ -273,8 +273,8 @@ export default function SignUpScreen() {
                                     <Ionicons
                                         name={showPassword ? "eye-off-outline" : "eye-outline"}
                                         size={20}
-                                        color="#666"
-                                        style={{ marginRight: 10 }}
+                                        color="#6B6B6B"
+                                        // style={{ marginRight: 2 }}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -341,16 +341,16 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 24,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        // paddingTop: 10,
         paddingBottom: 20,
     },
     header: {
-        marginBottom: 20,
-        marginLeft: -10,
+        marginBottom: 24,
+        marginLeft: -4,
     },
     backButton: {
-        padding: 10,
+        // padding: 10,
     },
     stepContainer: {
         marginBottom: 24,
@@ -373,19 +373,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     stepText: {
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: "BrittiRegular",
         fontWeight: 400,
         color: '#080808',
     },
     textContainer: {
-        marginBottom: 32,
+        marginBottom: 40,
     },
     title: {
         fontSize: 24,
         fontWeight: 700,
         color: "#080808",
-        marginBottom: 8,
+        marginBottom: 4,
         alignSelf: "flex-start",
         fontFamily: "BrittiBold",
     },
@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     inputGroup: {
-        marginBottom: 20,
+        marginBottom: 32,
     },
     label: {
         fontSize: 16,
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
         color: "#EF4444",
         fontSize: 12,
         fontFamily: "BrittiRegular",
-        marginTop: 4,
+        marginTop: 8,
         textAlign: "right",
     },
     createButton: {
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 10,
+        // marginTop: 10,
     },
     disabledButton: {
         backgroundColor: "#CECECE",
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     separatorContainer: {
         flexDirection: "row",
         alignItems: "center",
-        marginVertical: 30,
+        marginVertical: 24,
     },
     separatorLine: {
         flex: 1,
@@ -492,7 +492,7 @@ const styles = StyleSheet.create({
         fontFamily: "BrittiRegular",
         color: "#6B6B6B",
         textAlign: "center",
-        marginTop: 24,
+        marginTop: 12,
         lineHeight: 18,
     },
     termsHighlight: {
@@ -500,7 +500,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
     },
     footerLink: {
-        marginTop: 32,
+        marginTop: 24,
         alignItems: "center",
         marginBottom: 20,
     },

@@ -163,9 +163,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 16,
+        // paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 10,
+        // paddingBottom: 24,
     },
     backButton: {
         width: 40,
@@ -174,36 +174,39 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     scrollContent: {
-        paddingTop: 8,
+        paddingTop: 24,
         paddingBottom: 40,
     },
     titleSection: {
         marginBottom: 32,
     },
     title: {
-        fontSize: 28,
-        fontWeight: '800',
+        fontSize: 22,
+        fontWeight: '600',
         color: '#080808',
-        marginBottom: 12,
-        paddingHorizontal: 24,
+        marginBottom: 8,
+        lineHeight: 19.2,
+        paddingHorizontal: 16,
         fontFamily: 'BrittiSemibold'
     },
     subtitle: {
-        fontSize: 16,
+        fontSize: 14,
+        fontWeight: 400,
         color: '#393939',
         lineHeight: 24,
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         fontFamily: 'BrittiRegular'
     },
     listSection: {
         marginBottom: 32,
     },
     listTitle: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '600',
         color: '#080808',
-        marginBottom: 20,
-        paddingHorizontal: 24,
+        lineHeight: 24,
+        marginBottom: 10,
+        paddingHorizontal: 16,
         fontFamily: 'BrittiSemibold'
     },
     listContainer: {
@@ -237,19 +240,21 @@ const styles = StyleSheet.create({
     listItemText: {
         fontSize: 16,
         color: '#080808',
-        fontWeight: '500',
+        fontWeight: '400',
         flex: 1,
+        fontFamily: 'BrittiRegular'
     },
     whatStaysSection: {
         marginTop: 8,
         marginBottom: 40,
     },
     whatStaysTitle: {
-        fontSize: 18,
-        fontWeight: '700',
+        fontSize: 16,
+        fontWeight: '600',
         color: '#080808',
-        marginBottom: 16,
-        paddingHorizontal: 24,
+        lineHeight: 24,
+        marginBottom: 10,
+        paddingHorizontal: 16,
         fontFamily: 'BrittiSemibold'
     },
     whatStaysContent: {
@@ -258,14 +263,16 @@ const styles = StyleSheet.create({
         borderColor: '#DADADA',
         backgroundColor: '#FFFFFF',
         height: 82,
-        paddingVertical: 20,
-        paddingHorizontal: 24,
+        justifyContent: 'center',
+        alignItems: 'center',
+        // paddingVertical: 20,
+        paddingHorizontal: 16,
     },
     whatStaysDescription: {
         fontSize: 14,
         color: '#080808',
         fontWeight: 400,
-        lineHeight: 22,
+        lineHeight: 24,
         fontFamily: 'BrittiRegular'
     },
     deleteButton: {
@@ -352,7 +359,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        // marginBottom: 20
     },
     cancelModalButton: {
         backgroundColor: '#F0F0F0',

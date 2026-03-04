@@ -144,32 +144,33 @@ function PasswordResetScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
         fontWeight: 400,
         color: '#080808',
+        fontFamily: 'BrittiRegular'
     },
     keyboardView: {
         flex: 1,
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingTop: 30,
+        paddingTop: 32,
         paddingBottom: 40,
     },
     imageContainer: {
@@ -187,22 +188,26 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         color: '#080808',
         marginBottom: 10,
+        fontFamily: 'BrittiSemibold',
+        lineHeight: 19.2
     },
     instructionText: {
         fontSize: 14,
         fontWeight: 400,
         color: '#393939',
-        lineHeight: 20,
+        lineHeight: 24,
         marginBottom: 30,
+        fontFamily: 'BrittiRegular'
     },
     inputGroup: {
         marginBottom: 20,
     },
     inputLabel: {
-        fontSize: 14,
+        fontSize: 16,
         fontWeight: 400,
         color: '#080808',
         marginBottom: 8,
+        fontFamily: 'BrittiRegular'
     },
     input: {
         height: 50,
@@ -213,13 +218,16 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#080808',
         backgroundColor: '#EDEDED',
+        fontFamily: 'BrittiRegular'
     },
     inputFocused: {
         borderColor: '#6B6B6B',
         backgroundColor: '#F0F0F0',
     },
     footer: {
-        padding: 20,
+        paddingTop: 20,
+        paddingBottom: 40,
+        paddingHorizontal: 16,
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',
     },

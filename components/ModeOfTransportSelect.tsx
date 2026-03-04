@@ -49,26 +49,27 @@ const styles = StyleSheet.create({
     },
     card: {
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#F5F5F5',
-        borderRadius: 18,
+        borderRadius: 20,
         shadowOpacity: 0.2,
         shadowRadius: 4,
         width: '32.5%',
-        height: 129,
+        height: 107.84,
         borderWidth: 1,
         borderColor: 'transparent', // Default transparent border
+        paddingVertical: 12,
     },
     cardSelected: {
         borderColor: '#080808', // Black border when selected
-        // backgroundColor: '#fff',
     },
     image: {
-        width: '100%',
-        height: 86,
+        width: 50.17,
+        height: 44,
         borderRadius: 8,
     },
     text: {
-        marginTop: 8,
+        marginTop: 20,
         textAlign: 'center',
         fontSize: 14,
         fontWeight: '500',

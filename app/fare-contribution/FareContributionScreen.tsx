@@ -493,9 +493,11 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        paddingVertical: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: '#E0E0E0',
+        paddingTop: 10,
+        // paddingBottom: 10,
+        marginLeft: -4
+        // borderBottomWidth: 1,
+        // borderBottomColor: '#E0E0E0',
     },
     backButton: {
         width: 40,
@@ -512,18 +514,21 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         color: '#080808',
         marginBottom: 8,
+        fontFamily: 'BrittiSemibold'
     },
     subtitle: {
         fontSize: 14,
         fontWeight: 400,
         color: '#393939',
-        marginBottom: 32,
+        fontFamily: 'BrittiRegular',
+        marginBottom: 24,
     },
     sectionTitle: {
         fontSize: 16,
         fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
-        paddingTop: 35,
+        paddingTop: 32,
         paddingBottom: 16,
     },
     fareInputContainer: {
@@ -532,19 +537,22 @@ const styles = StyleSheet.create({
         backgroundColor: '#F0F0F0',
         borderRadius: 100,
         paddingHorizontal: 16,
-        paddingVertical: 14,
-        marginBottom: 16,
+        // paddingVertical: 14,
+        marginBottom: 8,
+        height: 50
     },
     nairaSign: {
         fontSize: 16,
         fontWeight: 400,
         color: '#080808',
         marginRight: 8,
+        fontFamily: 'BrittiRegular'
     },
     fareInput: {
         flex: 1,
         fontSize: 16,
-        color: '#000',
+        color: '#080808',
+        fontFamily: 'BrittiRegular'
     },
     quickSelectContainer: {
         flexDirection: 'row',
@@ -558,11 +566,14 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#EBEDEF',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     quickSelectText: {
         fontSize: 14,
         fontWeight: 400,
         color: '#080808',
+        fontFamily: 'BrittiRegular'
     },
     selectInput: {
         flexDirection: 'row',
@@ -577,11 +588,13 @@ const styles = StyleSheet.create({
     },
     selectInputText: {
         fontSize: 16,
+        fontFamily: 'BrittiRegular',
         color: '#757575',
         flex: 1,
     },
     placeholderText: {
         color: '#757575',
+        fontFamily: 'BrittiRegular'
     },
     conditionsChipsContainer: {
         flexDirection: 'row',
@@ -594,6 +607,8 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#DADADA',
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     conditionChipSelected: {
         borderColor: '#6B6B6B',
@@ -601,6 +616,7 @@ const styles = StyleSheet.create({
     conditionChipText: {
         fontSize: 14,
         color: '#080808',
+        fontFamily: 'BrittiRegular'
     },
     conditionChipTextSelected: {
         fontWeight: '600',
@@ -609,9 +625,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#F2F3F4',
         borderRadius: 12,
         paddingHorizontal: 16,
-        paddingVertical: 14,
+        paddingVertical: 16,
         fontSize: 16,
-        color: '#000',
+        color: '#080808',
+        fontFamily: 'BrittiRegular',
         minHeight: 97,
         marginBottom: 32,
     },
@@ -620,7 +637,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         paddingVertical: 16,
         alignItems: 'center',
-        marginTop: 8,
         marginBottom: 40,
     },
     submitButtonDisabled: {

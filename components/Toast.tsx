@@ -17,17 +17,21 @@ const { width } = Dimensions.get('window');
 const getToastConfig = (type: ToastType) => {
     switch (type) {
         case 'success':
-            return { image: 'checkmark-circle-outline', color: '#4CAF50' };
+            return { image: require('../assets/images/toast-icons/success-icon.png'), color: '#4CAF50' };
         case 'error':
             return { image: require('../assets/images/toast-icons/error-icon.png'), color: '#F44336' };
         case 'badge':
-            return { image: 'trophy-outline', color: '#FF9800' };
+            return { image: require('../assets/images/toast-icons/point-earned-icon.png'), color: '#FF9800' };
         case 'points':
-            return { image: 'star-outline', color: '#2196F3' };
-        case 'thanks':
-            return { image: 'heart-outline', color: '#9C27B0' };
+            return { image: require('../assets/images/toast-icons/point-earned-icon.png'), color: '#2196F3' };
+        case 'saved':
+            return { image: require('../assets/images/toast-icons/input-saved-icon.png'), color: '#9C27B0' };
+        case 'feature_update':
+            return { image: require('../assets/images/toast-icons/feature-update-icon.png'), color: '#080808' };
+        case 'general':
+            return { image: require('../assets/images/toast-icons/general-icon.png'), color: '#080808' };
         default:
-            return { image: 'information-circle-outline', color: '#080808' };
+            return { image: require('../assets/images/toast-icons/success-icon.png'), color: '#080808' };
     }
 };
 

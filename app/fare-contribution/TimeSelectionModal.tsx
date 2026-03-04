@@ -25,14 +25,14 @@ interface TimeSelectionModalProps {
     currentSelection: string;
 }
 
-const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({
+export default function TimeSelectionModal({
     visible,
     onClose,
     onSave,
     options,
     currentSelection,
-}) => {
-    const [slideAnim] = useState(new Animated.Value(height));
+}: TimeSelectionModalProps) {
+    const slideAnim = React.useRef(new Animated.Value(height)).current;
     const [tempSelection, setTempSelection] = useState(currentSelection);
 
     useEffect(() => {
@@ -45,14 +45,10 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({
                 friction: 11,
             }).start();
         } else {
-            // Reset state or handle closure
-            Animated.timing(slideAnim, {
-                toValue: height,
-                duration: 250,
-                useNativeDriver: true,
-            }).start();
+            // Ensure it's off-screen when not visible
+            slideAnim.setValue(height);
         }
-    }, [visible, currentSelection]);
+    }, [visible, currentSelection, slideAnim]);
 
     const handleSave = () => {
         const selectedOption = options.find(o => o.value === tempSelection);
@@ -67,13 +63,12 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({
             toValue: height,
             duration: 250,
             useNativeDriver: true,
-        }).start(() => {
-            onClose();
+        }).start(({ finished }) => {
+            if (finished) {
+                onClose();
+            }
         });
     };
-
-    // Removed early return to allow Modal to manage visibility and animations correctly
-    // if (!visible) return null;
 
     return (
         <Modal
@@ -139,7 +134,7 @@ const TimeSelectionModal: React.FC<TimeSelectionModalProps> = ({
             </TouchableOpacity>
         </Modal>
     );
-};
+}
 
 const styles = StyleSheet.create({
     modalOverlay: {
@@ -148,7 +143,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
     },
     modalContent: {
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
         borderTopLeftRadius: 24,
         borderTopRightRadius: 24,
         paddingTop: 24,
@@ -160,7 +155,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 600,
         color: '#000000',
-        marginBottom: 20,
+        marginBottom: 24,
         alignItems: 'center',
         textAlign: 'center',
         justifyContent: 'center',
@@ -172,8 +167,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 16,
-        paddingHorizontal: 16,
+        // paddingVertical: 16,
+        // paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         height: 60
@@ -189,15 +184,15 @@ const styles = StyleSheet.create({
     modalListItemText: {
         fontSize: 16,
         color: '#000000',
+        fontFamily: 'BrittiRegular',
         fontWeight: 400,
-        fontFamily: 'Britti Sans Trial',
         flex: 1,
     },
     radioButton: {
         width: 20,
         height: 20,
-        borderRadius: 12,
-        borderWidth: 2,
+        borderRadius: 41.67,
+        borderWidth: 1.67,
         borderColor: '#9C9C9C',
         justifyContent: 'center',
         alignItems: 'center',
@@ -218,20 +213,22 @@ const styles = StyleSheet.create({
         height: 50,
         borderRadius: 100,
         paddingVertical: 14,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     cancelButtonText: {
         fontSize: 16,
         fontWeight: '600',
+        fontFamily: 'BrittiRegular',
         color: '#212121',
-        fontFamily: 'Britti Sans Trial',
     },
     saveButton: {
         flex: 1,
         backgroundColor: '#080808',
         borderRadius: 100,
         height: 50,
-        paddingVertical: 14,
+        // paddingVertical: 14,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     saveButtonDisabled: {
@@ -241,11 +238,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 600,
         color: '#FBFBFB',
-        fontFamily: 'Britti Sans Trial',
+        fontFamily: 'BrittiRegular',
     },
     saveButtonTextDisabled: {
         color: '#979797',
     },
 });
 
-export default TimeSelectionModal;

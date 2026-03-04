@@ -5,6 +5,7 @@ import {
     StyleSheet,
     TouchableOpacity,
     SafeAreaView,
+    Image,
     ScrollView,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -30,7 +31,10 @@ function AboutAppScreen() {
                 {/* Center Info */}
                 <View style={styles.centerInfo}>
                     <View style={styles.logoPlaceholder}>
-                        <Text style={styles.logoText}>F</Text>
+                        <Image 
+                            source={require('../../assets/images/logo/WHITE-LOGO.png')}
+                            style={styles.logo}
+                        />
                     </View>
                     <Text style={styles.appName}>Ferify</Text>
                     <Text style={styles.versionText}>Version 1.0.0</Text>
@@ -42,10 +46,10 @@ function AboutAppScreen() {
                     <Text style={styles.sectionTitle}>What is Ferify</Text>
                     <View style={styles.detailsBox}>
                         <Text style={styles.detailsText}>
-                            Ferify is a community-driven platform that helps daily commuters
-                            find reliable transport fares and route information.
-                            By sharing and verifying fares, we make commuting transparent
-                            and predictable for everyone.
+                            Ferify is a community-powered transport fare checker
+                            for everyday Nigerians. We help you find accurate bus,
+                            keke, and okada fares, preventing overcharging and helping 
+                            you plan your transport budget with confidence.
                         </Text>
                     </View>
                 </View>
@@ -63,9 +67,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
     },
@@ -84,7 +88,7 @@ const styles = StyleSheet.create({
     centerInfo: {
         alignItems: 'center',
         marginTop: 40,
-        marginBottom: 40,
+        marginBottom: 32,
         backgroundColor: "#FFFFFF",
         borderRadius: 20,
         borderWidth: 1,
@@ -94,16 +98,18 @@ const styles = StyleSheet.create({
         marginHorizontal: 20    
     },
     logoPlaceholder: {
-        width: 80,
-        height: 80,
-        borderRadius: 20,
+        width: 54,
+        height: 54,
+        borderRadius: 90,
         backgroundColor: '#000',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 20,
     },
-    logoText: {
-        color: '#fff',
+    logo: {
+        width: 27.94,
+        height: 32,
+        // color: '#fff',
         fontSize: 40,
         fontWeight: 'bold',
     },
@@ -112,19 +118,23 @@ const styles = StyleSheet.create({
         fontWeight: 700,
         fontFamily: 'BrittiBold',
         color: '#080808',
-        marginBottom: 8,
+        marginBottom: 20,
+        lineHeight: 19.2
     },
     versionText: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 5,
+        marginBottom: 8,
+        fontWeight: 400,
+        lineHeight: 24
     },
     buildText: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
+        lineHeight: 24
     },
     explanationSection: {
         paddingHorizontal: 20,
@@ -137,7 +147,8 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 20,
+        marginBottom: 12,
+        lineHeight: 19.2
     },
     detailsBox: {
         backgroundColor: '#F3F3F3',
@@ -148,7 +159,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'BrittiRegular',
         color: '#393939',
-        lineHeight: 22,
+        lineHeight: 24,
         fontWeight: 400
     },
 });

@@ -16,26 +16,23 @@ function PopularQuestionScreen() {
     const questions = [
         {
             id: '1',
-            title: 'How do I reset my password?',
-            answer: 'To reset your password, go to the login screen and tap on "Forgot Password". Follow the instructions sent to your email to create a new password.',
+            title: 'How do I report fares?',
+            subtitle: 'Get started',
+            answer: 'To report a fare, simply search for your route or select one from the Home screen. Once you\'re on the Route details, tap the "Share Fare" button and enter the amount you paid. This helps others know the current market price!',
             onPress: (item: any) => router.push({ pathname: '/help/AnswerToQuestionScreen', params: { title: item.title, answer: item.answer } })
         },
         {
             id: '2',
-            title: 'How to change email address?',
-            answer: 'You can change your email address in the Account Settings. Go to Settings > Account > Email and follow the verification steps.',
+            title: 'Why are some routes missing?',
+            subtitle: 'Routes',
+            answer: 'Our database relies on commuter contributions. If you can\'t find a specific route, you can be the first to add it! Just use the "Share Fare" feature and enter the new route details to make it available for everyone else.',
             onPress: (item: any) => router.push({ pathname: '/help/AnswerToQuestionScreen', params: { title: item.title, answer: item.answer } })
         },
         {
             id: '3',
-            title: 'Is my payment information safe?',
-            answer: 'Yes, we use industry-standard encryption to protect your payment information. We do not store your full credit card details on our servers.',
-            onPress: (item: any) => router.push({ pathname: '/help/AnswerToQuestionScreen', params: { title: item.title, answer: item.answer } })
-        },
-        {
-            id: '4',
-            title: 'Cannot connect to server',
-            answer: 'Please check your internet connection. If the problem persists, try restarting the app or contact support if you continue to experience issues.',
+            title: 'How do I earn points?',
+            subtitle: 'Points & rewards',
+            answer: 'You earn points (Ferify Points) for every fare you report and for every existing fare you verify. As your points grow, you\'ll unlock exclusive badges and move up the community leaderboards!',
             onPress: (item: any) => router.push({ pathname: '/help/AnswerToQuestionScreen', params: { title: item.title, answer: item.answer } })
         },
     ];
@@ -58,7 +55,10 @@ function PopularQuestionScreen() {
                             style={styles.listItem}
                             onPress={() => item.onPress(item)}
                         >
-                            <Text style={styles.itemTitle}>{item.title}</Text>
+                            <View style={{ flex: 1 }}>
+                                <Text style={styles.itemTitle}>{item.title}</Text>
+                                <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
+                            </View>
                             <Ionicons name="chevron-forward" size={20} color="#999" />
                         </TouchableOpacity>
                     ))}
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 30,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
+        lineHeight: 24
     },
     scrollContent: {
         paddingBottom: 40,
@@ -113,7 +114,15 @@ const styles = StyleSheet.create({
         color: '#080808',
         flex: 1, // Ensure text takes available space
         marginRight: 16,
+        lineHeight: 24
     },
+    itemSubtitle: {
+        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
+        color: '#757575',
+        lineHeight: 24,
+        fontSize: 14
+    }
 });
 
 export default PopularQuestionScreen;

@@ -132,7 +132,7 @@ export default function VerifyLoginScreen() {
                 >
                     {/* Title and Subtitle */}
                     <View style={styles.textContainer}>
-                        <Text style={styles.title}>Login verification</Text>
+                        <Text style={styles.title}>Enter the verification code</Text>
                         <Text style={styles.subtitle}>
                             We'll send a code of verification to <Text style={styles.emailText}>{email}</Text>
                         </Text>
@@ -192,26 +192,30 @@ const styles = StyleSheet.create({
         height: 40,
         justifyContent: "center",
         alignItems: "center",
+        marginLeft: -13,
+        marginBottom: 24
     },
     scrollContent: {
-        paddingHorizontal: 24,
-        paddingTop: 20,
+        paddingHorizontal: 16,
+        // paddingTop: 20,
         paddingBottom: 40,
     },
     textContainer: {
-        marginBottom: 40,
+        marginBottom: 32,
     },
     title: {
         fontSize: 24,
         fontWeight: '600',
         color: '#080808',
         marginBottom: 8,
+        fontFamily: 'BrittiBold'
     },
     subtitle: {
         fontSize: 14,
         fontWeight: '400',
         color: '#393939',
         lineHeight: 24,
+        fontFamily: 'BrittiRegular'
     },
     emailText: {
         fontWeight: '400',
@@ -223,7 +227,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         width: '100%',
-        marginBottom: 32,
+        marginBottom: 12,
     },
     otpInput: {
         width: 74,
@@ -244,6 +248,7 @@ const styles = StyleSheet.create({
     },
     resendText: {
         fontSize: 16,
+        fontFamily: 'BrittiBold',
         color: '#080808',
         fontWeight: 700,
         textDecorationLine: 'underline',
@@ -251,10 +256,12 @@ const styles = StyleSheet.create({
     timerText: {
         fontSize: 14,
         color: '#666',
+        fontFamily: 'BrittiRegular'
     },
     timerCount: {
         fontWeight: 'bold',
         color: '#080808',
+        fontFamily: 'BrittiBold'
     },
     otpInputActive: {
         borderColor: '#080808',

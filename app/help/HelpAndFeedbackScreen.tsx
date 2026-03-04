@@ -95,10 +95,10 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 25, 
+        marginBottom: 24, 
     },
     headerTitle: {
-        fontSize: 28, 
+        fontSize: 24, 
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',

@@ -117,11 +117,12 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
-        paddingBottom: 40,
+        // paddingBottom: 40,
         paddingHorizontal: 17,
         paddingTop: 16,
         width: '100%',
         minHeight: 304,
+        // backgroundColor: 'green',
         // elevation: 20,
         // shadowColor: "#000",
         // shadowOffset: { width: 0, height: -2 },
@@ -168,6 +169,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         width: '100%',
         gap: 16,
+        // backgroundColor: 'red'
     },
     notNowButton: {
         flex: 1,

@@ -10,7 +10,7 @@ interface IconProps extends SvgProps {
  * EXACT HOME ICON
  * Matches the outline style with the rounded door.
  */
-export const HomeIcon: React.FC<IconProps> = ({ size = 24, color = "#000000", ...props }) => {
+export function HomeIcon({ size = 24, color = "#000000", ...props }: IconProps) {
     return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
             <Path
@@ -26,11 +26,11 @@ export const HomeIcon: React.FC<IconProps> = ({ size = 24, color = "#000000", ..
  * EXACT DISCOVER ICON
  * Matches the Solid Black Circle with White Compass Needle inside.
  */
-export const DiscoverIcon: React.FC<IconProps> = ({
+export function DiscoverIcon({
     size = 24,
     color = "#000000",
     ...props
-}) => {
+}: IconProps) {
     return (
         <Svg
             width={size}
@@ -64,24 +64,24 @@ export const DiscoverIcon: React.FC<IconProps> = ({
  * EXACT ACCOUNT ICON
  * Matches the circle outline with the user head/shoulders.
  */
-export const AccountIcon: React.FC<IconProps> = ({ size = 24, color = "#000000", ...props }) => {
+export function AccountIcon({ size = 24, color = "#000000", ...props }: IconProps) {
     return (
         <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
             {/* Outer Ring */}
-            <Circle 
-                cx="12" 
-                cy="12" 
-                r="10" 
-                stroke={color} 
-                strokeWidth={2} 
+            <Circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke={color}
+                strokeWidth={2}
             />
             {/* Head */}
-            <Circle 
-                cx="12" 
-                cy="9" 
-                r="3" 
-                stroke={color} 
-                strokeWidth={2} 
+            <Circle
+                cx="12"
+                cy="9"
+                r="3"
+                stroke={color}
+                strokeWidth={2}
             />
             {/* Shoulders (Curved) */}
             <Path

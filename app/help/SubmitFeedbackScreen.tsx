@@ -127,26 +127,27 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 25,
+        // paddingBottom: 8,
     },
     backButton: {
         alignSelf: 'flex-start',
         marginLeft: -4,
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
+        marginBottom: 24,
     },
     scrollContent: {
-        padding: 24,
+        paddingHorizontal: 16,
     },
     description: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'BrittiRegular',
         color: '#393939',
         marginBottom: 32,
@@ -163,12 +164,12 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     input: {
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F0F0F0',
         borderWidth: 1,
         borderColor: '#E0E0E0',
         borderRadius: 12,
-        paddingHorizontal: 16,
-        paddingVertical: 14, // Consistent padding
+        paddingHorizontal: 12,
+        paddingVertical: 12, // Consistent padding
         fontSize: 16,
         fontFamily: 'BrittiRegular',
         color: '#080808',

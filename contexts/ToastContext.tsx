@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 
-export type ToastType = 'success' | 'error' | 'badge' | 'points' | 'thanks';
+export type ToastType = 'success' | 'error' | 'badge' | 'points' | 'saved' | 'feature_update' | 'general';
 
 interface ToastOptions {
     type: ToastType;
@@ -17,7 +17,7 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export function ToastProvider({ children }: { children: ReactNode }) {
     const [activeToast, setActiveToast] = useState<ToastOptions | null>(null);
 
     const hideToast = useCallback(() => {

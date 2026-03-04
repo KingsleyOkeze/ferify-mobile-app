@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     View,
     Text,
@@ -41,7 +41,7 @@ function AllContributionsScreen() {
     const [historyData, setHistoryData] = useState<any[]>([]);
 
     // Initial load from cache
-    React.useEffect(() => {
+    useEffect(() => {
         loadCachedHistory();
     }, [activeTab]);
 
@@ -71,25 +71,58 @@ function AllContributionsScreen() {
     const fetchHistory = async () => {
         setIsLoading(true);
         try {
-            // Fetch data based on activeTab
-            // Endpoint: /api/user/contribution/history?type=fares
+            // Map frontend tab to backend type
+            const typeMap: { [key in TabType]: string } = {
+                fares: 'fare_submission',
+                routes: 'route_confirmation',
+                reports: 'incorrect_report'
+            };
+
             const response = await api.get('/api/user/contribution/history', {
-                params: { type: activeTab }
+                params: { type: typeMap[activeTab] }
             });
 
             if (response.data && response.data.history) {
-                // Map the response to ensure icons are handled correctly
-                const mappedHistory = response.data.history.map((group: any) => ({
-                    ...group,
-                    items: group.items.map((item: any) => {
-                        let imageSource = busImage;
-                        if (item.transport === 'keke') imageSource = kekeImage;
-                        if (item.transport === 'okada') imageSource = okadaImage;
+                const rawHistory = response.data.history;
 
-                        // Retain existing image logic
-                        return { ...item, image: imageSource };
-                    })
+                // Group by date
+                const grouped: { [key: string]: any[] } = {};
+                rawHistory.forEach((item: any) => {
+                    const date = new Date(item.timestamp || item.createdAt || Date.now());
+                    const dateGroup = date.toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+
+                    if (!grouped[dateGroup]) {
+                        grouped[dateGroup] = [];
+                    }
+
+                    // Map transport type to image and format other fields
+                    let imageSource = busImage;
+                    const transport = item.details?.vehicleType || item.vehicleType || 'bus';
+                    if (transport === 'keke') imageSource = kekeImage;
+                    if (transport === 'bike' || transport === 'okada') imageSource = okadaImage;
+
+                    grouped[dateGroup].push({
+                        id: item._id,
+                        from: item.details?.from || item.origin?.raw?.split(',')[0] || 'Unknown',
+                        to: item.details?.to || item.destination?.raw?.split(',')[0] || 'Unknown',
+                        price: item.details?.fareAmount ? `₦${item.details.fareAmount}` : (item.fareAmount ? `₦${item.fareAmount}` : ''),
+                        time: item.details?.timeOfDay || item.timeOfDay || 'Unknown',
+                        transport: transport,
+                        image: imageSource,
+                        points: `+${item.pointsAwarded || 50} pts`,
+                        issue: item.type === 'incorrect_report' ? (item.details?.issue || 'Incorrect Report') : undefined
+                    });
+                });
+
+                const mappedHistory = Object.keys(grouped).map(dateGroup => ({
+                    dateGroup,
+                    items: grouped[dateGroup]
                 }));
+
                 setHistoryData(mappedHistory);
                 // Cache data
                 const cacheKey = `${STORAGE_KEYS.CONTRIBUTION_HISTORY}_${activeTab}`;
@@ -265,15 +298,16 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 10,
+        paddingBottom: 32,
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 24,
+        lineHeight: 19.2,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
@@ -282,18 +316,19 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
     },
     tabItem: {
         flex: 1,
         alignItems: 'center',
-        paddingVertical: 14,
+        paddingBottom: 12,
     },
     tabLabel: {
         fontSize: 16,
         fontFamily: 'BrittiRegular',
         color: '#757575',
-        fontWeight: 400,
+        fontWeight: 600,
+        lineHeight: 24
     },
     activeTabLabel: {
         color: '#080808',
@@ -304,17 +339,17 @@ const styles = StyleSheet.create({
     activeTabIndicator: {
         position: 'absolute',
         bottom: 0,
-        width: '60%',
+        width: '85%',
         height: 3,
         backgroundColor: '#080808',
         borderRadius: 2,
     },
     scrollContent: {
         paddingBottom: 40,
-        paddingTop: 20,
+        paddingTop: 32,
     },
     groupContainer: {
-        marginBottom: 24,
+        marginBottom: 32,
     },
     dateHeader: {
         fontSize: 16,
@@ -322,14 +357,15 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginLeft: 20,
-        marginTop: 5,
-        marginBottom: 20,
+        // marginTop: 5,
+        marginBottom: 16,
     },
     card: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 16,
-        paddingHorizontal: 20,
+        minHeight: 112,
+        paddingVertical: 20,
+        paddingHorizontal: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         backgroundColor: '#FFFFFF',
@@ -341,11 +377,11 @@ const styles = StyleSheet.create({
     iconContainer: {
         width: 72,
         height: 72,
-        borderRadius: 20,
-        backgroundColor: '#F9F9F9',
+        borderRadius: 4,
+        backgroundColor: '#F3F3F3',
         justifyContent: 'center',
         alignItems: 'center',
-        marginRight: 16,
+        marginRight: 12,
     },
     transportIcon: {
         width: 44,
@@ -353,33 +389,37 @@ const styles = StyleSheet.create({
     },
     cardContent: {
         flex: 1,
-        height: '100%'
+        height: '100%',
     },
     cardMainText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#000',
-        marginBottom: 2,
+        color: '#393939',
+        // marginBottom: 2,
+        lineHeight: 24,
     },
     reportIssueText: {
         color: '#080808',
         fontFamily: 'BrittiSemibold',
         fontWeight: 600,
-        fontSize: 14
+        fontSize: 14,
+        lineHeight: 24,
     },
     cardSubText: {
         fontSize: 14,
-        fontWeight: 400,
+        fontWeight: 600,
         color: '#080808',
-        marginTop: 10,
-        marginBottom: 2,
+        // marginTop: 10,
+        // marginBottom: 2,
+        lineHeight: 24
     },
     cardTimeText: {
         fontSize: 12,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
+        lineHeight: 24,
     },
     spacer: {
         height: 4,
@@ -389,11 +429,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 8,
-        height: '100%'
+        height: '100%',
 
     },
     pointsText: {
-        fontSize: 12,
+        fontSize: 14,
+        lineHeight: 24,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#1B9E4B',
@@ -409,7 +450,7 @@ const styles = StyleSheet.create({
     noDataImage: {
         width: 95.6,
         height: 97.36,
-        marginBottom: 24,
+        marginBottom: 32,
     },
     noDataTitle: {
         fontSize: 18,
@@ -418,6 +459,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         textAlign: 'center',
         marginBottom: 12,
+        lineHeight: 19.2
     },
     noDataSubtitle: {
         fontSize: 14,
@@ -425,8 +467,8 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular',
         color: '#757575',
         textAlign: 'center',
-        lineHeight: 22,
-        marginBottom: 32,
+        lineHeight: 24,
+        marginBottom: 40,
         width: '90%'
     },
     emptyStateButton: {
@@ -440,6 +482,7 @@ const styles = StyleSheet.create({
     emptyStateButtonText: {
         color: '#FBFBFB',
         fontSize: 16,
+        lineHeight: 24,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
     },

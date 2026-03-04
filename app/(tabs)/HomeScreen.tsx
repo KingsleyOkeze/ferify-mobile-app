@@ -3,7 +3,7 @@ import ModeOfTransportSelect from "@/components/ModeOfTransportSelect";
 import NotificationPermissionModal from "@/components/NotificationPermissionModal";
 import { STORAGE_KEYS } from '@/constants/storage';
 import { cacheHelper } from '@/utils/cache';
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
     View,
     Text,
@@ -18,7 +18,7 @@ import {
     Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { ActivityIndicator } from "react-native";
 import api from "@/services/api";
 import { getCachedLocation, fetchAndCacheLocation } from "@/services/locationService";
@@ -51,6 +51,42 @@ function HomeScreen() {
     const [isLocalFeed, setIsLocalFeed] = useState(true);
     const [loadingNearby, setLoadingNearby] = useState(false);
 
+    const loadNearbyFares = useCallback(async () => {
+        setLoadingNearby(true);
+        try {
+            // Try to get location, but don't block if it fails
+            const location = await getCachedLocation() || await fetchAndCacheLocation();
+
+            const params: any = {};
+            if (location) {
+                params.lng = location.longitude;
+                params.lat = location.latitude;
+                params.radius = 10000; // 10km
+            }
+
+            const response = await api.get('/api/fare/nearby', { params });
+
+            if (response.data) {
+                const { fares, isLocal } = response.data;
+                if (fares && fares.length > 0) {
+                    setNearbyFares(fares);
+                    setIsLocalFeed(isLocal);
+                }
+            }
+        } catch (error) {
+            console.warn("Failed to load nearby fares:", error);
+        } finally {
+            setLoadingNearby(false);
+        }
+    }, []);
+
+    // Refresh when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            loadNearbyFares();
+        }, [loadNearbyFares])
+    );
+
     useEffect(() => {
         // Register for push notifications and sync token
         syncPushTokenWithBackend();
@@ -81,73 +117,41 @@ function HomeScreen() {
         };
         checkNotificationPrompt();
 
-        // Initial load
-        loadNearbyFares();
-
         // Socket connection for real-time updates
-        // Connecting through the API Gateway
         const serverUrl = process.env.EXPO_PUBLIC_SERVER_URL || '';
         const socket = io(serverUrl, {
-            path: '/api/fare/socket.io', // Path through gateway
+            path: '/api/fare/socket.io',
             transports: ['websocket']
         });
 
         socket.on('nearby_contribution', (newFare: any) => {
             console.log('New nearby fare received via socket:', newFare);
-            // Prepend new fare and keep top 3
             setNearbyFares(prev => {
                 const exists = prev.find(f => f.id === newFare.id);
                 if (exists) return prev;
                 return [newFare, ...prev].slice(0, 3);
             });
-            // If we get a socket event, it's definitely a new activity (usually local in the future with rooms)
             setIsLocalFeed(true);
         });
 
-        // Silent refresh when app comes to foreground or screen is re-visited
-        const interval = setInterval(loadNearbyFares, 60000); // Check every minute
+        // Silent refresh at intervals while staying on screen
+        const interval = setInterval(loadNearbyFares, 60000);
 
         return () => {
             socket.disconnect();
             clearInterval(interval);
             cleanupNotifications();
         };
-    }, []);
-
-    const loadNearbyFares = async () => {
-        try {
-            // Try to get location, but don't block if it fails
-            const location = await getCachedLocation() || await fetchAndCacheLocation();
-
-            const params: any = {};
-            if (location) {
-                params.lng = location.longitude;
-                params.lat = location.latitude;
-                params.radius = 10000; // 10km
-            }
-
-            const response = await api.get('/api/fare/nearby', { params });
-
-            if (response.data) {
-                const { fares, isLocal } = response.data;
-                if (fares && fares.length > 0) {
-                    setNearbyFares(fares);
-                    setIsLocalFeed(isLocal);
-                }
-            }
-        } catch (error) {
-            console.warn("Failed to load nearby fares:", error);
-        }
-    };
+    }, [loadNearbyFares]);
 
 
 
     const FEATURED_CARDS = [
         {
             id: '1',
-            description: 'Share your fare to help other commuters plan better.',
+            description: 'Earn points every time you share a fare.',
             buttonText: 'Share Fare',
-            backgroundColor: '#014C1D',
+            backgroundColor: '#212121',
             image: require("../../assets/images/contributeAndEarnImage.png"),
             onPress: () => router.push('../fare-contribution/FareContributionScreen')
         },
@@ -203,7 +207,11 @@ function HomeScreen() {
             <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
                 {/* Header: Logo and Notification Bell */}
                 <View style={styles.header}>
-                    <Text style={styles.logo}>Ferify</Text>
+                    <Image
+                        source={require("../../assets/images/logo/ferify-text-logo-white-text.png")}
+                        style={styles.logo}
+                        resizeMode="contain"
+                    />
                     <TouchableOpacity
                         style={styles.notificationButton}
                         onPress={() => router.push('/notification/NotificationScreen')}
@@ -255,7 +263,7 @@ function HomeScreen() {
                             setVoiceModalVisible(true);
                         }
                     }}>
-                        <Ionicons name="mic" size={20} color="#000" style={styles.micIcon} />
+                        <Ionicons name="mic" size={20} color="#080808" style={styles.micIcon} />
                     </TouchableOpacity>
                 </View>
 
@@ -409,10 +417,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     logo: {
-        fontFamily: "BrittiBold",
-        fontSize: 26,
-        fontWeight: 700,
-        color: "#080808",
+        width: 66.58,
+        height: 26.07,
     },
     notificationButton: {
         width: 40,
@@ -447,13 +453,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#f2f2f2",
         borderRadius: 100,
-        paddingHorizontal: 10,
+        paddingHorizontal: 16,
         paddingVertical: 6,
-        marginBottom: 10,
         height: 52
     },
     searchIcon: {
-        marginRight: 6,
+        marginRight: 10,
         color: "#000000"
     },
     micIcon: {
@@ -472,7 +477,7 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiBold',
         marginBottom: 18,
         color: "#080808",
-        marginTop: 25,
+        marginTop: 32,
     },
     featureCard: {
         flexDirection: "row",
@@ -491,18 +496,13 @@ const styles = StyleSheet.create({
         width: 187,
         justifyContent: 'space-between',
     },
-    // cardTitle: {
-    //     color: "#FBFBFB",
-    //     fontSize: 14,
-    //     fontWeight: 700,
-    //     marginBottom: 6,
-    // },
     cardDescription: {
         color: "#FBFBFB",
         fontSize: 14,
         fontWeight: 700,
         marginBottom: 10,
-        lineHeight: 18,
+        lineHeight: 24,
+        fontFamily: 'BrittiBold',
     },
     shareButton: {
         backgroundColor: "#FFFFFF",
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
         height: 119.59,
         marginLeft: 10,
         position: 'absolute',
-        bottom: -5,
+        bottom: -10,
         right: 16
 
     },
@@ -541,10 +541,6 @@ const styles = StyleSheet.create({
         paddingVertical: 20,
         alignItems: 'center',
     },
-    // firstFeedCard: {
-    //     borderTopWidth: 1,
-    //     borderTopColor: '#F2F2F2',
-    // },
     feedCardLeft: {
         marginRight: 12,
         height: '100%'
@@ -598,14 +594,16 @@ const styles = StyleSheet.create({
     noCommuteDataImage: {
         width: 150,
         height: 150,
-        marginBottom: 16
+        marginTop: 56,
+        marginBottom: 32
     },
     noCommuteDataTitle: {
         fontFamily: 'BrittiSemibold',
         fontSize: 16,
         fontWeight: 600,
         color: '#080808',
-        marginBottom: 8
+        marginBottom: 32,
+        lineHeight: 24
     },
     noCommuteDataDescription: {
         fontFamily: 'BrittiRegular',
@@ -613,7 +611,7 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         color: '#757575',
         textAlign: 'center',
-        marginBottom: 20,
+        marginBottom: 32,
         maxWidth: '80%',
         lineHeight: 24
     },
@@ -622,12 +620,17 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: 16,
         color: '#080808',
-        textDecorationLine: 'underline'
+        lineHeight: 24,
+        borderBottomWidth: 1,
+        borderBottomColor: '#666',
+        paddingBottom: 1,
+        alignSelf: 'center',
+        marginBottom: 56
     },
     fab: {
         position: 'absolute',
-        bottom: 25, // Adjusted to be slightly above the bottom tab
-        right: 20,
+        bottom: 10, // Adjusted to be slightly above the bottom tab
+        right: 7,
         width: 44,
         height: 44,
         borderRadius: 22,

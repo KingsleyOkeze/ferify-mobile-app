@@ -5,10 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { fetchAndCacheLocation } from "@/services/locationService";
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
-// Import your custom design directly
 import MyCustomSplashScreen from "./auth/onboarding/SplashScreen";
-import InAppNotification from "@/components/InAppNotification";
-import { View } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from "@/constants/storage";
 
@@ -98,9 +95,6 @@ export default function Index() {
             ? "/auth/login/LoginScreen"
             : "/auth/onboarding/OnboardingScreen";
 
-    return <Redirect href={targetRoute} />;
-
-    // return (
-    //     <Redirect href="/(tabs)/HomeScreen" />
-    // );
+    // return <Redirect href={targetRoute} />;
+    return <Redirect href={"/auth/onboarding/OnboardingScreen"} />;
 }

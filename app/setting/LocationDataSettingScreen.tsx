@@ -35,11 +35,11 @@ function LocationDataSettingScreen() {
     };
 
     const loadSettings = async () => {
-        // 1. Check OS Permissions first (Highest Priority)
+        // Check OS Permissions first (Highest Priority)
         const isHandledByOS = await syncSettingsWithOS();
         if (isHandledByOS) return;
 
-        // 2. Load from Cache
+        // Load from Cache
         const cached = await cacheHelper.get<{ shareLocationData: boolean }>(STORAGE_KEYS.PRIVACY_SETTINGS, Infinity);
         if (cached) {
             setSelectedOption(cached.shareLocationData ? 'while_using' : 'never');
@@ -165,7 +165,7 @@ const styles = StyleSheet.create({
     backButton: {
         alignSelf: 'flex-start',
         marginTop: 10,
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,

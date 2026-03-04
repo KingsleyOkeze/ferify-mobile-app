@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -47,33 +47,33 @@ const slides = [
 
 
 const handFareCheckImageStyle: any = {
-    width: 255.28,
-    height: 334.19,
+    width: 228.82,
+    height: 299.54,
     resizeMode: 'contain',
     position: 'absolute',
     zIndex: 10,
-    top: '97%',
+    top: '92%',
     left: '17.7%',
-    transform: [{ translateX: -127 }, { translateY: -167 }]
+    transform: [{ translateX: -127 }, { translateY: -147 }]
 };
 
 const busAndConductorImageStyle: any = {
-    width: 136.17,
-    height: 142.5,
+    width: 110.18,
+    height: 115.3,
     resizeMode: 'contain',
     position: 'absolute',
-    top: '75%',
-    left: '50%',
-    transform: [{ translateX: -68 }, { translateY: -71 }]
+    top: '70%',
+    left: '60%',
+    transform: [{ translateX: -68 }, { translateY: -51 }]
 };
 
 const busConductorWordsImageStyle: any = {
-    width: 134.86,
-    height: 112.86,
+    width: 122.91,
+    height: 102.86,
     resizeMode: 'contain',
     position: 'absolute',
-    top: '35%',
-    left: '50%',
+    top: '30%',
+    left: '55%',
     transform: [{ translateX: -67 }, { translateY: -56 }]
 };
 
@@ -105,15 +105,18 @@ export default function OnboardingScreen() {
         }
     };
 
+    // Automatic carousel progression
+    useEffect(() => {
+        // const timer = setInterval(() => {
+        //     setStep(prev => (prev + 1) % slides.length);
+        // }, 5000); // 5 seconds per slide
+        // return () => clearInterval(timer);
+    }, []);
+
+
     return (
         <SafeAreaView style={styles.container}>
-            {/* Top Right Skip Button */}
-            <View style={styles.topHeader}>
-                <TouchableOpacity onPress={skip} style={styles.skipBtn}>
-                    <Text style={styles.skipText}>Skip</Text>
-                </TouchableOpacity>
-            </View>
-
+            {/* Skip button removed */}
             <View style={styles.imageArea}>
                 {step === 0 ? (
                     (slides[0].images as any[]).map((img: any, index: number) => (
@@ -136,7 +139,7 @@ export default function OnboardingScreen() {
                             width: 296.51,
                             height: 298.04,
                             position: "absolute",
-                            top: "66%",
+                            top: "60%",
                             left: " 50%",
                             transform: [{ translateX: -98 }, { translateY: -149 }],
                             zIndex: 10,
@@ -157,18 +160,22 @@ export default function OnboardingScreen() {
                         />
                     ))}
                 </View>
-                <Text style={[styles.title, { width: (slides[step] as any).title1Width }]}>
-                    {slides[step].title1}
-                </Text>
-                <Text style={[styles.title, { width: (slides[step] as any).title2Width }]}>
-                    {slides[step].title2}
-                </Text>
-                <Text style={[styles.title, { width: (slides[step] as any).title3Width }]}>
-                    {slides[step].title3}
-                </Text>
-                <Text style={styles.subtitle}>
-                    {slides[step].subtitle}
-                </Text>
+                <View style={styles.titleContainer}>
+                    <Text style={[styles.title, { width: (slides[step] as any).title1Width }]}>
+                        {slides[step].title1}
+                    </Text>
+                    <Text style={[styles.title, { width: (slides[step] as any).title2Width }]}>
+                        {slides[step].title2}
+                    </Text>
+                    <Text style={[styles.title, { width: (slides[step] as any).title3Width }]}>
+                        {slides[step].title3}
+                    </Text>
+                </View>
+                <View style={styles.subtitleContainer}>
+                    <Text style={styles.subtitle}>
+                        {slides[step].subtitle}
+                    </Text>
+                </View>
 
                 {/* Bottom Buttons Row */}
                 <View style={styles.buttonRow}>
@@ -204,8 +211,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#FBFBFB",
-        // backgroundColor: 'red'
+        // backgroundColor: "#FBFBFB",
         position: 'relative'
     },
     topHeader: {
@@ -216,18 +222,19 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     imageArea: {
-        flex: 4,
+        flex: 3.5,
     },
     bottomSheet: {
-        flex: 3,
-        paddingTop: 30,
-        paddingHorizontal: 25,
+        flex: 4.5,
+        paddingTop: 24,
+        paddingHorizontal: 16,
+        paddingBottom: 20,
         alignItems: "center",
         backgroundColor: "#fff",
     },
     dotsRow: {
         flexDirection: "row",
-        marginBottom: 25,
+        marginBottom: 32,
         gap: 10,
     },
     dot: {
@@ -242,12 +249,26 @@ const styles = StyleSheet.create({
         width: 6,
         backgroundColor: "#D9D9D9",
     },
+    titleContainer: {
+        marginBottom: 20,
+        textAlign: "center",
+        alignItems: "center",
+        flexGrow: 0,
+    },
     title: {
         fontFamily: "BrittiBold",
         fontSize: 24,
         fontWeight: 700,
         textAlign: "center",
         color: "#080808",
+    },
+
+    subtitleContainer: {
+        textAlign: "center",
+        alignItems: "center",
+        width: '85%',
+        marginBottom: 54,
+        flexGrow: 0,
     },
     subtitle: {
         fontFamily: "BrittiRegular",
@@ -257,22 +278,20 @@ const styles = StyleSheet.create({
         color: "#757575",
         textAlign: "center",
         lineHeight: 22,
-        marginBottom: 40,
-        paddingTop: 10,
+        paddingTop: 24,
         paddingHorizontal: 10,
     },
     buttonRow: {
         flexDirection: "row",
         width: "100%",
         gap: 12,
-        paddingVertical: 10,
-        // backgroundColor: 'green',
-        position: 'absolute',
-        bottom: 0
+        marginTop: 'auto',
+        paddingBottom: 40,
+        // backgroundColor: 'red'
     },
     btn: {
         flex: 1,
-        height: 56,
+        height: 50,
         borderRadius: 100,
         justifyContent: "center",
         alignItems: "center",

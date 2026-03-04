@@ -21,12 +21,12 @@ interface SuccessModalProps {
     onClaimReward: () => void;
 }
 
-const SuccessModal: React.FC<SuccessModalProps> = ({
+export default function SuccessModal({
     visible,
     onClose,
-}) => {
+}: SuccessModalProps) {
     const router = useRouter();
-    const [slideAnim] = useState(new Animated.Value(height));
+    const slideAnim = React.useRef(new Animated.Value(height)).current;
 
     useEffect(() => {
         if (visible) {
@@ -37,26 +37,21 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
                 friction: 11,
             }).start();
         } else {
-            Animated.timing(slideAnim, {
-                toValue: height,
-                duration: 250,
-                useNativeDriver: true,
-            }).start();
+            slideAnim.setValue(height);
         }
-    }, [visible]);
+    }, [visible, slideAnim]);
 
     const handleClose = () => {
         Animated.timing(slideAnim, {
             toValue: height,
             duration: 250,
             useNativeDriver: true,
-        }).start(() => {
-            onClose();
+        }).start(({ finished }) => {
+            if (finished) {
+                onClose();
+            }
         });
     };
-
-    // Removed early return
-    // if (!visible) return null;
 
     return (
         <Modal
@@ -112,7 +107,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
             </TouchableOpacity>
         </Modal>
     );
-};
+}
 
 const styles = StyleSheet.create({
     modalOverlay: {
@@ -204,4 +199,3 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SuccessModal;

@@ -19,8 +19,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
-
-const { width } = Dimensions.get('window');
+import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 
 function UpdateUserPhoneNumberScreen() {
     const router = useRouter();
@@ -62,16 +61,6 @@ function UpdateUserPhoneNumberScreen() {
         setPhoneNumber(prev => prev.slice(0, -1));
     };
 
-    const KeypadButton = ({ value, onPress, isIcon = false }: { value: string, onPress: () => void, isIcon?: boolean }) => (
-        <TouchableOpacity style={styles.keypadButton} onPress={onPress} activeOpacity={0.6}>
-            {isIcon ? (
-                <Ionicons name="backspace-outline" size={24} color="#000" />
-            ) : (
-                <Text style={styles.keypadButtonText}>{value}</Text>
-            )}
-        </TouchableOpacity>
-    );
-
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
@@ -110,7 +99,6 @@ function UpdateUserPhoneNumberScreen() {
                             showSoftInputOnFocus={false} // Custom keypad
                             onFocus={() => {
                                 setIsInputFocused(true);
-                                Keyboard.dismiss(); // Ensure platform keyboard is hidden
                             }}
                             onBlur={() => setIsInputFocused(false)}
                         />
@@ -137,31 +125,10 @@ function UpdateUserPhoneNumberScreen() {
                         </Text>
                     </TouchableOpacity>
                 </ScrollView>
-
-                {/* Custom Keypad at the bottom */}
-                <View style={styles.keypadContainer}>
-                    <View style={styles.keypadRow}>
-                        <KeypadButton value="1" onPress={() => handleKeyPress('1')} />
-                        <KeypadButton value="2" onPress={() => handleKeyPress('2')} />
-                        <KeypadButton value="3" onPress={() => handleKeyPress('3')} />
-                    </View>
-                    <View style={styles.keypadRow}>
-                        <KeypadButton value="4" onPress={() => handleKeyPress('4')} />
-                        <KeypadButton value="5" onPress={() => handleKeyPress('5')} />
-                        <KeypadButton value="6" onPress={() => handleKeyPress('6')} />
-                    </View>
-                    <View style={styles.keypadRow}>
-                        <KeypadButton value="7" onPress={() => handleKeyPress('7')} />
-                        <KeypadButton value="8" onPress={() => handleKeyPress('8')} />
-                        <KeypadButton value="9" onPress={() => handleKeyPress('9')} />
-                    </View>
-                    <View style={styles.keypadRow}>
-                        <View style={styles.keypadEmpty} />
-                        <KeypadButton value="0" onPress={() => handleKeyPress('0')} />
-                        <KeypadButton value="del" onPress={handleDelete} isIcon />
-                    </View>
-                </View>
             </View>
+
+            {/* Custom Keypad at the bottom */}
+            <CustomNumberKeyboard onPress={handleKeyPress} onDelete={handleDelete} />
         </SafeAreaView>
     );
 }
@@ -169,26 +136,26 @@ function UpdateUserPhoneNumberScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: 600,
         fontFamily: 'BrittiRegular',
-        color: '#000',
+        color: '#080808',
     },
     content: {
         flex: 1,
@@ -233,11 +200,11 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#000',
-        backgroundColor: '#F9F9F9',
+        backgroundColor: '#F0F0F0',
     },
     inputFocused: {
-        borderColor: '#000',
-        backgroundColor: '#fff',
+        borderColor: '#6B6B6B',
+        backgroundColor: '#F0F0F0',
     },
     statementRow: {
         marginTop: 8,
@@ -247,18 +214,18 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#999',
+        color: '#393939',
         fontStyle: 'italic',
     },
     updateButton: {
         height: 56,
-        backgroundColor: '#000',
+        backgroundColor: '#080808',
         borderRadius: 28,
         justifyContent: 'center',
         alignItems: 'center',
     },
     updateButtonDisabled: {
-        backgroundColor: '#F0F0F0',
+        backgroundColor: '#CECECE',
     },
     updateButtonText: {
         fontSize: 16,
@@ -267,32 +234,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     updateButtonTextDisabled: {
-        color: '#999',
-    },
-    keypadContainer: {
-        paddingBottom: Platform.OS === 'ios' ? 20 : 10,
-        backgroundColor: '#fff',
-        borderTopWidth: 1,
-        borderTopColor: '#F5F5F5',
-    },
-    keypadRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingVertical: 4,
-    },
-    keypadButton: {
-        width: width / 3,
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    keypadButtonText: {
-        fontSize: 22,
-        fontWeight: '600',
-        color: '#000',
-    },
-    keypadEmpty: {
-        width: width / 3,
+        color: '#979797',
     },
 });
 

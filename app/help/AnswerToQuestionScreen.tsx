@@ -58,9 +58,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center', // Center content (Title)
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#EFEFEF',
         position: 'relative', // For absolute positioning of buttons
@@ -94,18 +94,18 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 24,
-        lineHeight: 32,
+        lineHeight: 24,
     },
     answerContainer: {
-        backgroundColor: '#F3F3F3', // Light grey type background as requested
+        backgroundColor: '#F3F3F3', 
         borderRadius: 8,
         padding: 12,
     },
     answerText: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#333',
+        color: '#393939',
         lineHeight: 24,
     },
 });

@@ -18,7 +18,7 @@ function TransportPreferenceScreen() {
             id: 'modes',
             title: 'Transport preferences',
             description: 'Select your preferred vehicles',
-            onPress: () => {  }, // Navigate to modes selection
+            onPress: () => {  }, 
         },
         {
             id: 'routes',
@@ -53,7 +53,6 @@ function TransportPreferenceScreen() {
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                                 <Text style={styles.itemDescription}>{item.description}</Text>
                             </View>
-                            {/* Arrow without tail: Chevron Forward */}
                             <Ionicons name="chevron-forward" size={20} color="#999" />
                         </TouchableOpacity>
                     ))}
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
     backButton: {
         alignSelf: 'flex-start',
         padding: 4,
-        marginBottom: 10,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,

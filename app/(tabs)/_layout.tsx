@@ -24,7 +24,6 @@ function TabsLayout() {
                         height: 90,
                         paddingBottom: 4,
                         position: 'relative',
-                        // backgroundColor: 'red'
                     },
                 }}
             >

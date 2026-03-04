@@ -9,24 +9,29 @@ import {
     KeyboardAvoidingView,
     Platform,
     ActivityIndicator,
-    Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
+import { useToast } from '@/contexts/ToastContext';
+import { useLoader } from '@/contexts/LoaderContext';
 
 function ForgotPasswordScreen() {
     const router = useRouter();
+    const { showToast } = useToast();
+    const { showLoader, hideLoader } = useLoader();
     const [email, setEmail] = useState('');
+    const [isInputFocused, setIsInputFocused] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSendCode = async () => {
         if (!email || !email.includes('@')) {
-            Alert.alert('Error', 'Please enter a valid email address');
+            showToast('error', 'Please enter a valid email address');
             return;
         }
 
         setIsLoading(true);
+        showLoader();
         try {
             // Using the auth endpoint for non-logged in users
             const response = await api.post('/api/user/auth/forgot-password', { email });
@@ -40,9 +45,10 @@ function ForgotPasswordScreen() {
             }
         } catch (error: any) {
             console.error('Forgot password initiation error:', error);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to send verification code');
+            showToast('error', error.response?.data?.error || 'Failed to send verification code');
         } finally {
             setIsLoading(false);
+            hideLoader();
         }
     };
 
@@ -71,13 +77,18 @@ function ForgotPasswordScreen() {
                     <Text style={styles.inputLabel}>Email address</Text>
                     <View style={styles.inputWrapper}>
                         <TextInput
-                            style={styles.input}
+                            style={[
+                                styles.input,
+                                isInputFocused && styles.inputFocused
+                            ]}
                             placeholder="e.g sample@gmail.com"
                             placeholderTextColor="#999"
                             keyboardType="email-address"
                             autoCapitalize="none"
                             value={email}
                             onChangeText={setEmail}
+                            onFocus={() => setIsInputFocused(true)}
+                            onBlur={() => setIsInputFocused(false)}
                         />
                     </View>
                 </View>
@@ -106,12 +117,12 @@ function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
+        // paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        // paddingBottom: 20,
     },
     headerButton: {
         width: 40,
@@ -121,22 +132,26 @@ const styles = StyleSheet.create({
     },
     content: {
         flex: 1,
-        paddingHorizontal: 24,
-        paddingTop: 20,
+        paddingHorizontal: 16,
+        paddingTop: 24,
     },
     textSection: {
         marginBottom: 32,
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily: 'BrittiBold',
+        fontWeight: '800',
         color: '#080808',
         marginBottom: 8,
+        lineHeight: 24
     },
     instructionText: {
         fontSize: 16,
-        color: '#666',
-        lineHeight: 22,
+        color: '#393939',
+        lineHeight: 24,
+        fontWeight: '400',
+        fontFamily: 'BrittiRegular'
     },
     inputGroup: {
         marginBottom: 24,
@@ -146,35 +161,49 @@ const styles = StyleSheet.create({
         fontWeight: '500',
         color: '#080808',
         marginBottom: 8,
+        fontFamily: 'BrittiRegular',
         marginLeft: 4,
     },
     inputWrapper: {
         backgroundColor: "#F5F7F9",
         borderRadius: 12,
-        paddingHorizontal: 16,
+        // paddingHorizontal: 16,
         height: 56,
         justifyContent: "center",
     },
     input: {
+        height: 50,
+        borderWidth: 1.5,
+        borderColor: '#F0F0F0',
+        borderRadius: 100,
+        paddingHorizontal: 16,
         fontSize: 16,
         color: '#080808',
+        backgroundColor: '#EDEDED',
+        fontFamily: 'BrittiRegular'
+    },
+    inputFocused: {
+        borderColor: '#6B6B6B',
+        backgroundColor: '#F0F0F0',
     },
     footer: {
-        marginTop: 20,
+        marginTop: 'auto',
+        paddingBottom: 20,
     },
     sendButton: {
         height: 56,
         backgroundColor: '#080808',
-        borderRadius: 12,
+        borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
     },
     sendButtonDisabled: {
-        backgroundColor: '#E0E0E0',
+        backgroundColor: '#F0F0F0',
     },
     sendButtonText: {
         fontSize: 16,
         fontWeight: '600',
+        fontFamily: 'BrittiBold',
         color: '#fff',
     },
 });

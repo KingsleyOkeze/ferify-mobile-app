@@ -78,9 +78,9 @@ function UpdateUserFullNameScreen() {
                 style={styles.content}
             >
                 <ScrollView contentContainerStyle={styles.formContainer}>
-                    <Text style={styles.screenTitle}>Update your name</Text>
+                    <Text style={styles.screenTitle}>Update your Full Name</Text>
                     <Text style={styles.descriptionText}>
-                        This is the name that will be displayed in your profile and community contributions.
+                        This is the name that will be displayed in your profile.
                     </Text>
 
                     {/* Current Name Info */}
@@ -154,48 +154,49 @@ function UpdateUserFullNameScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 18,
         fontWeight: 600,
         fontFamily: 'BrittiRegular',
-        color: '#000',
+        color: '#080808',
     },
     content: {
         flex: 1,
     },
     formContainer: {
         paddingHorizontal: 20,
-        paddingTop: 30,
-        paddingBottom: 40,
+        paddingTop: 24,
+        paddingBottom: 24,
     },
     screenTitle: {
         fontSize: 24,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000',
-        marginBottom: 10,
+        lineHeight: 19.2,
+        marginBottom: 8,
     },
     descriptionText: {
         fontSize: 14,
         fontFamily: 'BrittiRegular',
-        color: '#666',
-        lineHeight: 20,
-        marginBottom: 30,
+        color: '#393939',
+        lineHeight: 24,
+        marginBottom: 24,
     },
     infoGroup: {
         marginBottom: 30,
@@ -211,10 +212,11 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     currentValue: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#393939',
+        color: '#757575',
+        lineHeight: 24
     },
     inputStack: {
         gap: 20,
@@ -223,29 +225,32 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     fieldLabel: {
-        fontSize: 14,
-        fontWeight: 600,
+        fontSize: 16,
+        fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#000',
-        marginBottom: 10,
+        color: '#080808',
+        marginBottom: 16,
     },
     input: {
+        
         height: 50,
         borderWidth: 1,
-        borderColor: '#F0F0F0',
+        borderColor: '#EDEDED',
         borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 16,
         fontFamily: 'BrittiRegular',
-        color: '#000',
-        backgroundColor: '#F9F9F9',
+        color: '#080808',
+        backgroundColor: '#F0F0F0',
     },
     inputFocused: {
-        borderColor: '#000',
-        backgroundColor: '#fff',
+        borderColor: '#6B6B6B',
+        backgroundColor: '#F0F0F0',
     },
     footer: {
-        padding: 20,
+        paddingTop: 20,
+        paddingBottom: 40,
+        paddingHorizontal: 16,
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',
     },
@@ -263,10 +268,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
-        color: '#fff',
+        color: '#FFFFFF',
     },
     updateButtonTextDisabled: {
-        color: '#999',
+        color: '#979797',
     },
 });
 

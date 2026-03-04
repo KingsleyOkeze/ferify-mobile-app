@@ -197,13 +197,13 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
         paddingBottom: 20,
     },
     header: {
-        marginBottom: 20,
-        marginLeft: -10,
+        marginBottom: 24,
+        marginLeft: -16,
     },
     backButton: {
         padding: 10,
@@ -235,18 +235,20 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 8,
     },
     subtitle: {
         fontSize: 14,
         fontWeight: '400',
+        fontFamily: 'BrittiRegular',
         color: '#393939',
         lineHeight: 22,
     },
     imageContainer: {
         alignItems: 'center',
-        marginVertical: 25,
+        marginVertical: 32,
     },
     imageWrapper: {
         position: 'relative',
@@ -295,8 +297,9 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: '400',
+        fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginTop: 15,
+        marginTop: 32,
         marginBottom: 8,
         marginLeft: 4,
     },

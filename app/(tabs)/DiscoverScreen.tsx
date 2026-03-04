@@ -258,7 +258,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        paddingTop: 20,
+        paddingTop: 16,
         paddingBottom: 10,
     },
     headerTitle: {
@@ -458,6 +458,7 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular',
         color: '#080808',
         flex: 1,
+        height: '100%'
     },
     popularMetaColumn: {
         marginTop: 4,
@@ -467,7 +468,8 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 4,
+        marginBottom: 2,
+        lineHeight: 24
     },
     popularTimeRow: {
         flexDirection: 'row',

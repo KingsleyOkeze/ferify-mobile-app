@@ -15,7 +15,7 @@ interface LogoutModalProps {
     onClose: () => void;
 }
 
-const LogoutModal: React.FC<LogoutModalProps> = ({ isVisible, onClose }) => {
+export default function LogoutModal({ isVisible, onClose }: LogoutModalProps) {
     const router = useRouter();
     const { logout } = useAuth();
 
@@ -126,4 +126,3 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LogoutModal;

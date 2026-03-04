@@ -142,8 +142,8 @@ function AccountDetailsScreen() {
     };
 
     const personalInfoItems = [
-        { id: 'username', title: 'Username', value: user?.username ? `@${user.username}` : 'Set username', onPress: () => router.push('../setting/UpdateUsernameScreen') },
         { id: 'name', title: 'Full name', value: user?.fullName || 'Set your name', onPress: () => router.push('../setting/UpdateUserFullNameScreen') },
+        { id: 'username', title: 'Username', value: user?.username ? `@${user.username}` : 'Set username', onPress: () => router.push('../setting/UpdateUsernameScreen') },
         { id: 'phone', title: 'Phone number', value: user?.phone || 'Add phone number', onPress: () => router.push('../setting/UpdateUserPhoneNumberScreen') },
         { id: 'email', title: 'Email address', value: user?.email || 'Set email', onPress: () => router.push('../setting/UpdateUserEmailScreen') },
         { id: 'location', title: 'Location', value: user?.location || 'Set location', onPress: () => { } },
@@ -335,12 +335,12 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 20,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#EAECF1',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
@@ -356,13 +356,14 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginTop: 15,
+        marginTop: 24,
         marginLeft: 20,
-        marginBottom: 25,
+        marginBottom: 24,
+        lineHeight: 19.2
     },
     avatarContainer: {
         alignItems: 'center',
-        marginBottom: 30,
+        marginBottom: 24,
     },
     avatarWrapper: {
         position: 'relative',
@@ -425,15 +426,17 @@ const styles = StyleSheet.create({
     itemTitle: {
         fontSize: 16,
         fontWeight: 400,
+        lineHeight: 24,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 4,
+        // marginBottom: 2,
     },
     itemValue: {
         fontSize: 16,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
+        lineHeight: 24
     },
     footerStatement: {
         fontSize: 12,

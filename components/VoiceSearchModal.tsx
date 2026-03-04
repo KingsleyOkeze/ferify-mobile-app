@@ -26,7 +26,7 @@ import {
 
 // --- COMPONENTS ---
 
-// 1. The Red Ripple (Listening Mode)
+// The Red Ripple (Listening Mode)
 const RippleRing = ({ delay }: { delay: number }) => {
     const ring = useSharedValue(0);
 
@@ -55,7 +55,7 @@ const RippleRing = ({ delay }: { delay: number }) => {
     return <Animated.View style={[styles.ripple, style]} />;
 };
 
-// 2. The Black Spinner (Processing Mode)
+// The Black Spinner (Processing Mode)
 const ProcessingSpinner = () => {
     const rotation = useSharedValue(0);
 

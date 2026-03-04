@@ -89,16 +89,11 @@ function UpdateUserEmailScreen() {
                             style={styles.emailIcon}
                         />
                     </View>
-                    <Text style={styles.screenTitle}>Update your email</Text>
+                    <Text style={styles.screenTitle}>Update your Email</Text>
                     <Text style={styles.descriptionText}>
-                        Changing your email address will require you to verify the new one before it becomes active.
+                        This is the email where you will receive messages, sign in
+                        and recover your account.
                     </Text>
-
-                    {/* Current Email */}
-                    <View style={styles.infoGroup}>
-                        <Text style={styles.label}>Current email address</Text>
-                        <Text style={styles.currentValue}>{currentEmail}</Text>
-                    </View>
 
                     {/* New Email Input */}
                     <View style={styles.inputGroup}>
@@ -159,15 +154,15 @@ function UpdateUserEmailScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
@@ -185,9 +180,8 @@ const styles = StyleSheet.create({
     },
     formContainer: {
         paddingHorizontal: 20,
-        paddingTop: 30,
+        paddingTop: 24,
         paddingBottom: 40,
-        // alignItems: 'center',
     },
     imageContainer: {
         marginBottom: 24,
@@ -204,7 +198,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000',
-        marginBottom: 10,
+        marginBottom: 8,
         textAlign: 'left',
     },
     descriptionText: {
@@ -212,8 +206,8 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
-        lineHeight: 20,
-        marginBottom: 30,
+        lineHeight: 22.4,
+        marginBottom: 33,
         textAlign: 'left',
     },
     infoGroup: {
@@ -225,14 +219,14 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiRegular',
         color: '#000',
-        marginBottom: 8,
+        marginBottom: 10,
     },
-    currentValue: {
-        fontSize: 14,
-        fontWeight: 400,
-        fontFamily: 'BrittiRegular',
-        color: '#666',
-    },
+    // currentValue: {
+    //     fontSize: 14,
+    //     fontWeight: 400,
+    //     fontFamily: 'BrittiRegular',
+    //     color: '#666',
+    // },
     inputGroup: {
         marginBottom: 20,
         width: '100%',
@@ -250,12 +244,12 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#000',
-        backgroundColor: '#F9F9F9',
+        color: '#080808',
+        backgroundColor: '#EDEDED',
     },
     inputFocused: {
-        borderColor: '#000',
-        backgroundColor: '#fff',
+        borderColor: '#080808',
+        backgroundColor: '#EDEDED',
     },
     inputLoading: {
         position: 'absolute',
@@ -264,8 +258,9 @@ const styles = StyleSheet.create({
     verificationNotice: {
         fontSize: 12,
         fontWeight: 400,
+        lineHeight: 24,
         fontFamily: 'BrittiRegular',
-        color: '#999',
+        color: '#393939',
         textAlign: 'right',
         marginTop: 8,
     },

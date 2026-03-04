@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
         paddingVertical: 15,
     },
     backButton: {
-        marginBottom: 10,
+        marginBottom: 24,
         alignSelf: 'flex-start',
     },
     screenTitle: {

@@ -165,7 +165,7 @@ function RouteSelectScreen() {
         const init = async () => {
             const { initialFrom, initialTo } = params;
 
-            // 1. Handle "From" Location
+            // Handle "From" Location
             if (initialFrom) {
                 setFromLocation(initialFrom as string);
                 setFromResult({
@@ -184,7 +184,7 @@ function RouteSelectScreen() {
                     });
                 }
 
-                // B. Freshness: Refresh in background to ensure accuracy
+                // Freshness: Refresh in background to ensure accuracy
                 // Request a fresh location if the cached one is older than 60 seconds
                 fetchAndCacheLocation(60000).then((fresh) => {
                     if (fresh && fresh.address && fresh.address !== cached?.address) {
@@ -197,7 +197,7 @@ function RouteSelectScreen() {
                 });
             }
 
-            // 2. Handle "To" Location (e.g. from Voice Search)
+            // Handle "To" Location (e.g. from Voice Search)
             if (initialTo) {
                 setToLocation(initialTo as string);
                 // Trigger search for the destination immediately
@@ -324,12 +324,6 @@ function RouteSelectScreen() {
                                         />
                                     </View>
                                 )}
-
-                                {isSearching && !recommendations.length && (
-                                    <View style={{ padding: 20, alignItems: 'center' }}>
-                                        <ActivityIndicator size="small" color="#000" />
-                                    </View>
-                                )}
                             </View>
 
                             {/* Replaced results list with LocationRecommendation component */}
@@ -397,7 +391,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 20,
-        marginBottom: 20,
+        // marginTop: 8,
+        marginBottom: 24,
     },
     headerSpacer: { width: 24 },
     headerTitle: {
@@ -426,7 +421,7 @@ const styles = StyleSheet.create({
     },
 
     modeOfTransportContainer: {
-        marginTop: 12
+        marginTop: 8
     }
 });
 

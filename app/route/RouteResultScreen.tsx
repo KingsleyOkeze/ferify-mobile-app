@@ -142,11 +142,11 @@ function RouteResultScreen() {
                                 {/* Bottom Row: Reliability & Contributors */}
                                 <View style={styles.summaryBottomRow}>
                                     <View style={styles.badgeContainer}>
-                                        <Ionicons name="shield-checkmark" size={16} color="#757575" style={styles.badgeIcon} />
+                                        <Ionicons name="shield-checkmark" size={20} color="#757575" style={styles.badgeIcon} />
                                         <Text style={styles.badgeText}>{getReliabilityText(estimate?.reliabilityScore)}</Text>
                                     </View>
                                     <View style={styles.badgeContainer}>
-                                        <Ionicons name="people" size={16} color="#757575" style={styles.badgeIcon} />
+                                        <Ionicons name="people" size={20} color="#757575" style={styles.badgeIcon} />
                                         <Text style={styles.badgeText}>{estimate?.contributorCount || 0} Contributors</Text>
                                     </View>
                                 </View>
@@ -263,24 +263,25 @@ function RouteResultScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingVertical: 12,
+        paddingTop: 16,
+        paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#000',
+        fontSize: 20,
+        fontWeight: 400,
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
     },
     liveUpdateContainer: {
         alignItems: 'center',
-        marginVertical: 16,
+        marginVertical: 24,
     },
     liveUpdatePill: {
         flexDirection: 'row',
@@ -302,19 +303,22 @@ const styles = StyleSheet.create({
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#4CAF50',
+        backgroundColor: '#21A351',
         marginRight: 6,
     },
     liveUpdateText: {
-        color: '#4CAF50',
-        fontSize: 12,
-        fontWeight: '600',
+        color: '#080808',
+        fontFamily: 'BrittiRegular',
+        fontSize: 14,
+        fontWeight: '400',
+        lineHeight: 24
     },
     summaryCard: {
         backgroundColor: '#F2F3F4',
         borderRadius: 16,
-        padding: 16,
-        marginTop: 10,
+        paddingVertical: 20,
+        paddingHorizontal: 12,
+        marginTop: 20,
         marginBottom: 20,
         minHeight: 154,
         borderWidth: 1,
@@ -325,16 +329,18 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 16,
+        marginBottom: 44,
     },
     summaryLabel: {
-        fontSize: 12,
-        color: '#666',
+        fontSize: 14,
+        color: '#757575',
+        lineHeight: 24,
         marginBottom: 4,
     },
     summaryPrice: {
         fontSize: 16,
         fontWeight: 700,
+        lineHeight: 24,
         fontFamily: 'BrittiBold',
         color: '#080808',
     },
@@ -351,7 +357,6 @@ const styles = StyleSheet.create({
     badgeContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F9F9F9',
         paddingHorizontal: 8,
         paddingVertical: 4,
         borderRadius: 6,
@@ -359,12 +364,13 @@ const styles = StyleSheet.create({
     badgeIcon: {
         marginRight: 4,
         width: 20,
-        height: 20
+        // height: 20
     },
     badgeText: {
         fontSize: 14,
         color: '#393939',
         fontWeight: 400,
+        lineHeight: 24,
         fontFamily: 'BrittiRegular',
     },
     breakdownToggle: {
@@ -380,7 +386,7 @@ const styles = StyleSheet.create({
     breakdownToggleDisabled: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#F5F5F5',
+        // backgroundColor: '#F5F5F5',
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 8,
@@ -524,8 +530,9 @@ const styles = StyleSheet.create({
     footer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        paddingBottom: 40,
         borderTopWidth: 1,
         borderTopColor: '#F0F0F0',
         backgroundColor: '#fff',

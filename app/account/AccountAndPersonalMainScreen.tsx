@@ -98,11 +98,11 @@ const styles = StyleSheet.create({
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: '600', // Fixed: fontWeight should be string '600' or number 600, but safest as string in some RN versions/libs or standard css. RN supports number. 
+        fontWeight: '600', 
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
@@ -110,7 +110,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     menuContainer: {
-        // paddingHorizontal: 20,
         backgroundColor: "#FFFFFF",
         borderTopWidth: 1,
         borderTopColor: '#DADADA',
@@ -119,14 +118,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
+        // paddingVertical: 18,
         paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         height: 79
     },
     disabledMenuItem: {
-        backgroundColor: '#F9F9F9', // Light background for disabled state
+        backgroundColor: '#F9F9F9', 
     },
     itemLeft: {
         flexDirection: 'row',

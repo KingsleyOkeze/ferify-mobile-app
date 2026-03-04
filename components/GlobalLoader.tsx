@@ -12,7 +12,8 @@ import Animated, {
 // --- CONFIGURATION ---
 const SPINNER_SIZE = 80; // Total diameter
 const STROKE_WIDTH = 5;  // Thickness of the ring
-const LOGO_SIZE = 40;    // Size of the logo inside
+const LOGO_SIZE = 15.24;    // Size of the logo inside
+const LOGO_HEIGHT = 18; 
 
 // Replace this with your actual local image import
 // e.g., require('../assets/images/logo.png')
@@ -113,7 +114,7 @@ const styles = StyleSheet.create({
     logoContainer: {
         position: 'absolute',
         width: LOGO_SIZE,
-        height: LOGO_SIZE,
+        height: LOGO_HEIGHT,
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 10,

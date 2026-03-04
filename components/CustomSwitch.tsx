@@ -15,13 +15,13 @@ interface CustomSwitchProps {
     style?: ViewStyle;
 }
 
-const CustomSwitch: React.FC<CustomSwitchProps> = ({
+export default function CustomSwitch({
     value,
     onValueChange,
     trackColor = { false: '#E3E3E3', true: '#080808' },
     thumbColor = '#FFFFFF',
     style,
-}) => {
+}: CustomSwitchProps) {
     // Dimensions
     const TRACK_WIDTH = 37.14;
     const TRACK_HEIGHT = 20;
@@ -97,4 +97,3 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomSwitch;

@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     backButton: {
         alignSelf: 'flex-start',
         marginLeft: -4,
-        marginBottom: 10,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
@@ -184,15 +184,15 @@ const styles = StyleSheet.create({
     },
     profileSection: {
         alignItems: 'center',
-        paddingVertical: 30,
-        marginHorizontal: 20,
+        paddingVertical: 20,
+        marginHorizontal: 12,
         backgroundColor: '#FFFFFF',
         borderWidth: 1,
         borderColor: '#DADADA',
         borderRadius: 12
     },
     avatarWrapper: {
-        marginBottom: 16,
+        marginBottom: 12,
     },
     avatarImage: {
         width: 52,
@@ -219,20 +219,21 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular',
         color: '#080808',
         textTransform: 'lowercase',
+        marginBottom: 12
     },
     pointsValue: {
         fontSize: 28,
         fontWeight: 700,
         fontFamily: 'BrittiBold',
         color: '#080808',
-        marginVertical: 4,
+        marginBottom: 32
     },
     username: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 8,
+        marginBottom: 20,
     },
     memberSinceContainer: {
         flexDirection: 'row',
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
         color: '#080808',
     },
     menuContainer: {
-        marginTop: 33,
+        marginTop: 32,
     },
     menuItem: {
         flexDirection: 'row',
@@ -297,7 +298,6 @@ const styles = StyleSheet.create({
     menuItemDisabled: {
         backgroundColor: '#FCFCFC',
         opacity: 0.7,
-        // Light shadow background indicator as requested
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.08,

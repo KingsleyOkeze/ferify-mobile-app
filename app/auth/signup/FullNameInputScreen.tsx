@@ -67,7 +67,7 @@ export default function FullNameInputScreen() {
                     <View style={styles.formContainer}>
                         {/* First Name */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>your first name</Text>
+                            <Text style={styles.label}>Your first name</Text>
                             <View style={[
                                 styles.inputWrapper,
                                 focusedField === 'firstName' && styles.focusedInput
@@ -87,7 +87,7 @@ export default function FullNameInputScreen() {
 
                         {/* Last Name */}
                         <View style={styles.inputGroup}>
-                            <Text style={styles.label}>your last name</Text>
+                            <Text style={styles.label}>Your last name</Text>
                             <View style={[
                                 styles.inputWrapper,
                                 focusedField === 'lastName' && styles.focusedInput
@@ -132,16 +132,16 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         flexGrow: 1,
-        paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        // paddingTop: 10,
         paddingBottom: 20,
     },
     header: {
-        marginBottom: 20,
-        marginLeft: -10,
+        marginBottom: 24,
+        marginLeft: -3,
     },
     backButton: {
-        padding: 10,
+        // padding: 10,
     },
     stepContainer: {
         marginBottom: 24,
@@ -172,6 +172,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         color: '#080808',
         marginBottom: 8,
+        fontFamily: "BrittiBold",
     },
     subtitle: {
         fontSize: 14,
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     inputGroup: {
-        marginBottom: 24,
+        marginBottom: 32,
     },
     label: {
         fontSize: 16,
@@ -191,6 +192,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         marginBottom: 8,
         marginLeft: 4,
+        fontFamily: 'BrittiRegular'
     },
     inputWrapper: {
         flexDirection: 'row',

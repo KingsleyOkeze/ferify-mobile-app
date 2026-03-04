@@ -10,13 +10,17 @@ import {
     Platform,
     ScrollView,
     ActivityIndicator,
-    Alert
+    Alert,
+    Dimensions
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
+import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
+
+const { width } = Dimensions.get('window');
 
 function VerifyUpdateUserEmailScreen() {
     const router = useRouter();
@@ -26,6 +30,7 @@ function VerifyUpdateUserEmailScreen() {
     const [timer, setTimer] = useState(30);
     const { showLoader, hideLoader } = useLoader();
     const inputRefs = useRef<Array<TextInput | null>>([]);
+    const [focusedIndex, setFocusedIndex] = useState(0);
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
@@ -37,20 +42,38 @@ function VerifyUpdateUserEmailScreen() {
         return () => clearInterval(interval);
     }, [timer]);
 
-    const handleOtpChange = (value: string, index: number) => {
-        const newOtp = [...otp];
-        newOtp[index] = value;
-        setOtp(newOtp);
-
-        // Move to next input if value is entered
-        if (value.length === 1 && index < 5) {
-            inputRefs.current[index + 1]?.focus();
+    const handleKeyPress = (val: string) => {
+        const currentOtp = [...otp];
+        if (currentOtp[focusedIndex] === '') {
+            currentOtp[focusedIndex] = val;
+            const updatedOtp = [...currentOtp];
+            setOtp(updatedOtp);
+            if (focusedIndex < 5) {
+                setFocusedIndex(focusedIndex + 1);
+                inputRefs.current[focusedIndex + 1]?.focus();
+            } else {
+                // All 6 digits entered, auto-verify if needed or just wait for manual Verify
+                // For this screen, we have a manual Verify button, so we just set the last digit
+            }
+        } else if (focusedIndex < 5) {
+            currentOtp[focusedIndex + 1] = val;
+            const updatedOtp = [...currentOtp];
+            setOtp(updatedOtp);
+            setFocusedIndex(focusedIndex + 1);
+            inputRefs.current[focusedIndex + 1]?.focus();
         }
     };
 
-    const handleKeyPress = (e: any, index: number) => {
-        if (e.nativeEvent.key === 'Backspace' && otp[index] === '' && index > 0) {
-            inputRefs.current[index - 1]?.focus();
+    const handleDelete = () => {
+        const currentOtp = [...otp];
+        if (currentOtp[focusedIndex] !== '') {
+            currentOtp[focusedIndex] = '';
+            setOtp(currentOtp);
+        } else if (focusedIndex > 0) {
+            currentOtp[focusedIndex - 1] = '';
+            setOtp(currentOtp);
+            setFocusedIndex(focusedIndex - 1);
+            inputRefs.current[focusedIndex - 1]?.focus();
         }
     };
 
@@ -131,14 +154,16 @@ function VerifyUpdateUserEmailScreen() {
                                 ref={(ref) => {
                                     inputRefs.current[index] = ref;
                                 }}
-                                style={[styles.otpInput, digit !== '' && styles.otpInputFilled]}
+                                style={[
+                                    styles.otpInput,
+                                    digit !== '' && styles.otpInputFilled,
+                                    focusedIndex === index && styles.otpInputFocused
+                                ]}
                                 value={digit}
-                                onChangeText={(value) => handleOtpChange(value, index)}
-                                onKeyPress={(e) => handleKeyPress(e, index)}
-                                keyboardType="number-pad"
+                                showSoftInputOnFocus={false}
+                                onFocus={() => setFocusedIndex(index)}
                                 maxLength={1}
-                                selectTextOnFocus
-                                autoFocus={index === 0}
+                                caretHidden
                             />
                         ))}
                     </View>
@@ -155,33 +180,17 @@ function VerifyUpdateUserEmailScreen() {
                     </View>
                 </ScrollView>
 
-                {/* Footer Button */}
-                <View style={styles.footer}>
-                    <TouchableOpacity
-                        style={[
-                            styles.verifyButton,
-                            !isOtpComplete && styles.verifyButtonDisabled
-                        ]}
-                        disabled={!isOtpComplete}
-                        onPress={handleVerify}
-                    >
-                        <Text style={[
-                            styles.verifyButtonText,
-                            !isOtpComplete && styles.verifyButtonTextDisabled
-                        ]}>
-                            Verify
-                        </Text>
-                    </TouchableOpacity>
-                </View>
+                {/* Custom Keypad at the bottom */}
+                <CustomNumberKeyboard onPress={handleKeyPress} onDelete={handleDelete} />
             </KeyboardAvoidingView>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
@@ -236,20 +245,23 @@ const styles = StyleSheet.create({
         marginBottom: 30,
     },
     otpInput: {
-        width: 45,
+        width: (width - 60) / 6,
         height: 55,
-        borderWidth: 1,
+        borderWidth: 1.5,
         borderColor: '#F0F0F0',
         borderRadius: 8,
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
-        backgroundColor: '#F9F9F9',
+        backgroundColor: '#F0F0F0',
         color: '#000',
     },
     otpInputFilled: {
         borderColor: '#000',
         backgroundColor: '#fff',
+    },
+    otpInputFocused: {
+        borderColor: '#6B6B6B',
     },
     resendContainer: {
         marginTop: 10,
@@ -263,29 +275,6 @@ const styles = StyleSheet.create({
         color: '#000',
         fontWeight: 'bold',
         textDecorationLine: 'underline',
-    },
-    footer: {
-        padding: 20,
-        borderTopWidth: 1,
-        borderTopColor: '#F0F0F0',
-    },
-    verifyButton: {
-        height: 50,
-        backgroundColor: '#000',
-        borderRadius: 25,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    verifyButtonDisabled: {
-        backgroundColor: '#F0F0F0',
-    },
-    verifyButtonText: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#fff',
-    },
-    verifyButtonTextDisabled: {
-        color: '#979797',
     },
 });
 

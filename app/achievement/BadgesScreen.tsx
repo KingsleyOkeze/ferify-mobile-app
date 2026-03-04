@@ -62,8 +62,8 @@ const badgeImages: any = {
 
 const { width } = Dimensions.get('window');
 const GRID_PADDING = 24;
-const COLUMN_GAP = 12;
-const COLUMN_WIDTH = (width - (GRID_PADDING * 2) - (COLUMN_GAP * 2)) / 3;
+const COLUMN_GAP = 8;
+const COLUMN_WIDTH = Math.floor((width - (GRID_PADDING * 2) - (COLUMN_GAP * 2)) / 3) - 0.5;
 
 interface Badge {
     id: string;
@@ -264,7 +264,7 @@ export default function BadgesScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#FBFBFB',
     },
     header: {
         paddingHorizontal: 24,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
         paddingBottom: 24,
     },
     backButton: {
-        marginBottom: 20,
+        marginBottom: 24,
         width: 24,
         height: 24,
         justifyContent: 'center',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 10,
+        marginBottom: 8,
     },
     subtitle: {
         fontSize: 14,
@@ -295,17 +295,17 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 24,
-        paddingBottom: 40,
+        paddingBottom: 32,
     },
     grid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'flex-start',
-        gap: COLUMN_GAP,
+        rowGap: 12,
+        columnGap: COLUMN_GAP,
     },
     badgeCard: {
         width: COLUMN_WIDTH,
-        marginBottom: 24,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F2F3F4',

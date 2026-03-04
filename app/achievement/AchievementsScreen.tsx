@@ -214,9 +214,9 @@ export default function AchievementsScreen() {
                         {/* Leadership Section */}
                         <View style={styles.section}>
                             <View style={styles.sectionHeader}>
-                                <Text style={styles.sectionTitle}>Leadership</Text>
+                                <Text style={styles.sectionTitle}>Leaderboards</Text>
                                 <TouchableOpacity onPress={() => router.push('./LeadersBoardScreen')}>
-                                    <Text style={styles.seeAll}>See all</Text>
+                                    <Text style={styles.seeAll}>See full leaderboard</Text>
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.leadershipList}>
@@ -254,23 +254,23 @@ const styles = StyleSheet.create({
         borderBottomColor: '#F5F5F5',
     },
     backButton: {
-        marginBottom: 20,
-        padding: 4,
+        marginBottom: 24,
+        paddingTop: 10,
         marginLeft: -4,
     },
     titleContainer: {
-        // No extra styling needed
     },
     title: {
         fontSize: 24,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#393939',
-        marginBottom: 10,
+        marginBottom: 24,
     },
     subtitle: {
         fontSize: 14,
         fontWeight: 400,
+        lineHeight: 24,
         fontFamily: 'BrittiRegular',
         color: '#666666',
     },
@@ -305,7 +305,8 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginLeft: 6,
+        marginLeft: 7,
+        lineHeight: 24
     },
     statNumber: {
         fontSize: 20,
@@ -326,9 +327,9 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 16,
         fontWeight: 600,
+        lineHeight: 24,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 16,
     },
     seeAll: {
         fontSize: 14,
@@ -339,20 +340,18 @@ const styles = StyleSheet.create({
     },
     levelList: {
         paddingRight: 20,
-        justifyContent: 'space-between', // Try logic for even spacing if items are few, or use gap
-        gap: 12, // Added gap evenly
+        justifyContent: 'space-between', 
+        gap: 12, 
     },
     levelCard: {
-        width: 60, // Sligthly wider to accommodate content better
+        width: 60, 
         height: 96,
         alignItems: 'center',
-        // marginRight: 16, // Removed in favor of gap
     },
     levelImageContainer: {
         width: 64,
         height: 64,
         borderRadius: 32,
-        // backgroundColor: '#EEEEEE',
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
@@ -401,8 +400,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingVertical: 12,
-        paddingHorizontal: 16,
+        height: 68,
+        paddingHorizontal: 12,
         marginBottom: 10,
         borderRadius: 8,
     },
@@ -421,16 +420,18 @@ const styles = StyleSheet.create({
     },
     leadershipText: {
         fontSize: 14,
+        lineHeight: 24,
+        marginBottom: 2,
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     leadershipDesc: {
-        fontSize: 12,
+        fontSize: 14,
+        lineHeight: 24,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
-        color: '#666',
-        marginTop: 2,
+        color: '#757575',
     },
     leadershipCount: {
         fontSize: 14,

@@ -9,7 +9,7 @@ interface CustomNumberKeyboardProps {
 
 const { width } = Dimensions.get('window');
 
-const CustomNumberKeyboard: React.FC<CustomNumberKeyboardProps> = ({ onPress, onDelete }) => {
+export default function CustomNumberKeyboard({ onPress, onDelete }: CustomNumberKeyboardProps) {
     const keys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'delete'];
 
     return (
@@ -62,4 +62,3 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CustomNumberKeyboard;

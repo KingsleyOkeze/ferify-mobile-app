@@ -131,10 +131,10 @@ function MainAccountProfileScreen() {
                             onPress={item.onPress}
                         >
                             <View style={styles.menuLeft}>
-                                <Ionicons name={item.icon as any} size={22} color="#333" style={styles.menuIcon} />
+                                <Ionicons name={item.icon as any} size={20} color="#333" style={styles.menuIcon} />
                                 <Text style={styles.menuTitle}>{item.title}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color="#999" />
+                            <Ionicons name="chevron-forward" size={16} color="#999" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -159,12 +159,12 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     scrollContent: {
-        paddingBottom: 40,
+        paddingBottom: 32,
     },
     profileSection: {
         alignItems: 'center',
         marginTop: 20,
-        marginBottom: 40,
+        marginBottom: 32,
     },
     avatarContainer: {
         width: 72,
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F2F2F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: 20,
     },
     avatarText: {
         fontSize: 28,
@@ -186,14 +186,14 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000000',
-        marginBottom: 10,
+        marginBottom: 20,
     },
     userHandle: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 10,
+        marginBottom: 24,
     },
     userBadge: {
         fontSize: 15,
@@ -204,9 +204,13 @@ const styles = StyleSheet.create({
     },
     viewProfileButton: {
         backgroundColor: '#F0F0F0',
-        paddingVertical: 10,
-        paddingHorizontal: 24,
+        // paddingVertical: 10,
+        // paddingHorizontal: 24,
+        height: 41,
+        width: 115,
         borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     viewProfileText: {
         fontSize: 14,
@@ -226,7 +230,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 18,
+        // paddingVertical: 18,
+        height: 60,
     },
     menuLeft: {
         flexDirection: 'row',
