@@ -33,6 +33,7 @@ const DEFAULT_USER_DATA = {
 };
 
 const DEFAULT_AVATAR_COLORS = [
+    '#F0F0F0', // Default Light Grey
     '#2E7D32', // Green
     '#1565C0', // Blue
     '#C62828', // Red
@@ -146,7 +147,7 @@ function AccountDetailsScreen() {
         { id: 'username', title: 'Username', value: user?.username ? `@${user.username}` : 'Set username', onPress: () => router.push('../setting/UpdateUsernameScreen') },
         { id: 'phone', title: 'Phone number', value: user?.phone || 'Add phone number', onPress: () => router.push('../setting/UpdateUserPhoneNumberScreen') },
         { id: 'email', title: 'Email address', value: user?.email || 'Set email', onPress: () => router.push('../setting/UpdateUserEmailScreen') },
-        { id: 'location', title: 'Location', value: user?.location || 'Set location', onPress: () => { } },
+        { id: 'location', title: 'Location', value: user?.location || 'Set location', onPress: () => { }, disabled: true },
     ];
 
     const getInitials = (first?: string, last?: string) => {
@@ -202,9 +203,13 @@ function AccountDetailsScreen() {
                             key={item.id}
                             style={[
                                 styles.listItem,
-                                index === 0 && styles.firstListItem
+                                index === 0 && styles.firstListItem,
+                                // @ts-ignore
+                                item.disabled && styles.disabledListItem
                             ]}
                             onPress={item.onPress}
+                            // @ts-ignore
+                            disabled={item.disabled}
                         >
                             <View style={styles.itemTextContainer}>
                                 <Text style={styles.itemTitle}>{item.title}</Text>
@@ -333,8 +338,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#EAECF1',
@@ -344,7 +349,6 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
     },
@@ -353,7 +357,6 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginTop: 24,
@@ -384,7 +387,6 @@ const styles = StyleSheet.create({
     avatarInitials: {
         fontSize: 30,
         fontFamily: 'BrittiSemibold',
-        fontWeight: 600,
         color: '#333',
     },
     editIconContainer: {
@@ -415,6 +417,10 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
         height: 87
     },
+    disabledListItem: {
+        backgroundColor: '#F7F7F7',
+        opacity: 0.8,
+    },
     firstListItem: {
         borderTopWidth: 1,
         borderTopColor: '#DADADA',
@@ -425,7 +431,6 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: 400,
         lineHeight: 24,
         fontFamily: 'BrittiRegular',
         color: '#080808',
@@ -433,7 +438,6 @@ const styles = StyleSheet.create({
     },
     itemValue: {
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
         lineHeight: 24
@@ -452,7 +456,6 @@ const styles = StyleSheet.create({
     },
     actionText: {
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000',
     },
@@ -522,7 +525,6 @@ const styles = StyleSheet.create({
         color: '#FBFBFB',
         fontSize: 16,
         fontFamily: 'BrittiSemibold',
-        fontWeight: 600,
     },
     cancelModalButton: {
         backgroundColor: '#F5F5F5',
@@ -531,7 +533,7 @@ const styles = StyleSheet.create({
     cancelModalButtonText: {
         color: '#000',
         fontSize: 16,
-        fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
     },
     modalHandle: {
         width: 40,
@@ -579,7 +581,7 @@ const styles = StyleSheet.create({
     modalOptionText: {
         fontSize: 16,
         color: '#080808',
-        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
     cancelOption: {
         marginTop: 10,
@@ -587,7 +589,7 @@ const styles = StyleSheet.create({
     },
     cancelText: {
         color: '#E53935',
-        fontWeight: 'bold',
+        fontFamily: 'BrittiSemibold',
         textAlign: 'center',
     },
 });

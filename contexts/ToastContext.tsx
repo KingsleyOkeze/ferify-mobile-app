@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
 import { DeviceEventEmitter } from 'react-native';
 
-export type ToastType = 'success' | 'error' | 'badge' | 'points' | 'saved' | 'feature_update' | 'general';
+export type ToastType = 'success' | 'error' | 'badge' | 'points' | 'saved' | 'general';
 
 interface ToastOptions {
     type: ToastType;

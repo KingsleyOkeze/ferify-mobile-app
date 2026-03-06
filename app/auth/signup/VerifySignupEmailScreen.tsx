@@ -223,20 +223,17 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: '600',
-        color: '#080808',
+        color: "#080808",
         marginBottom: 8,
-        fontFamily: 'BrittiSemiold'
+        fontFamily: 'BrittiSemibold'
     },
     subtitle: {
         fontSize: 14,
-        fontWeight: '400',
         color: '#393939',
         lineHeight: 24,
         fontFamily: 'BrittiRegular'
     },
     emailText: {
-        fontWeight: '400',
         fontSize: 14,
         color: '#393939',
         paddingLeft: 10
@@ -267,9 +264,8 @@ const styles = StyleSheet.create({
     resendText: {
         fontSize: 16,
         color: '#080808',
-        fontWeight: 700,
         textDecorationLine: 'underline',
-        fontFamily: 'BrittiSemiold'
+        fontFamily: 'BrittiSemibold'
     },
     timerText: {
         fontSize: 14,

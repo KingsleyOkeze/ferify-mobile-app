@@ -61,9 +61,9 @@ const badgeImages: any = {
 };
 
 const { width } = Dimensions.get('window');
-const GRID_PADDING = 24;
-const COLUMN_GAP = 8;
-const COLUMN_WIDTH = Math.floor((width - (GRID_PADDING * 2) - (COLUMN_GAP * 2)) / 3) - 0.5;
+const GRID_PADDING = 16;
+const COLUMN_GAP = 12;
+const COLUMN_WIDTH = (width - (GRID_PADDING * 2) - (COLUMN_GAP * 2)) / 3;
 
 interface Badge {
     id: string;
@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 24,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        paddingTop: 8,
         paddingBottom: 24,
     },
     backButton: {
@@ -281,7 +281,6 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 8,
@@ -289,12 +288,11 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 14,
         color: '#393939',
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         lineHeight: 20,
     },
     scrollContent: {
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         paddingBottom: 32,
     },
     grid: {
@@ -319,7 +317,6 @@ const styles = StyleSheet.create({
     },
     badgeTitle: {
         fontSize: 12,
-        fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         textAlign: 'center',
@@ -369,13 +366,11 @@ const styles = StyleSheet.create({
     },
     requirementText: {
         fontSize: 18,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     modalDescription: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
         textAlign: 'center',
@@ -404,7 +399,6 @@ const styles = StyleSheet.create({
     },
     progressText: {
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         paddingBottom: 5,
@@ -422,7 +416,6 @@ const styles = StyleSheet.create({
     okayButtonText: {
         color: '#FBFBFB',
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
     },
 

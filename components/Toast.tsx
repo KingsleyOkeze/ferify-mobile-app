@@ -26,8 +26,6 @@ const getToastConfig = (type: ToastType) => {
             return { image: require('../assets/images/toast-icons/point-earned-icon.png'), color: '#2196F3' };
         case 'saved':
             return { image: require('../assets/images/toast-icons/input-saved-icon.png'), color: '#9C27B0' };
-        case 'feature_update':
-            return { image: require('../assets/images/toast-icons/feature-update-icon.png'), color: '#080808' };
         case 'general':
             return { image: require('../assets/images/toast-icons/general-icon.png'), color: '#080808' };
         default:
@@ -118,7 +116,7 @@ export default function Toast() {
                     <View style={styles.content}>
                         {/* Left Icon */}
                         <View style={[styles.iconContainer, { backgroundColor: `${config.color}15` }]}>
-                            <Image source={config.image as any} style={styles.icon} />
+                            <Image source={config.image} style={styles.icon} />
                         </View>
 
                         {/* Description */}

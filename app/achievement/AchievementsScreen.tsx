@@ -247,29 +247,26 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingHorizontal: 16,
         paddingBottom: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#F5F5F5',
     },
     backButton: {
         marginBottom: 24,
-        paddingTop: 10,
+        paddingTop: 8,
         marginLeft: -4,
     },
     titleContainer: {
     },
     title: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#393939',
         marginBottom: 24,
     },
     subtitle: {
         fontSize: 14,
-        fontWeight: 400,
         lineHeight: 24,
         fontFamily: 'BrittiRegular',
         color: '#666666',
@@ -302,7 +299,6 @@ const styles = StyleSheet.create({
     },
     statCardTitle: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
         marginLeft: 7,
@@ -310,7 +306,6 @@ const styles = StyleSheet.create({
     },
     statNumber: {
         fontSize: 20,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         textAlign: 'right',
@@ -326,7 +321,6 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: 600,
         lineHeight: 24,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
@@ -335,16 +329,15 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#080808',
         textDecorationLine: 'underline',
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
     },
     levelList: {
         paddingRight: 20,
-        justifyContent: 'space-between', 
-        gap: 12, 
+        justifyContent: 'space-between',
+        gap: 12,
     },
     levelCard: {
-        width: 60, 
+        width: 60,
         height: 96,
         alignItems: 'center',
     },
@@ -362,7 +355,6 @@ const styles = StyleSheet.create({
     levelLabel: {
         fontSize: 12,
         color: '#393939',
-        fontWeight: 400,
         fontFamily: 'BrittiSemibold',
     },
     badgeRow: {
@@ -384,7 +376,6 @@ const styles = StyleSheet.create({
     },
     badgeTitle: {
         fontSize: 12,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#000000',
         textAlign: 'center',
@@ -412,7 +403,6 @@ const styles = StyleSheet.create({
     },
     rankText: {
         fontSize: 18,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginRight: 16,
@@ -422,21 +412,18 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 24,
         marginBottom: 2,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     leadershipDesc: {
         fontSize: 14,
         lineHeight: 24,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
     },
     leadershipCount: {
         fontSize: 14,
         color: '#1B9E4B',
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
     },
 });

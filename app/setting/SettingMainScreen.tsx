@@ -123,17 +123,18 @@ const styles = StyleSheet.create({
         padding: 4,
     },
     header: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 20,
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
+        marginTop: 8,
+        marginLeft: -4,
         marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
@@ -171,14 +172,12 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
     },
@@ -211,7 +210,7 @@ const styles = StyleSheet.create({
     },
     modalDescription: {
         fontSize: 16,
-        fontWeight: 400,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         textAlign: 'center',
         lineHeight: 24,
@@ -243,12 +242,12 @@ const styles = StyleSheet.create({
     cancelModalButtonText: {
         color: '#080808',
         fontSize: 14,
-        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
     confirmLogoutButtonText: {
         color: '#FBFBFB',
         fontSize: 14,
-        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
     },
 });
 

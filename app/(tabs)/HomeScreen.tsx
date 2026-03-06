@@ -208,7 +208,7 @@ function HomeScreen() {
                 {/* Header: Logo and Notification Bell */}
                 <View style={styles.header}>
                     <Image
-                        source={require("../../assets/images/logo/ferify-text-logo-white-text.png")}
+                        source={require("../../assets/images/logo/ferify-text-logo-black-text.png")}
                         style={styles.logo}
                         resizeMode="contain"
                     />
@@ -368,11 +368,11 @@ function HomeScreen() {
                                         <Text style={styles.routeDestinationText}>{item.from} - {item.to}</Text>
                                     </Text>
                                     <View style={styles.feedMetaRow}>
-                                        <Ionicons name="time-outline" size={14} color="#666" />
+                                        <Ionicons name="time" size={14} color="#757575" />
                                         <Text style={styles.feedMetaText}>{item.time}</Text>
                                     </View>
                                     <View style={styles.feedMetaRow}>
-                                        <Ionicons name="people-outline" size={14} color="#666" />
+                                        <Ionicons name="people" size={14} color="#757575" />
                                         <Text style={styles.feedMetaText}>{item.contributors || 1} contributors</Text>
                                     </View>
                                 </View>
@@ -386,18 +386,6 @@ function HomeScreen() {
                 </View>
             </ScrollView>
 
-            {/* Floating Action Button (FAB) */}
-            <TouchableOpacity
-                style={styles.fab}
-                activeOpacity={0.7}
-                onPress={() => {
-                    requestAnimationFrame(() => {
-                        router.push('../fare-contribution/FareContributionScreen');
-                    });
-                }}
-            >
-                <Ionicons name="add" size={24} color="#FFF" />
-            </TouchableOpacity>
         </View>
     );
 }
@@ -445,7 +433,6 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontSize: 10,
         fontFamily: 'BrittiBold',
-        fontWeight: 'bold',
         textAlign: 'center',
     },
     searchContainer: {
@@ -473,7 +460,6 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiBold',
         marginBottom: 18,
         color: "#080808",
@@ -499,7 +485,6 @@ const styles = StyleSheet.create({
     cardDescription: {
         color: "#FBFBFB",
         fontSize: 14,
-        fontWeight: 700,
         marginBottom: 10,
         lineHeight: 24,
         fontFamily: 'BrittiBold',
@@ -516,7 +501,6 @@ const styles = StyleSheet.create({
     },
     shareButtonText: {
         color: "#080808",
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
     },
     cardImage: {
@@ -561,8 +545,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     routeDestinationText: {
-        fontWeight: '600',
-        fontFamily: 'BrittiRegular',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     feedMetaRow: {
@@ -582,7 +565,6 @@ const styles = StyleSheet.create({
     },
     feedPriceText: {
         fontSize: 14,
-        fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
@@ -600,7 +582,6 @@ const styles = StyleSheet.create({
     noCommuteDataTitle: {
         fontFamily: 'BrittiSemibold',
         fontSize: 16,
-        fontWeight: 600,
         color: '#080808',
         marginBottom: 32,
         lineHeight: 24
@@ -608,7 +589,6 @@ const styles = StyleSheet.create({
     noCommuteDataDescription: {
         fontFamily: 'BrittiRegular',
         fontSize: 14,
-        fontWeight: 400,
         color: '#757575',
         textAlign: 'center',
         marginBottom: 32,
@@ -617,7 +597,6 @@ const styles = StyleSheet.create({
     },
     shareDataText: {
         fontFamily: 'BrittiSemibold',
-        fontWeight: '600',
         fontSize: 16,
         color: '#080808',
         lineHeight: 24,
@@ -626,22 +605,6 @@ const styles = StyleSheet.create({
         paddingBottom: 1,
         alignSelf: 'center',
         marginBottom: 56
-    },
-    fab: {
-        position: 'absolute',
-        bottom: 10, // Adjusted to be slightly above the bottom tab
-        right: 7,
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        backgroundColor: '#000',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOpacity: 0.3,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
     },
 });
 

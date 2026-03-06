@@ -15,12 +15,14 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import api from '@/services/api'; // Removed setToken/setRefreshToken as not needed for reset
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 
 export default function VerifyPasswordResetScreen() {
     const router = useRouter();
     // Retrieve newPassword from params as required for reset flow
     const { newPassword } = useLocalSearchParams<{ newPassword: string }>();
+    const { showToast } = useToast();
 
     const [otp, setOtp] = useState(['', '', '', '']); // 4 digits
 
@@ -87,20 +89,14 @@ export default function VerifyPasswordResetScreen() {
             console.log("Password Reset verified:", response.data);
 
             if (response.status === 200) {
-                 Alert.alert('Success', 'Password updated successfully!', [
-                    {
-                        text: 'OK',
-                        onPress: () => {
-                            // Go back to security screen or login
-                            router.dismiss(2);
-                        }
-                    }
-                ]);
+                showToast('success', 'Password updated successfully!');
+                // Go back to security screen or login
+                router.dismiss(2);
             }
 
         } catch (error: any) {
             console.error('Verify OTP error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
+            showToast('error', error.response?.data?.error || 'Verification failed. Please check the code.');
         } finally {
             hideLoader();
         }
@@ -116,10 +112,10 @@ export default function VerifyPasswordResetScreen() {
             setTimer(60);
             setOtp(['', '', '', '']);
             setActiveIndex(0);
-            Alert.alert("Success", "A new code has been sent to your email.");
+            showToast('success', 'A new code has been sent to your email.');
         } catch (error: any) {
-             console.error('OTP resend error:', error);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
+            console.error('OTP resend error:', error);
+            showToast('error', error.response?.data?.error || 'Failed to resend code');
         } finally {
             hideLoader();
         }
@@ -145,7 +141,7 @@ export default function VerifyPasswordResetScreen() {
                     <View style={styles.textContainer}>
                         <Text style={styles.title}>Enter code</Text>
                         <Text style={styles.subtitle}>
-                             We've sent a 4-digit verification code to your email. Enter it below to confirm your password change.
+                            We've sent a 4-digit verification code to your email. Enter it below to confirm your password change.
                         </Text>
                     </View>
                     {/* OTP Inputs (4 Boxes) */}
@@ -195,7 +191,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
     },
     backButton: {
         width: 40,
@@ -205,7 +201,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 24,
-        paddingTop: 20,
+        paddingTop: 24,
         paddingBottom: 40,
     },
     textContainer: {

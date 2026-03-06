@@ -89,12 +89,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 30, 
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 24, 
     },
     backButton: {
         alignSelf: 'flex-start',
+        marginLeft: -4,
         marginBottom: 24, 
     },
     headerTitle: {

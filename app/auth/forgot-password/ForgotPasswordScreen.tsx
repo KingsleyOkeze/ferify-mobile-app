@@ -22,7 +22,6 @@ function ForgotPasswordScreen() {
     const { showLoader, hideLoader } = useLoader();
     const [email, setEmail] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
 
     const handleSendCode = async () => {
         if (!email || !email.includes('@')) {
@@ -30,7 +29,6 @@ function ForgotPasswordScreen() {
             return;
         }
 
-        setIsLoading(true);
         showLoader();
         try {
             // Using the auth endpoint for non-logged in users
@@ -47,7 +45,6 @@ function ForgotPasswordScreen() {
             console.error('Forgot password initiation error:', error);
             showToast('error', error.response?.data?.error || 'Failed to send verification code');
         } finally {
-            setIsLoading(false);
             hideLoader();
         }
     };
@@ -97,16 +94,12 @@ function ForgotPasswordScreen() {
                     <TouchableOpacity
                         style={[
                             styles.sendButton,
-                            (!email || isLoading) && styles.sendButtonDisabled
+                            (!email) && styles.sendButtonDisabled
                         ]}
-                        disabled={!email || isLoading}
+                        disabled={!email}
                         onPress={handleSendCode}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color="#fff" />
-                        ) : (
-                            <Text style={styles.sendButtonText}>Send Code</Text>
-                        )}
+                        <Text style={styles.sendButtonText}>Send Code</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>
@@ -141,7 +134,6 @@ const styles = StyleSheet.create({
     screenTitle: {
         fontSize: 24,
         fontFamily: 'BrittiBold',
-        fontWeight: '800',
         color: '#080808',
         marginBottom: 8,
         lineHeight: 24
@@ -150,7 +142,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#393939',
         lineHeight: 24,
-        fontWeight: '400',
         fontFamily: 'BrittiRegular'
     },
     inputGroup: {
@@ -158,7 +149,6 @@ const styles = StyleSheet.create({
     },
     inputLabel: {
         fontSize: 14,
-        fontWeight: '500',
         color: '#080808',
         marginBottom: 8,
         fontFamily: 'BrittiRegular',
@@ -202,7 +192,6 @@ const styles = StyleSheet.create({
     },
     sendButtonText: {
         fontSize: 16,
-        fontWeight: '600',
         fontFamily: 'BrittiBold',
         color: '#fff',
     },

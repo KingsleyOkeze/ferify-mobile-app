@@ -18,9 +18,10 @@ const { width } = Dimensions.get("window");
 const slides = [
     {
         id: 0,
+        title: "Step out ready and prepared, every single day.",
         title1: "Step out ready and",
         title2: "prepared, every",
-        title3: "single day",
+        title3: "single day.",
         title1Width: '85%',
         title2Width: '75%',
         title3Width: '65%',
@@ -34,9 +35,10 @@ const slides = [
     },
     {
         id: 1,
+        title: "Share the fare, earn points, and help the next person.",
         title1: "Share the fare, earn",
         title2: "points, and help the",
-        title3: "next person",
+        title3: "next person.",
         title1Width: '95%',
         title2Width: '95%',
         title3Width: '85%',
@@ -52,7 +54,7 @@ const handFareCheckImageStyle: any = {
     resizeMode: 'contain',
     position: 'absolute',
     zIndex: 10,
-    top: '92%',
+    top: '95%',
     left: '17.7%',
     transform: [{ translateX: -127 }, { translateY: -147 }]
 };
@@ -62,8 +64,8 @@ const busAndConductorImageStyle: any = {
     height: 115.3,
     resizeMode: 'contain',
     position: 'absolute',
-    top: '70%',
-    left: '60%',
+    top: '75%',
+    left: '61%',
     transform: [{ translateX: -68 }, { translateY: -51 }]
 };
 
@@ -72,8 +74,8 @@ const busConductorWordsImageStyle: any = {
     height: 102.86,
     resizeMode: 'contain',
     position: 'absolute',
-    top: '30%',
-    left: '55%',
+    top: '36%',
+    left: '57%',
     transform: [{ translateX: -67 }, { translateY: -56 }]
 };
 
@@ -83,7 +85,7 @@ const baricadeImageStyle: any = {
     resizeMode: 'contain',
     position: 'absolute',
     right: 0,
-    bottom: '3.5%',
+    bottom: '2%',
 };
 
 export default function OnboardingScreen() {
@@ -136,11 +138,11 @@ export default function OnboardingScreen() {
                     <Image
                         source={slides[1].images as any}
                         style={{
-                            width: 296.51,
-                            height: 298.04,
+                            width: 224.9,
+                            height: 258.48,
                             position: "absolute",
-                            top: "60%",
-                            left: " 50%",
+                            top: "70%",
+                            right: "-25%",
                             transform: [{ translateX: -98 }, { translateY: -149 }],
                             zIndex: 10,
                         }}
@@ -148,61 +150,57 @@ export default function OnboardingScreen() {
                 ) : null}
             </View>
 
-            <View style={styles.bottomSheet}>
-                <View style={styles.dotsRow}>
-                    {slides.map((_, i) => (
-                        <View
-                            key={i}
-                            style={[
-                                styles.dot,
-                                i === step ? styles.activeDot : styles.inactiveDot
-                            ]}
-                        />
-                    ))}
-                </View>
-                <View style={styles.titleContainer}>
-                    <Text style={[styles.title, { width: (slides[step] as any).title1Width }]}>
-                        {slides[step].title1}
-                    </Text>
-                    <Text style={[styles.title, { width: (slides[step] as any).title2Width }]}>
-                        {slides[step].title2}
-                    </Text>
-                    <Text style={[styles.title, { width: (slides[step] as any).title3Width }]}>
-                        {slides[step].title3}
-                    </Text>
-                </View>
-                <View style={styles.subtitleContainer}>
-                    <Text style={styles.subtitle}>
-                        {slides[step].subtitle}
-                    </Text>
-                </View>
+            {/* Standalone Content Sections */}
+            <View style={styles.dotsRow}>
+                {slides.map((_, i) => (
+                    <View
+                        key={i}
+                        style={[
+                            styles.dot,
+                            i === step ? styles.activeDot : styles.inactiveDot
+                        ]}
+                    />
+                ))}
+            </View>
 
-                {/* Bottom Buttons Row */}
-                <View style={styles.buttonRow}>
-                    <TouchableOpacity
-                        style={[styles.btn, styles.loginBtn]}
-                        onPress={async () => {
-                            console.log('Login clicked - triggering location fetch');
-                            fetchAndCacheLocation(); // Non-blocking
-                            await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
-                            router.push("/auth/login/LoginScreen");
-                        }}
-                    >
-                        <Text style={styles.loginBtnText}>Login</Text>
-                    </TouchableOpacity>
+            <View style={styles.titleContainer}>
+                <Text
+                    style={styles.title}>
+                    {slides[step].title}
+                </Text>
+            </View>
 
-                    <TouchableOpacity
-                        style={[styles.btn, styles.getStartedBtn]}
-                        onPress={async () => {
-                            console.log('Get Started clicked - triggering location fetch');
-                            fetchAndCacheLocation(); // Non-blocking
-                            await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
-                            router.push("/auth/signup/SignupScreen");
-                        }}
-                    >
-                        <Text style={styles.getStartedBtnText}>Get Started</Text>
-                    </TouchableOpacity>
-                </View>
+            <View style={styles.subtitleContainer}>
+                <Text style={styles.subtitle}>
+                    {slides[step].subtitle}
+                </Text>
+            </View>
+
+            {/* Bottom Buttons Row */}
+            <View style={styles.buttonRow}>
+                <TouchableOpacity
+                    style={[styles.btn, styles.loginBtn]}
+                    onPress={async () => {
+                        console.log('Login clicked - triggering location fetch');
+                        fetchAndCacheLocation(); // Non-blocking
+                        await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
+                        router.push("/auth/login/LoginScreen");
+                    }}
+                >
+                    <Text style={styles.loginBtnText}>Log in</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                    style={[styles.btn, styles.getStartedBtn]}
+                    onPress={async () => {
+                        console.log('Get Started clicked - triggering location fetch');
+                        fetchAndCacheLocation(); // Non-blocking
+                        await AsyncStorage.setItem(STORAGE_KEYS.HAS_LAUNCHED, 'true');
+                        router.push("/auth/signup/SignupScreen");
+                    }}
+                >
+                    <Text style={styles.getStartedBtnText}>Get Started</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -211,7 +209,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // backgroundColor: "#FBFBFB",
+        backgroundColor: "#FBFBFB",
         position: 'relative'
     },
     topHeader: {
@@ -222,20 +220,16 @@ const styles = StyleSheet.create({
         zIndex: 10,
     },
     imageArea: {
-        flex: 3.5,
-    },
-    bottomSheet: {
-        flex: 4.5,
-        paddingTop: 24,
-        paddingHorizontal: 16,
-        paddingBottom: 20,
-        alignItems: "center",
-        backgroundColor: "#fff",
+        flex: 1,
+        maxHeight: '45%',
     },
     dotsRow: {
         flexDirection: "row",
-        marginBottom: 32,
+        alignSelf: 'center',
+        marginTop: 'auto',
+        marginBottom: 24,
         gap: 10,
+        // backgroundColor: 'purple'
     },
     dot: {
         height: 6,
@@ -251,43 +245,45 @@ const styles = StyleSheet.create({
     },
     titleContainer: {
         marginBottom: 20,
-        textAlign: "center",
-        alignItems: "center",
-        flexGrow: 0,
+        alignSelf: 'center',
+        maxWidth: 217,
+        // height: 87,
+        // backgroundColor: 'green'
     },
     title: {
         fontFamily: "BrittiBold",
         fontSize: 24,
-        fontWeight: 700,
+        maxWidth: '100%',
+        lineHeight: 30,
         textAlign: "center",
         color: "#080808",
     },
 
     subtitleContainer: {
-        textAlign: "center",
-        alignItems: "center",
-        width: '85%',
-        marginBottom: 54,
-        flexGrow: 0,
+        alignSelf: 'center',
+        // width: '85%',
+        marginBottom: 72, // Space between subtitle and buttons
+        // backgroundColor: 'red',
+        // minHeight: 48,
+        justifyContent: 'center',
+        alignItems: 'center',
+        maxWidth: 283,
     },
     subtitle: {
         fontFamily: "BrittiRegular",
         fontSize: 16,
-        fontWeight: 400,
-        width: '95%',
+        // width: '95%',
         color: "#757575",
         textAlign: "center",
-        lineHeight: 22,
-        paddingTop: 24,
-        paddingHorizontal: 10,
+        lineHeight: 24,
     },
     buttonRow: {
         flexDirection: "row",
-        width: "100%",
+        width: width - 32,
+        alignSelf: 'center',
         gap: 12,
-        marginTop: 'auto',
-        paddingBottom: 40,
-        // backgroundColor: 'red'
+        marginBottom: 40,
+        // backgroundColor: 'yellow'
     },
     btn: {
         flex: 1,
@@ -305,13 +301,11 @@ const styles = StyleSheet.create({
     loginBtnText: {
         color: "#080808",
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: "BrittiBold",
     },
     getStartedBtnText: {
         color: "#FFFFFF",
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: "BrittiBold",
     },
     skipBtn: {
@@ -324,7 +318,6 @@ const styles = StyleSheet.create({
     skipText: {
         color: "#757575",
         fontSize: 14,
-        fontWeight: 600,
         fontFamily: "BrittiBold",
     },
 });

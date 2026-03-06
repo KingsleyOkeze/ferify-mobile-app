@@ -33,7 +33,6 @@ export default function SignUpScreen() {
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
     const { login } = useAuth();
-    const [isLoading, setIsLoading] = useState(false); // Kept for Google initialization if needed, but primary actions will use GlobalLoader
 
     // Form State
     const [email, setEmail] = useState("");
@@ -85,7 +84,7 @@ export default function SignUpScreen() {
     const signInWithGoogle = async (idToken: string) => {
         try {
             showLoader();
-            setIsLoading(true);
+            // setIsLoading(true);
             const res = await api.post("/api/user/auth/google-login", { idToken });
 
             if (res.status === 200) {
@@ -108,53 +107,8 @@ export default function SignUpScreen() {
             Alert.alert("Login Failed", err.response?.data?.error || "An error occurred.");
         } finally {
             hideLoader();
-            setIsLoading(false);
         }
     };
-
-
-    // Google Sign-In
-    // const signInWithGoogle = async () => {
-    //     setIsLoading(true);
-    //     // try {
-    //     //     await GoogleSignin.hasPlayServices();
-    //     //     const userInfo = await GoogleSignin.signIn();
-    //     //     const idToken = userInfo.data?.idToken;
-
-    //     //     if (idToken) {
-    //     //         api.post('/api/user/auth/google-login', { idToken })
-    //     //             .then(async (res) => {
-    //     //                 console.log("Google Signup Backend Success:", res.data);
-    //     //                 if (res.data.accessToken) {
-    //     //                     await setToken(res.data.accessToken);
-    //     //                     router.replace('/(tabs)/HomeScreen');
-    //     //                 }
-    //     //             })
-    //     //             .catch((error) => {
-    //     //                 console.error("Google Backend Error:", error, error.response?.data || error.message);
-    //     //                 Alert.alert("Google Sign-Up Failed", "Could not verify with server.");
-    //     //             })
-    //     //             .finally(() => setIsLoading(false));
-    //     //     } else {
-    //     //         Alert.alert("Error", "No ID token received from Google");
-    //     //         setIsLoading(false);
-    //     //     }
-    //     // } catch (error: any) {
-    //     //     console.error("Google Sign-In Error", error);
-    //     //     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-    //     //         // user cancelled the login flow
-    //     //     } else if (error.code === statusCodes.IN_PROGRESS) {
-    //     //         // operation (e.g. sign in) is in progress already
-    //     //     } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-    //     //         // play services not available or outdated
-    //     //         Alert.alert("Error", "Google Play Services not available");
-    //     //     } else {
-    //     //         // some other error happened
-    //     //         Alert.alert("Error", "An unexpected error occurred during Google Sign-In");
-    //     //     }
-    //     //     setIsLoading(false);
-    //     // }
-    // };
 
     // Validation
     useEffect(() => {
@@ -245,7 +199,6 @@ export default function SignUpScreen() {
                                     onBlur={() => setFocusedField(null)}
                                     keyboardType="email-address"
                                     autoCapitalize="none"
-                                    editable={!isLoading}
                                 />
                             </View>
                         </View>
@@ -267,14 +220,13 @@ export default function SignUpScreen() {
                                     onFocus={() => setFocusedField('password')}
                                     onBlur={() => setFocusedField(null)}
                                     secureTextEntry={!showPassword}
-                                    editable={!isLoading}
                                 />
                                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
                                     <Ionicons
                                         name={showPassword ? "eye-off-outline" : "eye-outline"}
                                         size={20}
                                         color="#6B6B6B"
-                                        // style={{ marginRight: 2 }}
+                                    // style={{ marginRight: 2 }}
                                     />
                                 </TouchableOpacity>
                             </View>
@@ -305,7 +257,6 @@ export default function SignUpScreen() {
                         <TouchableOpacity
                             style={styles.googleButton}
                             onPress={() => promptAsync()}
-                            disabled={isLoading}
                         >
                             <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
                             <Text style={styles.googleButtonText}>Sign up with Google</Text>
@@ -350,7 +301,7 @@ const styles = StyleSheet.create({
         marginLeft: -4,
     },
     backButton: {
-        // padding: 10,
+        paddingTop: 8,
     },
     stepContainer: {
         marginBottom: 24,
@@ -383,7 +334,6 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 700,
         color: "#080808",
         marginBottom: 4,
         alignSelf: "flex-start",
@@ -391,7 +341,6 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: "BrittiRegular",
         color: "#393939",
         lineHeight: 22,
@@ -404,7 +353,6 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: "BrittiRegular",
         color: "#080808",
         marginBottom: 8,
@@ -423,7 +371,6 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: "BrittiRegular",
         color: "#080808",
     },
@@ -448,7 +395,6 @@ const styles = StyleSheet.create({
     createButtonText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: "BrittiBold",
     },
     separatorContainer: {
@@ -483,12 +429,10 @@ const styles = StyleSheet.create({
     googleButtonText: {
         color: "#080808",
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: "BrittiRegular",
     },
     termsText: {
         fontSize: 12,
-        fontWeight: 400,
         fontFamily: "BrittiRegular",
         color: "#6B6B6B",
         textAlign: "center",
@@ -498,21 +442,22 @@ const styles = StyleSheet.create({
     termsHighlight: {
         color: "#080808",
         fontWeight: 600,
+        fontFamily: "BrittiRegular",
     },
     footerLink: {
         marginTop: 24,
         alignItems: "center",
         marginBottom: 20,
+        fontFamily: 'BrittiRegular'
     },
     footerText: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: "BrittiRegular",
         color: "#393939",
     },
     footerHighlight: {
         color: "#080808",
-        fontWeight: 400,
+        fontFamily: "BrittiRegular",
         textDecorationLine: "underline",
     },
 });

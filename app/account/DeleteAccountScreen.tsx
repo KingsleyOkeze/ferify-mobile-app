@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     },
     header: {
         // paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         // paddingBottom: 24,
     },
     backButton: {

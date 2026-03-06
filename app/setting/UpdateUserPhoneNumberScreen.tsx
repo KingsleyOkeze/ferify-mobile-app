@@ -16,16 +16,19 @@ import {
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 
 function UpdateUserPhoneNumberScreen() {
     const router = useRouter();
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const { user, updateUser } = useAuth();
+    const [phoneNumber, setPhoneNumber] = useState(user?.phone || '');
     const [isInputFocused, setIsInputFocused] = useState(false);
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
 
     // Basic phone number validation (e.g., at least 10 digits)
     const isFormValid = phoneNumber.trim().length >= 10;
@@ -38,14 +41,14 @@ function UpdateUserPhoneNumberScreen() {
             const response = await api.put('/api/user/account/update-phone', { phoneNumber: phoneNumber.trim() });
 
             if (response.status === 200) {
-                await AsyncStorage.setItem('phoneNumber', phoneNumber.trim());
-                Alert.alert('Success', 'Phone number updated successfully', [
-                    { text: 'OK', onPress: () => router.back() }
-                ]);
+                // Update global state and storage via AuthContext
+                updateUser({ phone: phoneNumber.trim() });
+                showToast('success', 'Phone number updated successfully');
+                router.back();
             }
         } catch (error: any) {
             console.error('Update phone error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to update phone number');
+            showToast('error', error.response?.data?.error || 'Failed to update phone number');
         } finally {
             hideLoader();
         }
@@ -143,7 +146,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
@@ -153,8 +156,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     content: {
@@ -167,14 +169,12 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 10,
     },
     descriptionText: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#666',
         lineHeight: 20,
@@ -185,8 +185,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 8,
     },
@@ -197,7 +196,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 20,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#000',
         backgroundColor: '#F0F0F0',
@@ -212,7 +210,6 @@ const styles = StyleSheet.create({
     },
     statementText: {
         fontSize: 12,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
         fontStyle: 'italic',
@@ -229,7 +226,6 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#fff',
     },

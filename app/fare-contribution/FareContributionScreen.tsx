@@ -25,6 +25,7 @@ import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCachedLocation } from '@/services/locationService';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 import { cacheHelper } from '@/utils/cache';
 import { STORAGE_KEYS } from '@/constants/storage';
 
@@ -123,6 +124,7 @@ function FareContributionScreen() {
 
     // Loading state
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
 
     const toInputRef = useRef<TextInput | null>(null);
 
@@ -265,7 +267,7 @@ function FareContributionScreen() {
             } catch (error: any) {
                 console.error('Submission error:', error);
                 const errorMessage = error.response?.data?.error || "Could not submit fare. Please try again.";
-                Alert.alert("Error", errorMessage);
+                showToast('error', errorMessage);
                 hideLoader();
             }
         }
@@ -511,21 +513,18 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 600,
         color: '#080808',
         marginBottom: 8,
         fontFamily: 'BrittiSemibold'
     },
     subtitle: {
         fontSize: 14,
-        fontWeight: 400,
         color: '#393939',
         fontFamily: 'BrittiRegular',
         marginBottom: 24,
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
         paddingTop: 32,
@@ -543,7 +542,6 @@ const styles = StyleSheet.create({
     },
     nairaSign: {
         fontSize: 16,
-        fontWeight: 400,
         color: '#080808',
         marginRight: 8,
         fontFamily: 'BrittiRegular'
@@ -571,7 +569,6 @@ const styles = StyleSheet.create({
     },
     quickSelectText: {
         fontSize: 14,
-        fontWeight: 400,
         color: '#080808',
         fontFamily: 'BrittiRegular'
     },
@@ -619,7 +616,7 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular'
     },
     conditionChipTextSelected: {
-        fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
     },
     notesInput: {
         backgroundColor: '#F2F3F4',
@@ -644,7 +641,7 @@ const styles = StyleSheet.create({
     },
     submitButtonText: {
         fontSize: 16,
-        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#FBFBFB',
     },
     submitButtonTextDisabled: {

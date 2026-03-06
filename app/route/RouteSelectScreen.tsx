@@ -19,6 +19,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import ModeOfTransportSelect from '@/components/ModeOfTransportSelect';
 import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 import LocationInputs from '@/components/LocationInputs';     // ← added
 import LocationRecommendation from '@/components/LocationRecommendation';         // ← added
@@ -36,6 +37,7 @@ function RouteSelectScreen() {
     const params = useLocalSearchParams();
     const isAndroid = Platform.OS === 'android';
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
 
     // Inputs
     const [fromLocation, setFromLocation] = useState('');
@@ -102,7 +104,7 @@ function RouteSelectScreen() {
             if (fromResult && selectedMode) {
                 performFareCheck(fromResult, item, selectedMode);
             } else if (!selectedMode) {
-                Alert.alert("Selection Required", "Please select a transport mode to continue.");
+                showToast('general', 'Please select a transport mode to continue.');
             }
         }
     };
@@ -147,7 +149,7 @@ function RouteSelectScreen() {
                     }
                 });
             } else {
-                Alert.alert("Error", "Could not calculate fare estimate. Please try again.");
+                showToast('error', 'Could not calculate fare estimate. Please try again.');
             }
         } finally {
             hideLoader();
@@ -248,7 +250,7 @@ function RouteSelectScreen() {
 
             // Case 3: Mode missing
             if ((toResult || (recommendations.length > 0)) && !selectedMode) {
-                Alert.alert("Selection Required", "Please select a transport mode to continue.");
+                showToast('general', 'Please select a transport mode to continue.');
             }
         }
     };
@@ -397,7 +399,6 @@ const styles = StyleSheet.create({
     headerSpacer: { width: 24 },
     headerTitle: {
         fontSize: 18,
-        fontWeight: '700',
         fontFamily: 'BrittiSemibold',
         color: '#000000'
     },
@@ -414,7 +415,7 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: 16,
-        fontWeight: 600,
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginTop: 12,
         marginBottom: 12

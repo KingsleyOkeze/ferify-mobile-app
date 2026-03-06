@@ -130,12 +130,13 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
         marginBottom: 24,
+        marginLeft: -4
     },
     headerTitle: {
         fontSize: 24,
@@ -149,6 +150,7 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
+        lineHeight: 24  
     },
     scrollContent: {
         paddingBottom: 40,

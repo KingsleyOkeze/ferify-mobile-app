@@ -143,13 +143,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 20,
+        paddingHorizontal: 16,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
-        marginTop: 10,
+        marginTop: 8,
+        marginLeft: -4,
         marginBottom: 24,
     },
     headerTitle: {
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         fontFamily: 'BrittiRegular',
-        color: '#000',
+        color: '#080808',
         marginBottom: 4,
     },
     itemDescription: {
@@ -227,6 +227,7 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         color: '#393939',
         lineHeight: 18,
+        fontFamily: 'BrittiRegular',
     },
 });
 

@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingTop: 16,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: 400,
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     scrollContent: {
@@ -310,7 +310,6 @@ const styles = StyleSheet.create({
         color: '#080808',
         fontFamily: 'BrittiRegular',
         fontSize: 14,
-        fontWeight: '400',
         lineHeight: 24
     },
     summaryCard: {
@@ -339,7 +338,6 @@ const styles = StyleSheet.create({
     },
     summaryPrice: {
         fontSize: 16,
-        fontWeight: 700,
         lineHeight: 24,
         fontFamily: 'BrittiBold',
         color: '#080808',
@@ -369,7 +367,6 @@ const styles = StyleSheet.create({
     badgeText: {
         fontSize: 14,
         color: '#393939',
-        fontWeight: 400,
         lineHeight: 24,
         fontFamily: 'BrittiRegular',
     },
@@ -394,14 +391,12 @@ const styles = StyleSheet.create({
     },
     breakdownToggleText: {
         color: '#080808',
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         fontSize: 14,
         marginRight: 4,
     },
     breakdownToggleTextDisabled: {
         color: '#A0A0A0',
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         fontSize: 14,
         marginRight: 4,
@@ -475,7 +470,6 @@ const styles = StyleSheet.create({
     },
     legCityText: {
         fontSize: 14,
-        fontWeight: '600',
         color: '#080808',
         fontFamily: 'BrittiSemibold'
     },
@@ -499,7 +493,6 @@ const styles = StyleSheet.create({
     },
     legPrice: {
         fontSize: 14,
-        fontWeight: 700,
         marginBottom: 18,
         color: '#080808',
         fontFamily: 'BrittiBold'
@@ -512,7 +505,6 @@ const styles = StyleSheet.create({
     miniBadgeText: {
         fontSize: 12,
         fontFamily: 'BrittiRegular',
-        fontWeight: 400,
         lineHeight: 20,
         color: '#6B6B6B',
         marginLeft: 4,
@@ -524,7 +516,6 @@ const styles = StyleSheet.create({
         color: '#080808',
         fontFamily: 'BrittiSemibold',
         fontSize: 14,
-        fontWeight: 600,
         textDecorationLine: 'underline',
     },
     footer: {
@@ -563,7 +554,6 @@ const styles = StyleSheet.create({
     mapButtonTextDisabled: {
         color: '#A0A0A0',
         fontSize: 14,
-        fontWeight: '600',
         fontFamily: 'BrittiSemibold',
     },
     mapComingSoonText: {
@@ -585,7 +575,7 @@ const styles = StyleSheet.create({
     verifyButtonText: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
     },
     // Empty State Styles
     emptyStateContainer: {
@@ -603,8 +593,8 @@ const styles = StyleSheet.create({
     },
     noDataTitle: {
         fontSize: 20,
-        fontWeight: '700',
         color: '#080808',
+        fontFamily: 'BrittiBold',
         marginBottom: 12,
         textAlign: 'center',
     },
@@ -627,7 +617,7 @@ const styles = StyleSheet.create({
     submitFareButtonText: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: '600',
+        fontFamily: 'BrittiSemibold',
     },
 });
 

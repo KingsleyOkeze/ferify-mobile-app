@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center', // Center content (Title)
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#EFEFEF',
@@ -69,14 +69,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         left: 20,
         top: 10,
-        padding: 4,
         zIndex: 1,
     },
     headerButtonRight: {
         position: 'absolute',
         right: 20,
         top: 10,
-        padding: 4,
         zIndex: 1,
     },
     headerTitle: {

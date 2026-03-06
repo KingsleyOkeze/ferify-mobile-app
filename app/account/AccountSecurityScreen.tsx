@@ -77,8 +77,8 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 20,
-        paddingTop: 16,
-        paddingBottom: 20,
+        paddingTop: 8,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: '#000',
+        color: '#080808',
     },
     scrollContent: {
         paddingBottom: 40,

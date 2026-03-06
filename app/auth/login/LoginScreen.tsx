@@ -1,4 +1,4 @@
-import api from "@/services/api";
+import api, { getUserData } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -30,11 +30,24 @@ export default function LoginScreen() {
     const router = useRouter();
     const [email, setEmail] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
-    const [loading, setLoading] = useState(false);
     const { showLoader, hideLoader } = useLoader();
 
     const [firstName, setFirstName] = useState<string>("");
     const [focusedField, setFocusedField] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const userData = await getUserData();
+                if (userData?.firstName) {
+                    setFirstName(userData.firstName);
+                }
+            } catch (error) {
+                console.error("Error fetching user data from cache:", error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
         webClientId: getWebClientId(),
@@ -73,7 +86,7 @@ export default function LoginScreen() {
     const { login } = useAuth();
 
     const signInWithGoogle = async (idToken: string) => {
-        setLoading(true);
+        showLoader();
         try {
             const res = await api.post("/api/user/auth/google-login", { idToken });
             console.log("Google Login Backend Success:", res.data);
@@ -102,7 +115,7 @@ export default function LoginScreen() {
             console.error("Google Backend Error:", error.response?.data || error.message);
             Alert.alert("Google Sign-In Failed", "Could not verify with server.");
         } finally {
-            setLoading(false);
+            hideLoader();
         }
     };
 
@@ -116,7 +129,6 @@ export default function LoginScreen() {
         if (!isEmailValid) return;
 
         showLoader();
-        setLoading(true);
         try {
             // This would typically initiate the login process (e.g., check email, then move to verification or password)
             // For now, we'll follow a flow similar to signup where we might send an OTP or ask for password next
@@ -144,7 +156,6 @@ export default function LoginScreen() {
             console.error("Login initiation error:", error.response?.data || error.message);
             // Alert.alert("Error", error.response?.data?.error || "Failed to start sign in. Please try again.");
         } finally {
-            setLoading(false);
             hideLoader();
         }
     };
@@ -194,7 +205,6 @@ export default function LoginScreen() {
                                         onBlur={() => setFocusedField(null)}
                                         keyboardType="email-address"
                                         autoCapitalize="none"
-                                        editable={!loading}
                                     />
                                 </View>
                             </View>
@@ -206,16 +216,12 @@ export default function LoginScreen() {
                                     !isEmailValid && styles.disabledButton
                                 ]}
                                 onPress={handleContinue}
-                                disabled={!isEmailValid || loading}
+                                disabled={!isEmailValid}
                             >
-                                {loading ? (
-                                    <ActivityIndicator color="#fff" />
-                                ) : (
-                                    <Text style={[
-                                        styles.signInButtonText,
-                                        !isEmailValid && { color: '#979797' }
-                                    ]}>Sign in</Text>
-                                )}
+                                <Text style={[
+                                    styles.signInButtonText,
+                                    !isEmailValid && { color: '#979797' }
+                                ]}>Sign in</Text>
                             </TouchableOpacity>
 
                             {/* Forgot Password */}
@@ -237,7 +243,7 @@ export default function LoginScreen() {
                             <TouchableOpacity
                                 style={styles.googleButton}
                                 onPress={() => promptAsync()}
-                                disabled={loading || !request}
+                                disabled={!request}
                             >
                                 <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
                                 <Text style={styles.googleButtonText}>Sign in with Google</Text>
@@ -301,14 +307,12 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 700,
         fontFamily: "BrittiBold",
         color: "#080808",
         marginBottom: 4,
     },
     subtitle: {
         fontSize: 14,
-        fontWeight: 400,
         color: "#393939",
         textAlign: "left",
         lineHeight: 22,
@@ -322,7 +326,6 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: "500",
         color: "#080808",
         marginTop: 5,
         marginBottom: 8,
@@ -333,7 +336,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#F0F0F0",
         borderRadius: 100,
-        paddingHorizontal: 16,
+        paddingHorizontal: 8,
         height: 50,
         borderWidth: 1,
         borderColor: "transparent",

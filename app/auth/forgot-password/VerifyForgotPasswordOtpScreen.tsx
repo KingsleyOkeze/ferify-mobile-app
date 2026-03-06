@@ -206,7 +206,6 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: '600',
         fontFamily: 'BrittiRegular',
         color: '#080808',
     },
@@ -220,14 +219,12 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 10,
     },
     instructionText: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#666',
         lineHeight: 20,
@@ -247,7 +244,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F0F0F0',
         textAlign: 'center',
         fontSize: 24,
-        fontWeight: 'bold',
         fontFamily: 'BrittiBold',
         color: '#080808',
     },
@@ -273,7 +269,6 @@ const styles = StyleSheet.create({
     },
     resendLink: {
         fontSize: 14,
-        fontWeight: 'bold',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         textDecorationLine: 'underline',

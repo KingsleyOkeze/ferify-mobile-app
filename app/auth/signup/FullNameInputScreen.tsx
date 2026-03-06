@@ -169,7 +169,6 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 20,
-        fontWeight: 600,
         color: '#080808',
         marginBottom: 8,
         fontFamily: "BrittiBold",
@@ -188,7 +187,6 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        fontWeight: '400',
         color: '#080808',
         marginBottom: 8,
         marginLeft: 4,
@@ -208,6 +206,7 @@ const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
         color: '#080808',
+        fontFamily: 'BrittiRegular'
     },
     focusedInput: {
         borderColor: '#080808',
@@ -227,6 +226,6 @@ const styles = StyleSheet.create({
     continueButtonText: {
         color: '#FBFBFB',
         fontSize: 16,
-        fontWeight: 600,
+        fontFamily: 'BrittiBold'
     },
 });

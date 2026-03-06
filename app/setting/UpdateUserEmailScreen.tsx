@@ -18,6 +18,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 function UpdateUserEmailScreen() {
     const router = useRouter();
@@ -25,6 +26,7 @@ function UpdateUserEmailScreen() {
     const [newEmail, setNewEmail] = useState('');
     const [isInputFocused, setIsInputFocused] = useState(false);
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -56,7 +58,7 @@ function UpdateUserEmailScreen() {
             }
         } catch (error: any) {
             console.error('Update email error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to initiate email update');
+            showToast('error', error.response?.data?.error || 'Failed to initiate email update');
         } finally {
             setIsLoading(false);
             hideLoader();
@@ -161,25 +163,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
-        color: '#000',
+        fontFamily: 'BrittiSemibold',
+        color: '#080808',
     },
     content: {
         flex: 1,
     },
     formContainer: {
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         paddingTop: 24,
         paddingBottom: 40,
     },
@@ -195,7 +196,6 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 8,
@@ -203,7 +203,6 @@ const styles = StyleSheet.create({
     },
     descriptionText: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
         lineHeight: 22.4,
@@ -216,8 +215,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 10,
     },
@@ -242,7 +240,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         paddingHorizontal: 16,
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
         backgroundColor: '#EDEDED',
@@ -257,7 +254,6 @@ const styles = StyleSheet.create({
     },
     verificationNotice: {
         fontSize: 12,
-        fontWeight: 400,
         lineHeight: 24,
         fontFamily: 'BrittiRegular',
         color: '#393939',
@@ -281,7 +277,6 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#fff',
     },

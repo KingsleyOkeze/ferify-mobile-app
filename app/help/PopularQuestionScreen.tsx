@@ -74,14 +74,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
-        paddingTop: 10,
+        paddingHorizontal: 16,
+        paddingTop: 8,
         paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
         marginLeft: -4,
-        marginBottom: 25,
+        marginBottom: 24,
     },
     headerTitle: {
         fontSize: 24,

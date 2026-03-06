@@ -201,15 +201,16 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FBFBFB',
-        paddingTop: 4,
+        // paddingTop: 4,
     },
     header: {
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
+        marginLeft: -4,
         marginBottom: 24,
     },
     headerTitle: {

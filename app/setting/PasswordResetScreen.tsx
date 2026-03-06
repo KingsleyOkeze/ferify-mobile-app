@@ -17,12 +17,14 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 function PasswordResetScreen() {
     const router = useRouter();
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
 
     // Focus States
     const [isNewPasswordFocused, setIsNewPasswordFocused] = useState(false);
@@ -46,7 +48,7 @@ function PasswordResetScreen() {
             }
         } catch (error: any) {
             console.error('Password reset initiation error:', error);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to send verification code');
+            showToast('error', error.response?.data?.error || 'Failed to send verification code');
         } finally {
             hideLoader();
         }
@@ -151,7 +153,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',

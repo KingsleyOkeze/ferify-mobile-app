@@ -16,16 +16,18 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 function SubmitFeedbackScreen() {
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
 
     const handleSubmit = async () => {
         if (!subject.trim() || !message.trim()) {
-            Alert.alert('Incomplete', 'Please fill in both subject and message.');
+            showToast('general', 'Please fill in both subject and message.');
             return;
         }
 
@@ -41,23 +43,17 @@ function SubmitFeedbackScreen() {
                 ? `\n\nYou have ${remainingSubmissions} feedback submission${remainingSubmissions === 1 ? '' : 's'} remaining today.`
                 : "\n\nYou've used all your feedback submissions for today.";
 
-            Alert.alert(
-                "Thank You",
-                "Your feedback has been sent successfully!" + quotaMessage,
-                [{ text: "OK", onPress: () => router.back() }]
-            );
+            showToast('success', 'Your feedback has been sent successfully!' + quotaMessage);
+            router.back();
         } catch (error: any) {
             console.error(error);
 
             // Handle rate limiting
             if (error.response?.status === 429) {
-                Alert.alert(
-                    "Daily Limit Reached",
-                    error.response?.data?.message || "You've reached your daily feedback limit. Please try again in 24 hours."
-                );
+                showToast('error', error.response?.data?.message || "You've reached your daily feedback limit. Please try again in 24 hours.");
             } else {
                 const errorMessage = error.response?.data?.error || "Failed to send feedback. Please try again.";
-                Alert.alert("Error", errorMessage);
+                showToast('error', errorMessage);
             }
         } finally {
             hideLoader();
@@ -138,7 +134,6 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 24,
@@ -158,7 +153,6 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 8,
@@ -198,7 +192,6 @@ const styles = StyleSheet.create({
     submitButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
     },
 });

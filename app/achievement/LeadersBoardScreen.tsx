@@ -178,7 +178,7 @@ export default function LeadersBoardScreen() {
                                     </View>
                                     <View>
                                         <Text style={styles.rankingName}>{item.name}</Text>
-                                        <Text style={[styles.rankingName, { fontSize: 14, color: '#757575', fontWeight: '400', lineHeight: 24 }]}>{item.title}</Text>
+                                        <Text style={[styles.rankingName, { fontSize: 14, color: '#757575', fontFamily: 'BrittiRegular', lineHeight: 24 }]}>{item.title}</Text>
                                     </View>
                                 </View>
                                 <Text style={styles.rankingCount}>+{item.count}</Text>
@@ -198,9 +198,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 24,
-        paddingTop: 16,
-        paddingBottom: 8,
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 24,
     },
     backButton: {
         marginBottom: 24,
@@ -212,12 +212,11 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     toggleOuterContainer: {
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         marginTop: 24,
         marginBottom: 32,
         width: 300,
@@ -250,7 +249,6 @@ const styles = StyleSheet.create({
     toggleText: {
         fontSize: 14,
         lineHeight: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
     },
     activeText: {
@@ -258,16 +256,14 @@ const styles = StyleSheet.create({
     },
     inactiveText: {
         color: '#757575',
-        fontWeight: 400,
         fontSize: 14,
     },
     rankingHeader: {
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         marginBottom: 10,
     },
     rankingTitle: {
         fontSize: 16,
-        fontWeight: 600,
         lineHeight: 24,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
@@ -276,7 +272,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     scrollContent: {
-        paddingHorizontal: 24,
+        paddingHorizontal: 16,
         paddingBottom: 40,
     },
     listContainer: {
@@ -308,7 +304,6 @@ const styles = StyleSheet.create({
     },
     rankingName: {
         fontSize: 14,
-        fontWeight: 600,
         marginBottom: 2,
         lineHeight: 24,
         fontFamily: 'BrittiSemibold',
@@ -318,7 +313,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 24,
         color: '#1B9E4B',
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
     },
 });

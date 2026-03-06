@@ -205,14 +205,12 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 24,
-        fontWeight: '600',
         color: '#080808',
         marginBottom: 8,
         fontFamily: 'BrittiBold'
     },
     subtitle: {
         fontSize: 14,
-        fontWeight: '400',
         color: '#393939',
         lineHeight: 24,
         fontFamily: 'BrittiRegular'
@@ -250,7 +248,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'BrittiBold',
         color: '#080808',
-        fontWeight: 700,
         textDecorationLine: 'underline',
     },
     timerText: {
@@ -259,7 +256,6 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular'
     },
     timerCount: {
-        fontWeight: 'bold',
         color: '#080808',
         fontFamily: 'BrittiBold'
     },

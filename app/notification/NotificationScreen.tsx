@@ -122,16 +122,17 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        paddingHorizontal: 20,
-        paddingVertical: 15,
+        paddingHorizontal: 16,
+        paddingTop: 8,
+        paddingBottom: 24,
     },
     backButton: {
-        marginBottom: 24,
         alignSelf: 'flex-start',
+        marginLeft: -4,
+        marginBottom: 24,
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 600,
         color: '#080808',
         fontFamily: 'BrittiSemibold',
         paddingTop: 10,
@@ -195,7 +196,6 @@ const styles = StyleSheet.create({
     },
     itemTitle: {
         fontSize: 16,
-        fontWeight: 600,
         color: '#080808',
         marginBottom: 4,
         fontFamily: 'BrittiSemibold',
@@ -203,7 +203,6 @@ const styles = StyleSheet.create({
     },
     itemDescription: {
         fontSize: 14,
-        fontWeight: 400,
         color: '#757575',
         marginBottom: 15,
         lineHeight: 20,
@@ -211,7 +210,6 @@ const styles = StyleSheet.create({
     },
     itemTime: {
         fontSize: 12,
-        fontWeight: 400,
         color: '#6B6B6B',
         fontFamily: 'BrittiRegular',
     },

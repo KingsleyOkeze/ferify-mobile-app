@@ -16,11 +16,13 @@ import { useRouter } from 'expo-router';
 import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 function UpdateUserFullNameScreen() {
     const router = useRouter();
     const { user, updateUser } = useAuth();
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
 
     const [firstName, setFirstName] = useState(user?.firstName || '');
     const [lastName, setLastName] = useState(user?.lastName || '');
@@ -48,13 +50,12 @@ function UpdateUserFullNameScreen() {
                     fullName: `${response.data.firstName} ${response.data.lastName}`
                 });
 
-                Alert.alert('Success', 'Name updated successfully', [
-                    { text: 'OK', onPress: () => router.back() }
-                ]);
+                showToast('success', 'Name updated successfully');
+                router.back();
             }
         } catch (error: any) {
             console.error('Update full name error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to update name');
+            showToast('error', error.response?.data?.error || 'Failed to update name');
         } finally {
             hideLoader();
         }
@@ -161,7 +162,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
@@ -171,8 +172,7 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 18,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
+        fontFamily: 'BrittiSemibold',
         color: '#080808',
     },
     content: {
@@ -185,9 +185,8 @@ const styles = StyleSheet.create({
     },
     screenTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
-        color: '#000',
+        color: '#080808',
         lineHeight: 19.2,
         marginBottom: 8,
     },
@@ -206,14 +205,12 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        fontWeight: 600,
-        fontFamily: 'BrittiRegular',
+        fontFamily: 'BrittiSemibold',
         color: '#000',
         marginBottom: 8,
     },
     currentValue: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
         lineHeight: 24
@@ -226,13 +223,12 @@ const styles = StyleSheet.create({
     },
     fieldLabel: {
         fontSize: 16,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
         marginBottom: 16,
     },
     input: {
-        
+
         height: 50,
         borderWidth: 1,
         borderColor: '#EDEDED',
@@ -266,7 +262,6 @@ const styles = StyleSheet.create({
     },
     updateButtonText: {
         fontSize: 16,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#FFFFFF',
     },
