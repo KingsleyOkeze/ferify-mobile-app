@@ -317,7 +317,7 @@ const styles = StyleSheet.create({
     },
     badgeTitle: {
         fontSize: 12,
-        fontFamily: 'BrittiSemibold',
+        fontFamily: 'BrittiRegular',
         color: '#080808',
         textAlign: 'center',
         textTransform: 'capitalize',

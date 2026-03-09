@@ -445,7 +445,7 @@ const styles = StyleSheet.create({
         height: 52
     },
     searchIcon: {
-        marginRight: 10,
+        marginRight: 8,
         color: "#000000"
     },
     micIcon: {

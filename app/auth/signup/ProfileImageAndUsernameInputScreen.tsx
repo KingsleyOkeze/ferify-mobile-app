@@ -11,7 +11,6 @@ import {
     ScrollView,
     Image,
     Pressable,
-    Alert,
     ActivityIndicator
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -19,11 +18,13 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/contexts/ToastContext';
 
 export default function ProfileImageAndUsernameInputScreen() {
     const router = useRouter();
     const params = useLocalSearchParams();
     const { updateUser } = useAuth();
+    const { showToast } = useToast();
     const [image, setImage] = useState<string | null>(null);
     const [username, setUsername] = useState('');
     const [focusedField, setFocusedField] = useState<string | null>(null);
@@ -84,10 +85,7 @@ export default function ProfileImageAndUsernameInputScreen() {
 
         } catch (error: any) {
             console.error("Profile Setup Error:", error.response?.data || error.message);
-            Alert.alert(
-                "Setup Failed",
-                error.response?.data?.error || "Could not complete your profile setup. Please try again."
-            );
+            showToast('error', "Setup Failed: " + (error.response?.data?.error || "Could not complete your profile setup. Please try again."));
         } finally {
             setIsLoading(false);
         }

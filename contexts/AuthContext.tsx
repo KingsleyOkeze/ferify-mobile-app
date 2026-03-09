@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getToken, getUserData, setUserData, removeToken, removeRefreshToken, removeUserData, setToken, setRefreshToken, getRefreshToken } from '@/services/api';
+import { getToken, getUserData, setUserData, removeToken, removeRefreshToken, removeUserData, setToken, setRefreshToken, getRefreshToken, setLastUserName } from '@/services/api';
 import api from '@/services/api';
 
 export interface UserData {
@@ -61,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await Promise.all([
                 setToken(token),
                 setUserData(userData),
+                userData.firstName ? setLastUserName(userData.firstName) : Promise.resolve(),
                 refreshToken ? setRefreshToken(refreshToken) : Promise.resolve(),
             ]);
             setUser(userData);
@@ -99,6 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 };
                 setUser(finalUser);
                 await setUserData(finalUser);
+                if (finalUser.firstName) {
+                    await setLastUserName(finalUser.firstName);
+                }
             }
         } catch (error) {
             console.error('Failed to refresh user data:', error);
@@ -110,6 +114,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (!prev) return null;
             const updated = { ...prev, ...data };
             setUserData(updated); // Sync to storage
+            if (updated.firstName) {
+                setLastUserName(updated.firstName);
+            }
             return updated;
         });
     }, []);

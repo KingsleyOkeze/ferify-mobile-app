@@ -1,4 +1,4 @@
-import api, { getUserData } from "@/services/api";
+import api, { getUserData, getLastUserName } from "@/services/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
@@ -8,7 +8,6 @@ import { makeRedirectUri } from "expo-auth-session";
 import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -21,6 +20,7 @@ import {
     View,
 } from "react-native";
 import { useLoader } from "@/contexts/LoaderContext";
+import { useToast } from "@/contexts/ToastContext";
 import * as Application from 'expo-application';
 import { getAndroidClientId, getWebClientId, getIosClientId } from "../../../utils/googleAuth";
 
@@ -31,22 +31,23 @@ export default function LoginScreen() {
     const [email, setEmail] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
 
     const [firstName, setFirstName] = useState<string>("");
     const [focusedField, setFocusedField] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchUserData = async () => {
+        const fetchLastUser = async () => {
             try {
-                const userData = await getUserData();
-                if (userData?.firstName) {
-                    setFirstName(userData.firstName);
+                const name = await getLastUserName();
+                if (name) {
+                    setFirstName(name);
                 }
             } catch (error) {
-                console.error("Error fetching user data from cache:", error);
+                console.error("Error fetching last user name from cache:", error);
             }
         };
-        fetchUserData();
+        fetchLastUser();
     }, []);
 
     const [request, response, promptAsync] = Google.useAuthRequest({
@@ -74,7 +75,7 @@ export default function LoginScreen() {
                 if (backupToken) {
                     signInWithGoogle(backupToken);
                 } else {
-                    Alert.alert("Google Sign-In Failed", "No ID token received.");
+                    showToast('error', "No ID token received.");
                 }
                 return;
             }
@@ -113,7 +114,7 @@ export default function LoginScreen() {
             }
         } catch (error: any) {
             console.error("Google Backend Error:", error.response?.data || error.message);
-            Alert.alert("Google Sign-In Failed", "Could not verify with server.");
+            showToast('error', "Google Sign-In Failed: Could not verify with server.");
         } finally {
             hideLoader();
         }
@@ -154,7 +155,7 @@ export default function LoginScreen() {
                 });
             }
             console.error("Login initiation error:", error.response?.data || error.message);
-            // Alert.alert("Error", error.response?.data?.error || "Failed to start sign in. Please try again.");
+            showToast('error', error.response?.data?.error || "Failed to start sign in. Please try again.");
         } finally {
             hideLoader();
         }
@@ -235,7 +236,7 @@ export default function LoginScreen() {
                             {/* Or Separator */}
                             <View style={styles.separatorContainer}>
                                 <View style={styles.separatorLine} />
-                                <Text style={styles.separatorText}>or</Text>
+                                <Text style={styles.separatorText}>OR</Text>
                                 <View style={styles.separatorLine} />
                             </View>
 
@@ -268,7 +269,7 @@ export default function LoginScreen() {
                             onPress={() => router.push("/auth/signup/SignupScreen")}
                         >
                             <Text style={styles.footerText}>
-                                New to Ferify? <Text style={styles.footerHighlight}>Create an account</Text>
+                                New to Ferify? <Text style={styles.footerHighlight}>Sign Up Here</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -445,6 +446,7 @@ const styles = StyleSheet.create({
     footerHighlight: {
         color: "#080808",
         fontWeight: "700",
+        fontFamily: "BrittiSemiBold",
         textDecorationLine: "underline",
     },
     footerContainer: {

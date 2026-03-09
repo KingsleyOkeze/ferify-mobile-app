@@ -8,7 +8,6 @@ import {
     TextInput,
     Platform,
     ScrollView,
-    Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -16,6 +15,7 @@ import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from "@/contexts/ToastContext";
 
 export default function VerifyLoginScreen() {
     const router = useRouter();
@@ -24,6 +24,7 @@ export default function VerifyLoginScreen() {
 
     const [otp, setOtp] = useState(['', '', '', '']);
     const { showLoader, hideLoader } = useLoader();
+    const { showToast } = useToast();
     const [activeIndex, setActiveIndex] = useState(0);
     const [timer, setTimer] = useState(30);
     const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -90,7 +91,7 @@ export default function VerifyLoginScreen() {
             router.replace('/(tabs)/HomeScreen');
         } catch (error: any) {
             console.error('Verify Login error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
+            showToast('error', error.response?.data?.error || 'Verification failed. Please check the code.');
         } finally {
             hideLoader();
         }
@@ -105,10 +106,10 @@ export default function VerifyLoginScreen() {
             setTimer(30);
             setOtp(['', '', '', '']);
             setActiveIndex(0);
-            Alert.alert("Success", "A new code has been sent to your email.");
+            showToast('success', "A new code has been sent to your email.");
         } catch (error: any) {
             console.error('Resend Login OTP error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
+            showToast('error', error.response?.data?.error || 'Failed to resend code');
         } finally {
             hideLoader();
         }

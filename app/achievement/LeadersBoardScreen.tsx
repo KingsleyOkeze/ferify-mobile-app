@@ -151,7 +151,7 @@ export default function LeadersBoardScreen() {
 
             {/* Ranking List */}
             <View style={styles.rankingHeader}>
-                <Text style={styles.rankingTitle}>Ranking</Text>
+                <Text style={styles.rankingTitle}>Rankings</Text>
             </View>
 
             <ScrollView
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     },
     toggleOuterContainer: {
         paddingHorizontal: 16,
-        marginTop: 24,
+        // marginTop: 8,
         marginBottom: 32,
         width: 300,
         height: 44,

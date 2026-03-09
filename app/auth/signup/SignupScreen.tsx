@@ -1,12 +1,12 @@
 import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
     ActivityIndicator,
-    Alert,
     Image,
     KeyboardAvoidingView,
     Platform,
@@ -33,6 +33,7 @@ export default function SignUpScreen() {
     const router = useRouter();
     const { showLoader, hideLoader } = useLoader();
     const { login } = useAuth();
+    const { showToast } = useToast();
 
     // Form State
     const [email, setEmail] = useState("");
@@ -72,7 +73,7 @@ export default function SignUpScreen() {
                 if (backupToken) {
                     signInWithGoogle(backupToken);
                 } else {
-                    Alert.alert("Google Sign-In Failed", "No ID token received.");
+                    showToast('error', "Google Sign-In Failed: No ID token received.");
                 }
                 return;
             }
@@ -104,7 +105,7 @@ export default function SignUpScreen() {
 
         } catch (err: any) {
             console.error("Backend Google Login Error:", err);
-            Alert.alert("Login Failed", err.response?.data?.error || "An error occurred.");
+            showToast('error', "Login Failed: " + (err.response?.data?.error || "An error occurred."));
         } finally {
             hideLoader();
         }
@@ -142,7 +143,7 @@ export default function SignUpScreen() {
         } catch (error: any) {
             console.error('error sigining up', error)
             console.error("Signup Error:", error.response?.data || error.message);
-            Alert.alert("Signup Failed", error.response?.data?.error || "An error occurred. Please try again.");
+            showToast('error', "Signup Failed: " + (error.response?.data?.error || "An error occurred. Please try again."));
         } finally {
             hideLoader();
         }
@@ -249,7 +250,7 @@ export default function SignUpScreen() {
                         {/* Or Separator */}
                         <View style={styles.separatorContainer}>
                             <View style={styles.separatorLine} />
-                            <Text style={styles.separatorText}>or</Text>
+                            <Text style={styles.separatorText}>OR</Text>
                             <View style={styles.separatorLine} />
                         </View>
 
@@ -363,7 +364,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#F0F0F0",
         borderRadius: 100,
-        paddingHorizontal: 16,
+        paddingHorizontal: 8,
         height: 56,
         borderWidth: 1,
         borderColor: "transparent",
@@ -457,7 +458,7 @@ const styles = StyleSheet.create({
     },
     footerHighlight: {
         color: "#080808",
-        fontFamily: "BrittiRegular",
+        fontFamily: "BrittiBold",
         textDecorationLine: "underline",
     },
 });

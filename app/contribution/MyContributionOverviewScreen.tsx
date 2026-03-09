@@ -98,8 +98,8 @@ function MyContributionOverviewScreen() {
 
     const menuItems = [
         {
-            id: 'achievement',
-            title: 'Achievement',
+            id: 'achievements',
+            title: 'Achievements',
             description: 'Badges and milestones earned',
             image: require('../../assets/images/my-contributions-icons/list-icons/achievements_icon.png'),
             onPress: () => { router.push('../achievement/AchievementsScreen') },
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 24,
+        marginBottom: 8,
     },
     headerSubtitle: {
         fontSize: 14,

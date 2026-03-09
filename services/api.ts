@@ -112,6 +112,23 @@ export const removeUserData = async () => {
     }
 };
 
+export const setLastUserName = async (name: string) => {
+    try {
+        await AsyncStorage.setItem(STORAGE_KEYS.LAST_USER_NAME, name);
+    } catch (error) {
+        console.error('Error saving last user name:', error);
+    }
+};
+
+export const getLastUserName = async (): Promise<string | null> => {
+    try {
+        return await AsyncStorage.getItem(STORAGE_KEYS.LAST_USER_NAME);
+    } catch (error) {
+        console.error('Error getting last user name:', error);
+        return null;
+    }
+};
+
 // Request Interceptor
 api.interceptors.request.use(
     async (config) => {

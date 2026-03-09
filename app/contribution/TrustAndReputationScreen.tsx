@@ -95,7 +95,7 @@ function TrustAndReputationScreen() {
                     <Text style={styles.scoreLabel}>TRUST SCORE</Text>
                     <Text style={styles.scoreValue}>{trustScore}%</Text>
                     <Text style={styles.scoreDescription}>
-                        Based on community verification and{'\n'}consistency of your data.
+                        Based on community verification and consistency of your data.
                     </Text>
                 </View>
 
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         color: '#080808',
         fontFamily: 'BrittiSemibold',
-        marginBottom: 24,
+        marginBottom: 8,
     },
     headerSubtitle: {
         fontSize: 14,
@@ -199,7 +199,8 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        lineHeight: 24
+        lineHeight: 19.2,
+        width: 253
     },
     listContainer: {
         paddingHorizontal: 16,

@@ -105,12 +105,19 @@ function AllContributionsScreen() {
                     if (transport === 'keke') imageSource = kekeImage;
                     if (transport === 'bike' || transport === 'okada') imageSource = okadaImage;
 
+                    // Format time to e.g., "5:55 PM"
+                    const timeString = date.toLocaleTimeString('en-US', {
+                        hour: 'numeric',
+                        minute: '2-digit',
+                        hour12: true
+                    }).toLowerCase();
+
                     grouped[dateGroup].push({
                         id: item._id,
                         from: item.details?.from || item.origin?.raw?.split(',')[0] || 'Unknown',
                         to: item.details?.to || item.destination?.raw?.split(',')[0] || 'Unknown',
                         price: item.details?.fareAmount ? `₦${item.details.fareAmount}` : (item.fareAmount ? `₦${item.fareAmount}` : ''),
-                        time: item.details?.timeOfDay || item.timeOfDay || 'Unknown',
+                        time: timeString,
                         transport: transport,
                         image: imageSource,
                         points: `+${item.pointsAwarded || 50} pts`,

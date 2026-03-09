@@ -113,7 +113,7 @@ function ProfileLandingScreen() {
                         )}
                     </View>
 
-                    <Text style={styles.pointsLabel}>points</Text>
+                    <Text style={styles.pointsLabel}>POINTS</Text>
                     {loadingAchievements ? (
                         <ActivityIndicator size="small" color="#080808" style={{ marginVertical: 8 }} />
                     ) : (
@@ -214,26 +214,25 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     pointsLabel: {
+        textAlign: 'center',
+        width: 317,
         fontSize: 12,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        textTransform: 'lowercase',
+        textTransform: 'uppercase',
         marginBottom: 12
     },
     pointsValue: {
         fontSize: 28,
-        fontWeight: 700,
         fontFamily: 'BrittiBold',
         color: '#080808',
         marginBottom: 32
     },
     username: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 20,
+        marginBottom: 8,
     },
     memberSinceContainer: {
         flexDirection: 'row',

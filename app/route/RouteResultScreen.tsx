@@ -146,7 +146,11 @@ function RouteResultScreen() {
                                         <Text style={styles.badgeText}>{getReliabilityText(estimate?.reliabilityScore)}</Text>
                                     </View>
                                     <View style={styles.badgeContainer}>
-                                        <Ionicons name="people" size={20} color="#757575" style={styles.badgeIcon} />
+                                        <Image 
+                                            source={require("../../assets/images/contributors-icons/contributors_icon.png")} 
+                                            style={styles.badgeIcon} 
+                                            resizeMode="contain"
+                                        />
                                         <Text style={styles.badgeText}>{estimate?.contributorCount || 0} Contributors</Text>
                                     </View>
                                 </View>
@@ -361,8 +365,8 @@ const styles = StyleSheet.create({
     },
     badgeIcon: {
         marginRight: 4,
-        width: 20,
-        // height: 20
+        width: 32.5,
+        height: 20
     },
     badgeText: {
         fontSize: 14,

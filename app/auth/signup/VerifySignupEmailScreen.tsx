@@ -8,7 +8,6 @@ import {
     TextInput,
     Platform,
     ScrollView,
-    Alert,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -16,6 +15,7 @@ import api from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import CustomNumberKeyboard from '@/components/CustomNumberKeyboard';
 import { useLoader } from '@/contexts/LoaderContext';
+import { useToast } from '@/contexts/ToastContext';
 
 
 export default function VerifySignupEmailScreen() {
@@ -31,6 +31,7 @@ export default function VerifySignupEmailScreen() {
 
     const { showLoader, hideLoader } = useLoader();
     const { login } = useAuth();
+    const { showToast } = useToast();
     const hasAttemptedSend = useRef(false);
     const [activeIndex, setActiveIndex] = useState(0);
     const inputRefs = useRef<Array<TextInput | null>>([]);
@@ -110,7 +111,7 @@ export default function VerifySignupEmailScreen() {
             }
         } catch (error: any) {
             console.error('Verify OTP error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Verification failed. Please check the code.');
+            showToast('error', error.response?.data?.error || 'Verification failed. Please check the code.');
         } finally {
             hideLoader();
         }
@@ -125,10 +126,10 @@ export default function VerifySignupEmailScreen() {
             setTimer(30);
             setOtp(['', '', '', '']);
             setActiveIndex(0);
-            Alert.alert("Success", "A new code has been sent to your email.");
+            showToast('success', "A new code has been sent to your email.");
         } catch (error: any) {
             console.error('Resend OTP error:', error.response?.data || error.message);
-            Alert.alert('Error', error.response?.data?.error || 'Failed to resend code');
+            showToast('error', error.response?.data?.error || 'Failed to resend code');
         } finally {
             hideLoader();
         }

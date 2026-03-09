@@ -28,6 +28,7 @@ export const STORAGE_KEYS = {
     HAS_SEEN_NOTIF_PROMPT: 'HAS_SEEN_NOTIF_PROMPT',
     NOTIFICATION_SETTINGS: 'NOTIFICATION_SETTINGS_CACHE',
     NOTIFICATION_TOKEN: 'notification_token',
+    LAST_USER_NAME: 'last_user_name',
 };
 
 export const CACHE_TTL = {
