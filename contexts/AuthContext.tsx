@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { DeviceEventEmitter } from 'react-native';
 import { getToken, getUserData, setUserData, removeToken, removeRefreshToken, removeUserData, setToken, setRefreshToken, getRefreshToken, setLastUserName } from '@/services/api';
 import api from '@/services/api';
 
@@ -86,6 +87,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ]);
         }
     };
+
+    // Global listener for forced logouts (e.g., from api.ts when refresh token expires)
+    useEffect(() => {
+        const subscription = DeviceEventEmitter.addListener('FORCE_LOGOUT', () => {
+            console.log("Global force logout triggered");
+            setUser(null);
+            Promise.all([
+                removeToken(),
+                removeRefreshToken(),
+                removeUserData()
+            ]).catch(e => console.error("Error clearing storage on force logout", e));
+        });
+
+        return () => subscription.remove();
+    }, []);
 
     const refreshUser = async () => {
         try {

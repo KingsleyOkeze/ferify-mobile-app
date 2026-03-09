@@ -68,6 +68,10 @@ export default function LoginScreen() {
 
     useEffect(() => {
         if (response?.type === "success") {
+            // Show loader immediately so the user never sees the login screen
+            // flash while the app transitions back from the OAuth browser.
+            showLoader();
+
             const { idToken } = response.params;
 
             if (!idToken) {
@@ -75,6 +79,7 @@ export default function LoginScreen() {
                 if (backupToken) {
                     signInWithGoogle(backupToken);
                 } else {
+                    hideLoader();
                     showToast('error', "No ID token received.");
                 }
                 return;
@@ -87,7 +92,6 @@ export default function LoginScreen() {
     const { login } = useAuth();
 
     const signInWithGoogle = async (idToken: string) => {
-        showLoader();
         try {
             const res = await api.post("/api/user/auth/google-login", { idToken });
             console.log("Google Login Backend Success:", res.data);

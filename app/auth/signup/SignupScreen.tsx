@@ -64,6 +64,10 @@ export default function SignUpScreen() {
     // Handle Google Sign-In response
     useEffect(() => {
         if (response?.type === "success") {
+            // Show loader immediately so the user never sees the signup screen
+            // flash while the app transitions back from the OAuth browser.
+            showLoader();
+
             const { idToken } = response.params;
 
             if (!idToken) {
@@ -73,6 +77,7 @@ export default function SignUpScreen() {
                 if (backupToken) {
                     signInWithGoogle(backupToken);
                 } else {
+                    hideLoader();
                     showToast('error', "Google Sign-In Failed: No ID token received.");
                 }
                 return;
@@ -84,8 +89,7 @@ export default function SignUpScreen() {
 
     const signInWithGoogle = async (idToken: string) => {
         try {
-            showLoader();
-            // setIsLoading(true);
+            // Loader is already showing from the response useEffect
             const res = await api.post("/api/user/auth/google-login", { idToken });
 
             if (res.status === 200) {

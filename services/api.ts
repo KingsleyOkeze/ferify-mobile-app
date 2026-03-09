@@ -157,6 +157,7 @@ api.interceptors.response.use(
                 const refreshToken = await getRefreshToken();
                 if (!refreshToken) {
                     await Promise.all([removeToken(), removeRefreshToken()]);
+                    DeviceEventEmitter.emit('FORCE_LOGOUT');
                     return Promise.reject(error);
                 }
 
@@ -176,6 +177,11 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 console.error('Token refresh failed:', refreshError);
                 await Promise.all([removeToken(), removeRefreshToken()]);
+                DeviceEventEmitter.emit('FORCE_LOGOUT');
+
+                // Show a toast to inform the user why they were logged out
+                DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: 'Session expired. Please log in again.' });
+
                 return Promise.reject(refreshError);
             }
         }
