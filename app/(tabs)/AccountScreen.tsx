@@ -52,7 +52,7 @@ function MainAccountProfileScreen() {
     }, [user]);
 
     const getBadgeText = () => {
-        if (!trustLevel || trustLevel === 'Bronze') return "Member";
+        if (!trustLevel || trustLevel === 'Bronze') return "New Member";
         return `${trustLevel} Contributor`;
     };
 
@@ -110,7 +110,7 @@ function MainAccountProfileScreen() {
                         <Text style={styles.avatarText}>{getInitials(user?.firstName, user?.lastName)}</Text>
                     </View>
 
-                    <Text style={styles.userName}>{user?.fullName || user?.firstName || 'User'}</Text>
+                    <Text style={styles.userName}>{user?.firstName || user?.lastName || 'User'}</Text>
                     <Text style={styles.userHandle}>@{user?.username || 'user'}</Text>
                     <Text style={styles.userBadge}>{getBadgeText()}</Text>
 
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F2F2F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 24,
     },
     avatarText: {
         fontSize: 28,
@@ -183,17 +183,18 @@ const styles = StyleSheet.create({
     },
     userName: {
         fontSize: 20,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000000',
-        marginBottom: 20,
+        marginBottom: 4,
+        lineHeight: 24
     },
     userHandle: {
         fontSize: 14,
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginBottom: 24,
+        marginBottom: 12,
+        lineHeight: 24
     },
     userBadge: {
         fontSize: 15,
@@ -201,6 +202,7 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular',
         color: '#646464',
         marginBottom: 20,
+        lineHeight: 24
     },
     viewProfileButton: {
         backgroundColor: '#F0F0F0',
@@ -219,7 +221,8 @@ const styles = StyleSheet.create({
         color: '#080808',
     },
     menuContainer: {
-        paddingHorizontal: 20,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
         backgroundColor: '#FFFFFF',
         borderTopWidth: 1,
         borderTopColor: '#DADADA',

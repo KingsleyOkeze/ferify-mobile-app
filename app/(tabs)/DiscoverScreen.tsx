@@ -140,7 +140,7 @@ function DiscoverScreen() {
                 {/* Popular Searches */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Popular searches near you</Text>
+                        <Text style={styles.sectionTitle}>Popular Searches Near You</Text>
                         <View style={styles.hotBadge}>
                             <Text style={styles.hotBadgeText}>HOT 🔥</Text>
                         </View>
@@ -149,7 +149,7 @@ function DiscoverScreen() {
                     <TouchableOpacity style={styles.popularSearchCard} onPress={() => router.push('/route/RouteSelectScreen')}>
                         <Image source={shareLocationHand} style={styles.searchImage} />
                         <View style={styles.searchContent}>
-                            <Text style={styles.searchMessage}>Check fare estimates for your next trip</Text>
+                            <Text style={styles.searchMessage}>People are checking this route a lot, you should too.</Text>
                         </View>
                         <Image source={mapImage} style={styles.searchMapImage} />
                     </TouchableOpacity>
@@ -158,7 +158,7 @@ function DiscoverScreen() {
                 {/* Popular Route Today */}
                 {popularRoutes.length > 0 && (
                     <View style={styles.section}>
-                        <Text style={[styles.sectionTitle, { marginBottom: 12 }]}>Popular routes today</Text>
+                        <Text style={[styles.sectionTitle, { marginBottom: 12 }]}>Popular Routes Today</Text>
                         <View style={styles.verticalList}>
                             {popularRoutes.map((item, index) => (
                                 <TouchableOpacity
@@ -263,14 +263,12 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 20,
+        marginBottom: 10,
     },
     headerSubtitle: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
         marginBottom: 24
@@ -289,8 +287,8 @@ const styles = StyleSheet.create({
         fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#000000',
-        marginRight: 10,
-        paddingHorizontal: 20,
+        paddingRight: 12,
+        paddingLeft: 16,
     },
 
     horizontalScroll: {
@@ -386,7 +384,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FAFAFA',
         marginHorizontal: 16,
         borderRadius: 16,
-        padding: 16,
+        padding: 8,
         borderWidth: 1,
         borderColor: '#DADADA',
     },
@@ -499,7 +497,7 @@ const styles = StyleSheet.create({
         paddingVertical: 16,
         paddingHorizontal: 16,
         backgroundColor: '#FFFFFF',
-        gap: 16,
+        gap: 8,
         borderWidth: 0
     },
     tipCard: {
@@ -507,18 +505,20 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F3F3F3',
         borderRadius: 16,
-        padding: 16,
+        padding: 12,
+        marginLeft: 0,
         minHeight: 91,
         borderWidth: 1,
         borderColor: '#F0F0F0',
     },
     tipIconContainer: {
-        width: 48,
-        height: 48,
+        // width: 48,
+        // height: 48,
         borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
+        // backgroundColor: 'red'
     },
     tipIcon: {
         width: 32,
@@ -532,7 +532,6 @@ const styles = StyleSheet.create({
     },
     tipTitle: {
         fontSize: 14,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginBottom: 10,
@@ -574,9 +573,9 @@ const styles = StyleSheet.create({
     promoTitle: {
         fontSize: 16,
         fontFamily: 'BrittiRegular',
-        fontWeight: 400,
         color: '#080808',
-        marginBottom: 5,
+        marginBottom: 4,
+        lineHeight: 24
     },
     promoBody: {
         fontSize: 14,

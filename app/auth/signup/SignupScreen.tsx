@@ -269,9 +269,9 @@ export default function SignUpScreen() {
 
                         {/* Terms */}
                         <Text style={styles.termsText}>
-                            By creating an account, you agree to our{" "}
-                            <Text style={styles.termsHighlight}>Terms & Conditions</Text> and{" "}
-                            <Text style={styles.termsHighlight}>Privacy Policy</Text>.
+                            By signing up, you agree to our{" "}
+                            <Text style={styles.termsHighlight}>Terms & Conditions</Text> {"\n"} and{" "}
+                            acknowledge our <Text style={styles.termsHighlight}>Privacy Policy</Text>.     
                         </Text>
 
                         {/* Sign In Footer */}
@@ -280,7 +280,7 @@ export default function SignUpScreen() {
                             onPress={() => router.push("/auth/login/LoginScreen")}
                         >
                             <Text style={styles.footerText}>
-                                Have an account? <Text style={styles.footerHighlight}>Sign in here</Text>
+                                Have an account? <Text style={styles.footerHighlight}>Sign In Here</Text>
                             </Text>
                         </TouchableOpacity>
                     </View>
@@ -331,7 +331,6 @@ const styles = StyleSheet.create({
     stepText: {
         fontSize: 14,
         fontFamily: "BrittiRegular",
-        fontWeight: 400,
         color: '#080808',
     },
     textContainer: {
@@ -340,7 +339,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         color: "#080808",
-        marginBottom: 4,
+        marginBottom: 8,
         alignSelf: "flex-start",
         fontFamily: "BrittiBold",
     },
@@ -354,7 +353,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     inputGroup: {
-        marginBottom: 32,
+        marginBottom: 20,
     },
     label: {
         fontSize: 16,
@@ -368,7 +367,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#F0F0F0",
         borderRadius: 100,
-        paddingHorizontal: 8,
+        paddingHorizontal: 16,
         height: 56,
         borderWidth: 1,
         borderColor: "transparent",
@@ -420,11 +419,13 @@ const styles = StyleSheet.create({
     },
     googleButton: {
         flexDirection: "row",
-        backgroundColor: "#F5F7F9",
+        backgroundColor: "#F2F3F4",
         height: 50,
         borderRadius: 50,
         justifyContent: "center",
         alignItems: "center",
+        borderWidth: 1,
+        borderColor: "#EDEDED"
     },
     googleLogo: {
         marginRight: 10,
@@ -446,11 +447,10 @@ const styles = StyleSheet.create({
     },
     termsHighlight: {
         color: "#080808",
-        fontWeight: 600,
-        fontFamily: "BrittiRegular",
+        fontFamily: "BrittiSemibold",
     },
     footerLink: {
-        marginTop: 24,
+        marginTop: 44,
         alignItems: "center",
         marginBottom: 20,
         fontFamily: 'BrittiRegular'

@@ -74,12 +74,11 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
     },
     headerButton: {
-        padding: 4,
+        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: 400,
-        fontFamily: 'BrittiSemibold',
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     scrollContent: {
@@ -115,11 +114,10 @@ const styles = StyleSheet.create({
     },
     appName: {
         fontSize: 24,
-        fontWeight: 700,
         fontFamily: 'BrittiBold',
         color: '#080808',
         marginBottom: 20,
-        lineHeight: 19.2
+        lineHeight: 24
     },
     versionText: {
         fontSize: 14,

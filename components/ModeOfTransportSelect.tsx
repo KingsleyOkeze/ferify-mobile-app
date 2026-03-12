@@ -50,11 +50,11 @@ const styles = StyleSheet.create({
     card: {
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#F5F5F5',
+        backgroundColor: '#F0F0F0',
         borderRadius: 20,
         shadowOpacity: 0.2,
         shadowRadius: 4,
-        width: '32.5%',
+        width: '31.5%',
         height: 107.84,
         borderWidth: 1,
         borderColor: 'transparent', // Default transparent border
@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
         marginTop: 20,
         textAlign: 'center',
         fontSize: 14,
-        fontWeight: '500',
         fontFamily: 'BrittiRegular',
     },
 });

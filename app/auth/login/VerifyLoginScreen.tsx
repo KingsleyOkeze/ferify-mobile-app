@@ -135,7 +135,7 @@ export default function VerifyLoginScreen() {
                     <View style={styles.textContainer}>
                         <Text style={styles.title}>Enter the verification code</Text>
                         <Text style={styles.subtitle}>
-                            We'll send a code of verification to <Text style={styles.emailText}>{email}</Text>
+                            A code will be sent to <Text style={styles.emailText}>{email}</Text>
                         </Text>
                     </View>
 
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        paddingTop: 10,
+        paddingTop: 8,
     },
     backButton: {
         width: 40,
@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
         width: 74,
         height: 61,
         backgroundColor: "#F0F0F0",
-        borderRadius: 12,
+        borderRadius: 4,
         justifyContent: 'center',
         alignItems: 'center',
         borderWidth: 1.5,

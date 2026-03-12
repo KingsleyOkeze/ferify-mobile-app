@@ -120,7 +120,7 @@ export default function ProfileImageAndUsernameInputScreen() {
                     <View style={styles.textContainer}>
                         <Text style={styles.title}>Final step!</Text>
                         <Text style={styles.subtitle}>
-                            Add your details so friends can recognize you.
+                            Set up your profile, this is what will show on your profile.
                         </Text>
                     </View>
 
@@ -152,7 +152,7 @@ export default function ProfileImageAndUsernameInputScreen() {
                             ]}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="@username"
+                                    placeholder="Your username"
                                     placeholderTextColor="#757575"
                                     value={username}
                                     onChangeText={setUsername}
@@ -200,11 +200,12 @@ const styles = StyleSheet.create({
         paddingBottom: 20,
     },
     header: {
-        marginBottom: 24,
-        marginLeft: -16,
+        marginTop: 8,
+        // marginBottom: 24,
+        marginLeft: -4,
     },
     backButton: {
-        padding: 10,
+        marginBottom: 24
     },
     stepContainer: {
         marginBottom: 24,
@@ -223,12 +224,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     stepText: {
-        fontSize: 12,
-        fontWeight: '400',
+        fontSize: 14,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     textContainer: {
-        marginBottom: 32,
+        // marginBottom: 32,
     },
     title: {
         fontSize: 20,
@@ -244,7 +245,8 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         alignItems: 'center',
-        marginVertical: 32,
+        marginTop: 52,
+        marginBottom: 44
     },
     imageWrapper: {
         position: 'relative',
@@ -288,13 +290,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     inputGroup: {
-        marginBottom: 24,
+        marginBottom: 32,
     },
     label: {
         fontSize: 16,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        marginTop: 32,
         marginBottom: 8,
         marginLeft: 4,
     },
@@ -303,7 +304,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F0F0F0',
         borderRadius: 100,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         height: 56,
         borderWidth: 1,
         borderColor: 'transparent',
@@ -323,7 +324,6 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 10,
     },
     disabledButton: {
         backgroundColor: '#CECECE',

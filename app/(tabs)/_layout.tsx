@@ -1,8 +1,14 @@
-import { Tabs } from 'expo-router';
-import { Ionicons, MaterialIcons, Feather, MaterialCommunityIcons, FontAwesome } from '@expo/vector-icons';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { HomeIcon, DiscoverIcon, AccountIcon } from '@/components/icons/CustomIcons';
-import { useRouter, usePathname } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { Tabs, useRouter, usePathname } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+// Import custom PNG icons
+const homeOn = require('../../assets/images/bottom-tab-icons/home_on_view_icon.png');
+const homeOff = require('../../assets/images/bottom-tab-icons/home_not_on_view_icon.png');
+const discoverOn = require('../../assets/images/bottom-tab-icons/discover_on_view_icon.png');
+const discoverOff = require('../../assets/images/bottom-tab-icons/discover_not_on_view_icon.png');
+const accountOn = require('../../assets/images/bottom-tab-icons/account_on_view_icon.png');
+const accountOff = require('../../assets/images/bottom-tab-icons/account_not_on_view_icon.png');
 
 
 function TabsLayout() {
@@ -24,21 +30,31 @@ function TabsLayout() {
                     tabBarLabelStyle: {
                         fontFamily: 'BrittiSemibold',
                         fontSize: 12,
-                        fontWeight: 600,
-                        // color: '#646464',
+                        fontWeight: '600',
+                        marginTop: 8, // 8px gap between icon and name
+                    },
+                    tabBarIconStyle: {
+                        marginTop: 10,
                     },
                     tabBarStyle: {
                         height: 90,
-                        paddingBottom: 4,
+                        paddingBottom: 24, // Adjusted to accommodate label margin
                         position: 'relative',
+                        backgroundColor: '#FFFFFF',
+                        borderTopWidth: 1,
+                        borderTopColor: '#F2F2F2',
                     },
                 }}
             >
                 <Tabs.Screen
                     name="HomeScreen"
                     options={{
-                        tabBarIcon: ({ color }) => (
-                            <HomeIcon size={24} color={color} />
+                        tabBarIcon: ({ focused }: { focused: boolean }) => (
+                            <Image
+                                source={focused ? homeOn : homeOff}
+                                style={{ width: 20, height: 20 }}
+                                resizeMode="contain"
+                            />
                         ),
                         tabBarLabel: 'Home',
                     }}
@@ -46,10 +62,12 @@ function TabsLayout() {
                 <Tabs.Screen
                     name="DiscoverScreen"
                     options={{
-                        tabBarIcon: ({ color }) => (
-                            <View>
-                                <DiscoverIcon size={24} color={color} />
-                            </View>
+                        tabBarIcon: ({ focused }: { focused: boolean }) => (
+                            <Image
+                                source={focused ? discoverOn : discoverOff}
+                                style={{ width: 20, height: 20 }}
+                                resizeMode="contain"
+                            />
                         ),
                         tabBarLabel: 'Discover',
                     }}
@@ -57,8 +75,12 @@ function TabsLayout() {
                 <Tabs.Screen
                     name="AccountScreen"
                     options={{
-                        tabBarIcon: ({ color }) => (
-                            <AccountIcon size={24} color={color} />
+                        tabBarIcon: ({ focused }: { focused: boolean }) => (
+                            <Image
+                                source={focused ? accountOn : accountOff}
+                                style={{ width: 20, height: 20 }}
+                                resizeMode="contain"
+                            />
                         ),
                         tabBarLabel: 'Account',
                     }}

@@ -59,7 +59,7 @@ export default function FullNameInputScreen() {
                     <View style={styles.textContainer}>
                         <Text style={styles.title}>You're almost done!</Text>
                         <Text style={styles.subtitle}>
-                            Please enter your legal name to help us personalize your experience.
+                            Finish setting up your profile, this will only take a minute.
                         </Text>
                     </View>
 
@@ -74,7 +74,7 @@ export default function FullNameInputScreen() {
                             ]}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="First Name"
+                                    placeholder="e.g John"
                                     placeholderTextColor="#757575"
                                     value={firstName}
                                     onChangeText={setFirstName}
@@ -94,7 +94,7 @@ export default function FullNameInputScreen() {
                             ]}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Last Name"
+                                    placeholder="e.g Doe"
                                     placeholderTextColor="#757575"
                                     value={lastName}
                                     onChangeText={setLastName}
@@ -138,10 +138,10 @@ const styles = StyleSheet.create({
     },
     header: {
         marginBottom: 24,
-        marginLeft: -3,
+        marginLeft: -10,
     },
     backButton: {
-        // padding: 10,
+        padding: 8,
     },
     stepContainer: {
         marginBottom: 24,
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     stepText: {
-        fontSize: 12,
-        fontWeight: '400',
+        fontSize: 14,
+        fontFamily: 'BrittiRegular',
         color: '#080808',
     },
     textContainer: {
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#F0F0F0',
         borderRadius: 100,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         height: 50,
         borderWidth: 1,
         borderColor: 'transparent',

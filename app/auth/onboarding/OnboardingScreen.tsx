@@ -109,10 +109,10 @@ export default function OnboardingScreen() {
 
     // Automatic carousel progression
     useEffect(() => {
-        const timer = setInterval(() => {
-            setStep(prev => (prev + 1) % slides.length);
-        }, 5000); // 5 seconds per slide
-        return () => clearInterval(timer);
+        // const timer = setInterval(() => {
+        //     setStep(prev => (prev + 1) % slides.length);
+        // }, 5000); // 5 seconds per slide
+        // return () => clearInterval(timer);
     }, []);
 
 
@@ -267,7 +267,8 @@ const styles = StyleSheet.create({
         // minHeight: 48,
         justifyContent: 'center',
         alignItems: 'center',
-        maxWidth: 283,
+        // maxWidth: 283,
+        maxWidth: 279,
     },
     subtitle: {
         fontFamily: "BrittiRegular",

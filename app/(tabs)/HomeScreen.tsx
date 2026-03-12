@@ -168,8 +168,8 @@ function HomeScreen() {
     // Triple the data to enable infinite scroll logic
     const [carouselData] = useState([...FEATURED_CARDS, ...FEATURED_CARDS, ...FEATURED_CARDS]);
     const flatListRef = React.useRef<FlatList>(null);
-    const CARD_WIDTH = 320;
-    const CARD_MARGIN = 16;
+    const CARD_WIDTH = 339;
+    const CARD_MARGIN = 12;
     const ITEM_WIDTH = CARD_WIDTH + CARD_MARGIN;
 
     const handleCarouselScroll = (event: any) => {
@@ -229,13 +229,13 @@ function HomeScreen() {
 
                 {/* Search Bar */}
                 <View style={styles.searchContainer}>
-                    <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+                    <Ionicons name="search" size={20} color="#080808" style={styles.searchIcon} />
 
                     <TouchableOpacity onPress={handleSearchPress} style={{ flex: 1 }}>
                         <TextInput
                             style={styles.searchInput}
                             placeholder="Where do you want to go?"
-                            placeholderTextColor="#393939"
+                            placeholderTextColor="#080808"
                             value={searchText}
                             editable={false} // Disable direct editing to prioritize navigation
                             pointerEvents="none" // Ensure touch passes to TouchableOpacity
@@ -279,23 +279,24 @@ function HomeScreen() {
                 />
 
                 {/* Mode Selector */}
-                <Text style={styles.sectionTitle}>Transport Mode</Text>
+                <Text style={styles.sectionTitle}>Transport Modes</Text>
                 <ModeOfTransportSelect
                     selectedMode={selectedMode}
                     onSelect={(mode) => setSelectedMode(mode)}
                 />
 
                 {/* Scrollable Cards Section */}
-                <View style={{ marginTop: 25 }}>
+                <View style={{ marginTop: 28, marginBottom: 4 }}>
                     <FlatList
                         ref={flatListRef}
                         data={carouselData}
                         horizontal
                         showsHorizontalScrollIndicator={false}
                         snapToInterval={ITEM_WIDTH}
+                        snapToAlignment="start"
                         decelerationRate="fast"
                         onMomentumScrollEnd={handleCarouselScroll}
-                        initialScrollIndex={FEATURED_CARDS.length}
+                        initialScrollIndex={FEATURED_CARDS.length} // Start at the middle set's Black card
                         getItemLayout={(_, index) => ({
                             length: ITEM_WIDTH,
                             offset: ITEM_WIDTH * index,
@@ -322,7 +323,7 @@ function HomeScreen() {
                 </View>
 
                 {/* Shared by commuters near you */}
-                <Text style={styles.sectionTitle}>Shared by commuters near you</Text>
+                <Text style={styles.sectionTitle}>Shared by Commuters near you</Text>
 
                 <View style={styles.feedContainer}>
                     {nearbyFares.length === 0 ? (
@@ -438,11 +439,13 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: "row",
         alignItems: "center",
-        backgroundColor: "#f2f2f2",
+        backgroundColor: "#F0F0F0",
         borderRadius: 100,
         paddingHorizontal: 16,
         paddingVertical: 6,
-        height: 52
+        height: 52,
+        borderWidth: 1,
+        borderColor: "#EDEDED"
     },
     searchIcon: {
         marginRight: 8,
@@ -454,38 +457,43 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         flex: 1,
-        fontSize: 15,
-        fontFamily: 'BrittiSemibold',
-        color: "#000",
+        fontSize: 16,
+        fontFamily: 'BrittiRegular',
+        color: "#080808",
     },
     sectionTitle: {
         fontSize: 16,
-        fontFamily: 'BrittiBold',
-        marginBottom: 18,
+        fontFamily: 'BrittiSemibold',
+        marginBottom: 16,
         color: "#080808",
-        marginTop: 32,
+        marginTop: 28,
     },
     featureCard: {
         flexDirection: "row",
         alignItems: "center",
         borderRadius: 16,
-        paddingVertical: 12,
+        paddingTop: 12,
+        paddingBottom: 16,
         paddingHorizontal: 16,
-        marginRight: 16,
-        height: 127,
+        marginRight: 12, // Match CARD_MARGIN
+        width: 339, // Restored to 339
+        gap: 12,
+        // flexBasis: '49%',
+        minHeight: 127,
         borderWidth: 1,
         borderColor: '#DADADA',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'visible'
     },
     cardLeft: {
-        height: 99,
+        minHeight: 99,
         width: 187,
         justifyContent: 'space-between',
     },
     cardDescription: {
         color: "#FBFBFB",
         fontSize: 14,
-        marginBottom: 10,
+        marginBottom: 20,
         lineHeight: 24,
         fontFamily: 'BrittiBold',
     },
@@ -569,21 +577,20 @@ const styles = StyleSheet.create({
         color: '#080808',
     },
     noCommuteDataContainer: {
-        padding: 20,
         alignItems: 'center',
-        justifyContent: 'center'
+        justifyContent: 'flex-start',
     },
     noCommuteDataImage: {
-        width: 150,
-        height: 150,
-        marginTop: 56,
+        width: 120,
+        height: 120,
+        marginTop: 32,
         marginBottom: 32
     },
     noCommuteDataTitle: {
         fontFamily: 'BrittiSemibold',
         fontSize: 16,
         color: '#080808',
-        marginBottom: 32,
+        marginBottom: 8,
         lineHeight: 24
     },
     noCommuteDataDescription: {
@@ -602,7 +609,7 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#666',
-        paddingBottom: 1,
+        paddingBottom: 0,
         alignSelf: 'center',
         marginBottom: 56
     },

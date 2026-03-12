@@ -202,7 +202,7 @@ export default function LoginScreen() {
                                 ]}>
                                     <TextInput
                                         style={styles.input}
-                                        placeholder="Enter your email here"
+                                        placeholder="Enter email here"
                                         placeholderTextColor="#9a9a9a"
                                         value={email}
                                         onChangeText={setEmail}
@@ -226,7 +226,7 @@ export default function LoginScreen() {
                                 <Text style={[
                                     styles.signInButtonText,
                                     !isEmailValid && { color: '#979797' }
-                                ]}>Sign in</Text>
+                                ]}>Sign In</Text>
                             </TouchableOpacity>
 
                             {/* Forgot Password */}
@@ -251,13 +251,13 @@ export default function LoginScreen() {
                                 disabled={!request}
                             >
                                 <Image source={require("../../../assets/images/onboarding/google_logo.png")} style={styles.googleLogo} />
-                                <Text style={styles.googleButtonText}>Sign in with Google</Text>
+                                <Text style={styles.googleButtonText}>Continue with Google</Text>
                             </TouchableOpacity>
 
                             {/* Terms */}
                             <Text style={styles.termsText}>
                                 By signing in, you agree to our{" "}
-                                <Text style={styles.termsHighlight}>Terms & Conditions</Text> and acknowledge our{" "}
+                                <Text style={styles.termsHighlight}>Terms & Conditions</Text> {"\n"} and acknowledge our{" "}
                                 <Text style={styles.termsHighlight}>Privacy Policy</Text>.
                             </Text>
 
@@ -308,13 +308,13 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         alignItems: "flex-start",
-        marginBottom: 24,
+        marginBottom: 36,
     },
     title: {
         fontSize: 24,
         fontFamily: "BrittiBold",
         color: "#080808",
-        marginBottom: 4,
+        marginBottom: 8,
     },
     subtitle: {
         fontSize: 14,
@@ -330,9 +330,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     label: {
-        fontSize: 14,
+        fontSize: 16,
+        fontFamily: "BrittiRegular",
         color: "#080808",
-        marginTop: 5,
         marginBottom: 8,
         marginLeft: 4,
     },
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         backgroundColor: "#F0F0F0",
         borderRadius: 100,
-        paddingHorizontal: 8,
+        paddingHorizontal: 16,
         height: 50,
         borderWidth: 1,
         borderColor: "transparent",
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     signInButtonText: {
         color: "#fff",
         fontSize: 16,
-        fontWeight: "600",
+        fontFamily: "BrittiSemibold"
     },
     forgotPasswordContainer: {
         alignItems: "flex-end",
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     googleButtonText: {
         color: "#080808",
         fontSize: 16,
-        fontWeight: "500",
+        fontFamily: "BrittiRegular",
     },
     termsText: {
         fontSize: 12,
@@ -443,7 +443,7 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     footerText: {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: 400,
         color: "#393939",
     },
@@ -455,6 +455,6 @@ const styles = StyleSheet.create({
     },
     footerContainer: {
         marginTop: 20,
-        paddingBottom: 10,
+        // paddingBottom: 10,
     },
 });
