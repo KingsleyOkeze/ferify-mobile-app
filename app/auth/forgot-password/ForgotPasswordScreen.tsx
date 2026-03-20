@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     inputLabel: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#080808',
         marginBottom: 8,
         fontFamily: 'BrittiRegular',

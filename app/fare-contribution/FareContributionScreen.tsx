@@ -386,7 +386,7 @@ function FareContributionScreen() {
 
                         {/* Quick Select Chips */}
                         <View style={styles.quickSelectContainer}>
-                            {[100, 200, 400, 500, 1000].map((amount) => (
+                            {[100, 200, 400, 500, 1000, 1500].map((amount) => (
                                 <TouchableOpacity
                                     key={amount}
                                     style={styles.quickSelectChip}
@@ -559,8 +559,8 @@ const styles = StyleSheet.create({
     },
     quickSelectChip: {
         height: 37,
-        paddingHorizontal: 20,
-        paddingVertical: 10,
+        paddingHorizontal: 24,
+        paddingVertical: 12,
         borderRadius: 20,
         borderWidth: 1,
         borderColor: '#EBEDEF',

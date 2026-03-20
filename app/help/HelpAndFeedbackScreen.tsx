@@ -17,10 +17,10 @@ function HelpCenterScreen() {
     const helpItems = [
         {
             id: 'contact',
-            title: 'Contact Support',
-            description: 'support@ferify.com',
-            image: require('../../assets/images/help-icons/customer_support_icon.png'),
-            hasArrow: false,
+            title: 'Get help',
+            // description: 'support@ferify.com',
+            image: require('../../assets/images/help-icons/get_help_icon.png'),
+            hasArrow: true,
             onPress: () => { /* Handle email intent? */ }
         },
         {
@@ -66,14 +66,14 @@ function HelpCenterScreen() {
                                 </View>
                                 <View style={styles.textContainer}>
                                     <Text style={styles.itemTitle}>{item.title}</Text>
-                                    {item.description && (
+                                    {/* {item.description && (
                                         <Text style={styles.itemDescription}>{item.description}</Text>
-                                    )}
+                                    )} */}
                                 </View>
                             </View>
 
                             {item.hasArrow && (
-                                <Ionicons name="chevron-forward" size={20} color="#999" />
+                                <Ionicons name="chevron-forward" size={16} color="#080808" />
                             )}
                         </TouchableOpacity>
                     ))}

@@ -355,14 +355,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         justifyContent: 'center',
-        marginBottom: 20,
+        marginBottom: 44,
     },
     requirementTag: {
         paddingHorizontal: 12,
-        paddingVertical: 6,
+        // paddingVertical: 6,
         borderRadius: 100,
         marginHorizontal: 4,
-        marginBottom: 8,
+        // marginBottom: 8,
     },
     requirementText: {
         fontSize: 18,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
         color: '#080808',
         textAlign: 'center',
         lineHeight: 24,
-        marginBottom: 32,
+        marginBottom: 20,
         maxWidth: '80%',
     },
     progressContainer: {
@@ -401,7 +401,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        paddingBottom: 5,
+        // paddingBottom: 5,
         height: 18
     },
     okayButton: {

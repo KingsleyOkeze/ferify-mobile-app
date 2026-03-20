@@ -25,10 +25,10 @@ function SettingMainScreen() {
             title: 'App appearance',
             description: 'Dark mode, light mode, system default',
             image: require('../../assets/images/settings-icons/app_appearance_icon.png'),
-            disabled: true,
             onPress: () => {
                 // Future implementation
-            }
+            },
+            disabled: true,
         },
         {
             id: 'notifications',
@@ -75,10 +75,7 @@ function SettingMainScreen() {
                     {settingsItems.map((item, index) => (
                         <TouchableOpacity
                             key={item.id}
-                            style={[
-                                styles.listItem,
-                                item.disabled && styles.disabledItem
-                            ]}
+                            style={styles.listItem}
                             onPress={item.onPress}
                             disabled={item.disabled}
                             activeOpacity={item.disabled ? 1 : 0.7}
@@ -86,22 +83,21 @@ function SettingMainScreen() {
                             <View style={styles.itemLeft}>
                                 <Image
                                     source={item.image}
-                                    style={[styles.itemImage, item.disabled && { opacity: 0.5 }]}
+                                    style={styles.itemImage}
                                 />
                                 <View style={styles.textContainer}>
                                     <Text style={[
                                         styles.itemTitle,
                                         item.isDestructive && styles.destructiveText,
-                                        item.disabled && styles.disabledText
                                     ]}>
                                         {item.title}
                                     </Text>
-                                    <Text style={[styles.itemDescription, item.disabled && styles.disabledText]}>
+                                    <Text style={styles.itemDescription}>
                                         {item.description}
                                     </Text>
                                 </View>
                             </View>
-                            {!item.disabled && <Ionicons name="chevron-forward" size={16} color="#999" />}
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -180,13 +176,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontFamily: 'BrittiRegular',
         color: '#757575',
-    },
-    disabledItem: {
-        backgroundColor: '#F9F9F9',
-        opacity: 0.8,
-    },
-    disabledText: {
-        color: '#BDBDBD',
     },
     destructiveText: {
         color: 'red',

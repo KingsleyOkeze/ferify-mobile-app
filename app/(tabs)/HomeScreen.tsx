@@ -351,14 +351,14 @@ function HomeScreen() {
                                 key={item.id}
                                 style={[
                                     styles.feedCard,
-                                    { borderBottomWidth: 1, borderBottomColor: '#F2F2F2' }
+                                    { borderBottomWidth: 1, borderBottomColor: '#DADADA' }
                                 ]}
                             >
                                 <View style={styles.feedCardLeft}>
                                     <View style={styles.feedTransportImage}>
                                         <Image
                                             source={getVehicleImage(item.vehicleType)}
-                                            style={{ width: '100%', height: '100%' }}
+                                            style={{ width: 44.6, height: 39.11 }}
                                             resizeMode="contain"
                                         />
                                     </View>
@@ -524,9 +524,9 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 30,
         borderTopWidth: 1,
-        borderTopColor: '#F2F2F2',
+        borderTopColor: '#DADADA',
         borderBottomWidth: 1,
-        borderBottomColor: '#F2F2F2',
+        borderBottomColor: '#DADADA',
     },
     feedCard: {
         flexDirection: 'row',
@@ -538,9 +538,11 @@ const styles = StyleSheet.create({
         height: '100%'
     },
     feedTransportImage: {
-        width: 54,
-        height: 54,
+        width: 64,
+        height: 64,
         borderRadius: 8,
+        justifyContent: 'center',
+        alignItems: 'center',
         backgroundColor: '#F5F5F5',
     },
     feedCardMiddle: {

@@ -470,13 +470,12 @@ const styles = StyleSheet.create({
     },
     noDataSubtitle: {
         fontSize: 14,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
         textAlign: 'center',
         lineHeight: 24,
         marginBottom: 40,
-        width: '90%'
+        width: '80%'
     },
     emptyStateButton: {
         backgroundColor: '#080808',

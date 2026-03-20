@@ -63,8 +63,8 @@ function ProfileLandingScreen() {
             title: 'Saved route',
             description: 'Manage your frequently used routes',
             image: require('../../assets/images/profile-icons/saved_routes_icon.png'),
-            onPress: () => { /* Nothing happens */ },
-            disabledStyle: true
+            onPress: () => { },
+            disabled: true,
         },
         {
             id: 'achievements',
@@ -72,7 +72,6 @@ function ProfileLandingScreen() {
             description: 'Badges and milestones earned',
             image: require('../../assets/images/profile-icons/achievements_icon.png'),
             onPress: () => { router.push('/achievement/AchievementsScreen') },
-            disabledStyle: false
         }
     ];
 
@@ -132,13 +131,10 @@ function ProfileLandingScreen() {
                     {menuItems.map((item, index) => (
                         <TouchableOpacity
                             key={item.id}
-                            style={[
-                                styles.menuItem,
-                                item.disabledStyle && styles.menuItemDisabled
-                            ]}
+                            style={styles.menuItem}
                             onPress={item.onPress}
-                            disabled={item.disabledStyle}
-                            activeOpacity={item.disabledStyle ? 1 : 0.7}
+                            disabled={item.disabled}
+                            activeOpacity={item.disabled ? 1 : 0.7}
                         >
                             <View style={styles.itemLeft}>
                                 <Image source={item.image} style={styles.itemImage} />
@@ -147,7 +143,7 @@ function ProfileLandingScreen() {
                                     <Text style={styles.itemDescription}>{item.description}</Text>
                                 </View>
                             </View>
-                            <Ionicons name="chevron-forward" size={18} color="#999" />
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -164,7 +160,7 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 16,
         paddingTop: 10,
-        paddingBottom: 20,
+        paddingBottom: 24,
     },
     backButton: {
         alignSelf: 'flex-start',
@@ -173,11 +169,9 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 24,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         paddingTop: 10,
-        paddingBottom: 3
     },
     scrollContent: {
         paddingBottom: 40,
@@ -293,16 +287,6 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#757575',
-    },
-    menuItemDisabled: {
-        backgroundColor: '#FCFCFC',
-        opacity: 0.7,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.08,
-        shadowRadius: 10,
-        elevation: 2,
-        zIndex: 1,
     }
 });
 

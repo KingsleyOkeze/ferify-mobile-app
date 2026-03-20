@@ -75,13 +75,13 @@ function SubmitFeedbackScreen() {
             >
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <Text style={styles.description}>
-                        We value your feedback. Let us know what you think or report a problem.
+                        We value your feedback. Let us know what {'\n'}you think or report a problem.
                     </Text>
 
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Subject</Text>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, { borderRadius: 100, }]}
                             placeholder="e.g., Bug report, Feature request"
                             placeholderTextColor="#999"
                             value={subject}
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        marginBottom: 24,
+        marginBottom: 8,
     },
     scrollContent: {
         paddingHorizontal: 16,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: '#E0E0E0',
         borderRadius: 12,
-        paddingHorizontal: 12,
+        paddingHorizontal: 16,
         paddingVertical: 12, // Consistent padding
         fontSize: 16,
         fontFamily: 'BrittiRegular',
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
         height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 24,
+        // marginTop: 24,
         // shadowColor: "#000",
         // shadowOffset: { width: 0, height: 4 },
         // shadowOpacity: 0.2,

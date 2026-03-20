@@ -95,7 +95,7 @@ function RouteResultScreen() {
                         <Image source={noDataImage} style={styles.noDataImage} resizeMode="contain" />
                         <Text style={styles.noDataTitle}>No fare data yet</Text>
                         <Text style={styles.noDataText}>
-                            Be the first to help others by submitting a fare for the route
+                            Be the first to help others by submitting {'\n'}a fare for the route
                         </Text>
                         <TouchableOpacity
                             style={styles.submitFareButton}
@@ -592,34 +592,35 @@ const styles = StyleSheet.create({
     },
     noDataImage: {
         width: 200,
-        height: 200,
-        marginBottom: 24,
+        height: 120,
+        marginBottom: 40,
     },
     noDataTitle: {
         fontSize: 20,
         color: '#080808',
-        fontFamily: 'BrittiBold',
+        fontFamily: 'BrittiSemibold',
         marginBottom: 12,
         textAlign: 'center',
     },
     noDataText: {
         fontSize: 14,
-        color: '#666',
+        color: '#757575',
         textAlign: 'center',
         lineHeight: 22,
         marginBottom: 32,
         paddingHorizontal: 10,
     },
     submitFareButton: {
-        backgroundColor: '#000',
-        paddingVertical: 14,
-        paddingHorizontal: 40,
+        backgroundColor: '#080808',
+        paddingHorizontal: 24,
         borderRadius: 100,
-        width: '100%',
+        minWidth: 100,
+        height: 48,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     submitFareButtonText: {
-        color: '#fff',
+        color: '#FBFBFB',
         fontSize: 16,
         fontFamily: 'BrittiSemibold',
     },

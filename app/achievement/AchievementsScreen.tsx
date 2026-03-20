@@ -156,7 +156,7 @@ export default function AchievementsScreen() {
                             <View style={styles.statCard}>
                                 <View style={styles.statCardHeader}>
                                     <Ionicons name="star" size={16} color="#FFD700" />
-                                    <Text style={styles.statCardTitle}>Points</Text>
+                                    <Text style={styles.statCardTitle}>Contribution Points</Text>
                                 </View>
                                 <Text style={styles.statNumber}>{achievementData?.points?.toLocaleString() || 0}</Text>
                             </View>
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        paddingBottom: 20,
+        // paddingBottom: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#F5F5F5',
     },
@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
         fontSize: 24,
         fontFamily: 'BrittiSemibold',
         color: '#393939',
-        marginBottom: 24,
+        marginBottom: 8,
     },
     subtitle: {
         fontSize: 14,

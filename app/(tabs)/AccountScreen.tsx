@@ -131,10 +131,10 @@ function MainAccountProfileScreen() {
                             onPress={item.onPress}
                         >
                             <View style={styles.menuLeft}>
-                                <Ionicons name={item.icon as any} size={20} color="#333" style={styles.menuIcon} />
+                                <Ionicons name={item.icon as any} size={20} color="#393939" style={styles.menuIcon} />
                                 <Text style={styles.menuTitle}>{item.title}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={16} color="#999" />
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     },
     viewProfileText: {
         fontSize: 14,
-        fontWeight: 600,
         fontFamily: 'BrittiSemibold',
         color: '#080808',
     },

@@ -130,12 +130,12 @@ function VerifyForgotPasswordOtpScreen() {
                 <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
                     <Ionicons name="arrow-back" size={24} color="#000" />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Verification</Text>
+                {/* <Text style={styles.headerTitle}>Verification</Text> */}
             </View>
 
             <View style={styles.content}>
                 <View style={styles.textSection}>
-                    <Text style={styles.screenTitle}>Enter code</Text>
+                    <Text style={styles.screenTitle}>Enter the verification code</Text>
                     <Text style={styles.instructionText}>
                         We've sent a 4-digit verification code to {email}. Enter it below to proceed.
                     </Text>
@@ -195,14 +195,15 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 20,
-        paddingTop: 10,
-        paddingBottom: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: '#F0F0F0',
+        paddingTop: 8,
+        // paddingBottom: 20,
+        // borderBottomWidth: 1,
+        // borderBottomColor: '#F0F0F0',
     },
     headerButton: {
         padding: 4,
         marginRight: 10,
+        marginLeft: -5
     },
     headerTitle: {
         fontSize: 18,
@@ -212,7 +213,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         paddingHorizontal: 20,
-        paddingTop: 30,
+        paddingTop: 24,
     },
     textSection: {
         marginBottom: 30,
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     },
     otpInput: {
         width: (width - 80) / 4,
-        height: 56,
+        height: 61,
         borderWidth: 1.5,
         borderColor: '#F0F0F0',
         borderRadius: 10,

@@ -228,11 +228,11 @@ function DataAndPrivacyScreen() {
                             </View>
                             {/* Show loading indicator, checkmark, or arrow */}
                             {item.showIndicator ? (
-                                <ActivityIndicator size="small" color="#666" />
+                                <ActivityIndicator size="small" color="#080808" />
                             ) : item.showCheckmark ? (
                                 <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />
                             ) : (
-                                <Ionicons name="chevron-forward" size={20} color="#999" />
+                                <Ionicons name="chevron-forward" size={16} color="#080808" />
                             )}
                         </TouchableOpacity>
                     ))}

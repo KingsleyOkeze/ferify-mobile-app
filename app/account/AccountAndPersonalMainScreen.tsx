@@ -61,22 +61,20 @@ function AccountAndPersonalMainScreen() {
                     {menuItems.map((item, index) => (
                         <TouchableOpacity
                             key={item.id}
-                            style={[
-                                styles.menuItem,
-                                item.disabled && styles.disabledMenuItem
-                            ]}
+                            style={styles.menuItem}
                             onPress={item.onPress}
                             disabled={item.disabled}
+                            activeOpacity={item.disabled ? 1 : 0.7}
                         >
                             <View style={styles.itemLeft}>
-                                <Image source={item.image} style={[styles.itemImage, item.disabled && { opacity: 0.5 }]} />
+                                <Image source={item.image} style={styles.itemImage} />
                                 <View style={styles.textContainer}>
-                                    <Text style={[styles.itemTitle, item.disabled && { color: '#999' }]}>{item.title}</Text>
-                                    <Text style={[styles.itemDescription, item.disabled && { color: '#bbb' }]}>{item.description}</Text>
+                                    <Text style={styles.itemTitle}>{item.title}</Text>
+                                    <Text style={styles.itemDescription}>{item.description}</Text>
                                 </View>
                             </View>
                             {/* Arrow without tail: Chevron Forward */}
-                            {!item.disabled && <Ionicons name="chevron-forward" size={16} color="#999" />}
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -123,9 +121,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         height: 79
-    },
-    disabledMenuItem: {
-        backgroundColor: '#F9F9F9', 
     },
     itemLeft: {
         flexDirection: 'row',

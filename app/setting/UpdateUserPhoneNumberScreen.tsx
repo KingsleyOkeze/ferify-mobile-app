@@ -85,7 +85,7 @@ function UpdateUserPhoneNumberScreen() {
                 >
                     <Text style={styles.screenTitle}>Update your number</Text>
                     <Text style={styles.descriptionText}>
-                        Keep your contact details up to date for account security and communication.
+                        You will use this number to receive notifications and recover your account.
                     </Text>
 
                     {/* Phone Number Input */}
@@ -184,9 +184,9 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     label: {
-        fontSize: 14,
-        fontFamily: 'BrittiSemibold',
-        color: '#000',
+        fontSize: 16,
+        fontFamily: 'BrittiRegular',
+        color: '#080808',
         marginBottom: 8,
     },
     input: {
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'BrittiRegular',
         color: '#393939',
-        fontStyle: 'italic',
+        // fontStyle: 'italic',
     },
     updateButton: {
         height: 56,

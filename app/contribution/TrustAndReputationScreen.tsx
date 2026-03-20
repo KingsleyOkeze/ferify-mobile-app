@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         borderRadius: 40, 
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 12,
     },
     scoreIcon: {
         width: 54,

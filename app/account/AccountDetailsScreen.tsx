@@ -204,18 +204,16 @@ function AccountDetailsScreen() {
                             style={[
                                 styles.listItem,
                                 index === 0 && styles.firstListItem,
-                                // @ts-ignore
-                                item.disabled && styles.disabledListItem
                             ]}
                             onPress={item.onPress}
-                            // @ts-ignore
                             disabled={item.disabled}
+                            activeOpacity={item.disabled ? 1 : 0.7}
                         >
                             <View style={styles.itemTextContainer}>
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                                 <Text style={styles.itemValue}>{item.value}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color="#999" />
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -233,7 +231,7 @@ function AccountDetailsScreen() {
                         <View style={styles.itemTextContainer}>
                             <Text style={styles.actionText}>Log out</Text>
                         </View>
-                        <Ionicons name="chevron-forward" size={20} color="#999" />
+                        <Ionicons name="chevron-forward" size={16} color="#080808" />
                     </TouchableOpacity>
 
                     <TouchableOpacity
@@ -243,7 +241,7 @@ function AccountDetailsScreen() {
                         <View style={styles.itemTextContainer}>
                             <Text style={[styles.actionText, styles.deleteText]}>Delete account</Text>
                         </View>
-                        <Ionicons name="chevron-forward" size={20} color="#999" />
+                        <Ionicons name="chevron-forward" size={16} color="#080808" />
                     </TouchableOpacity>
                 </View>
 
@@ -417,10 +415,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
         height: 87
     },
-    disabledListItem: {
-        backgroundColor: '#F7F7F7',
-        opacity: 0.8,
-    },
     firstListItem: {
         borderTopWidth: 1,
         borderTopColor: '#DADADA',
@@ -437,7 +431,7 @@ const styles = StyleSheet.create({
         // marginBottom: 2,
     },
     itemValue: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'BrittiRegular',
         color: '#757575',
         lineHeight: 24

@@ -86,10 +86,10 @@ const styles = StyleSheet.create({
     },
     centerInfo: {
         alignItems: 'center',
-        marginTop: 40,
+        marginTop: 24,
         marginBottom: 32,
         backgroundColor: "#FFFFFF",
-        borderRadius: 20,
+        borderRadius: 12,
         borderWidth: 1,
         borderColor: "#DADADA",
         paddingVertical: 20,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiRegular',
         color: '#393939',
         lineHeight: 24,
-        fontWeight: 400
+        fontWeight: 400,
     },
 });
 

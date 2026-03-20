@@ -14,6 +14,7 @@ import {
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
 import api from '@/services/api';
+import { getCachedLocation, fetchAndCacheLocation } from "@/services/locationService";
 import mapImage from '../../assets/images/popular-search-icons/map_icon.png'
 import shareLocationHand from '../../assets/images/popular-search-icons/share_location_hand_icon.png'
 import alertIcon from '../../assets/images/popular-search-icons/alert_icon.png'
@@ -33,10 +34,18 @@ function DiscoverScreen() {
 
     const fetchDiscoverData = useCallback(async () => {
         try {
+            const location = await getCachedLocation() || await fetchAndCacheLocation();
+
+            const params: any = {};
+            if (location) {
+                params.lng = location.longitude;
+                params.lat = location.latitude;
+            }
+
             const [recentRes, popularRes, insightsRes] = await Promise.all([
-                api.get('/api/fare/nearby'), // Reusing nearby as global recent
-                api.get('/api/fare/popular'),
-                api.get('/api/fare/insights')
+                api.get('/api/fare/nearby', { params: { ...params, radius: 20000 } }),
+                api.get('/api/fare/popular', { params }),
+                api.get('/api/fare/insights', { params })
             ]);
 
             if (recentRes.data) setRecentlyUpdated(recentRes.data.fares || []);

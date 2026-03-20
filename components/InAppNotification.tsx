@@ -128,13 +128,14 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
         borderRadius: 16,
         paddingVertical: 16,
-        paddingHorizontal: 20,
+        paddingHorizontal: 16,
         shadowColor: '#0A0A0A99',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.15,
         shadowRadius: 15,
         elevation: 10,
         zIndex: 9999, // Ensure it's on top
+        marginTop: 16
     },
     content: {
         flex: 1,

@@ -149,7 +149,7 @@ api.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // 1. Handle 401 Unauthorized (Token Refresh)
+        // Handle 401 Unauthorized (Token Refresh)
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
@@ -186,7 +186,7 @@ api.interceptors.response.use(
             }
         }
 
-        // 2. Handle Retry Mechanism (Network Errors, Timeouts, 5xx)
+        // Handle Retry Mechanism (Network Errors, Timeouts, 5xx)
         const isNetworkError = !error.response && error.message === 'Network Error';
         const isTimeout = error.code === 'ECONNABORTED' && error.message.includes('timeout');
         const isServerError = error.response?.status && error.response.status >= 500;
@@ -201,8 +201,7 @@ api.interceptors.response.use(
             return api(originalRequest);
         }
 
-        // 3. User Feedback (Toasts) - only show on final failure
-        // 3. User Feedback (Toasts) - only show on final failure
+        // User Feedback (Toasts) - only show on final failure
         if (error.code === 'ECONNABORTED' && error.message.includes('timeout')) {
             DeviceEventEmitter.emit('SHOW_TOAST', { type: 'error', message: 'Request timed out. Please check your connection.' });
         } else if (error.response?.data?.error) {

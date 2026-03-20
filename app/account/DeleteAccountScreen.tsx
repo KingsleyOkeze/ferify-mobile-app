@@ -61,7 +61,7 @@ export default function DeleteAccountScreen() {
                 <View style={styles.titleSection}>
                     <Text style={styles.title}>Delete account</Text>
                     <Text style={styles.subtitle}>
-                        We're sorry to see you go 😢 Deleting your Ferify account will permanently remove your profile activity.
+                        We're sorry to see you go 😢 Deleting your Ferify {'\n'}account will permanently remove your profile activity.
                     </Text>
                 </View>
 
@@ -133,7 +133,7 @@ export default function DeleteAccountScreen() {
                         <Text style={styles.modalTitle}>Delete account?</Text>
 
                         <Text style={styles.modalDescription}>
-                            Are you sure you want to delete your account? This action is permanent and cannot be reversed.
+                            We will delete your account in 30 days, you can {'\n'}restore it anytime during that period
                         </Text>
 
                         <View style={styles.modalButtonRow}>
@@ -182,12 +182,11 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 22,
-        fontWeight: '600',
         color: '#080808',
         marginBottom: 8,
         lineHeight: 19.2,
         paddingHorizontal: 16,
-        fontFamily: 'BrittiSemibold'
+        fontFamily: 'BrittiSemibold',
     },
     subtitle: {
         fontSize: 14,
@@ -195,7 +194,8 @@ const styles = StyleSheet.create({
         color: '#393939',
         lineHeight: 24,
         paddingHorizontal: 16,
-        fontFamily: 'BrittiRegular'
+        fontFamily: 'BrittiRegular',
+        // width: '90%'
     },
     listSection: {
         marginBottom: 32,

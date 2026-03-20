@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         paddingHorizontal: 16,
-        marginTop: 32,
+        marginTop: 24,
     },
     pageTitle: {
         fontSize: 24,

@@ -59,7 +59,7 @@ function PopularQuestionScreen() {
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                                 <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
                             </View>
-                            <Ionicons name="chevron-forward" size={20} color="#999" />
+                            <Ionicons name="chevron-forward" size={16} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>

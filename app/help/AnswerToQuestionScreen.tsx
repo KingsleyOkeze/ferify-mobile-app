@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: 20,
-        fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
     },

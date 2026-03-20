@@ -81,7 +81,6 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontFamily: 'BrittiSemibold',
         fontSize: 24, 
-        fontWeight: 600,
         color: '#080808',
     },
     scrollContent: {

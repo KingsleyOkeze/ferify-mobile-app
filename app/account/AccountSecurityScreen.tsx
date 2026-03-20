@@ -48,20 +48,17 @@ function AccountSecurityScreen() {
                             style={[
                                 styles.menuItem,
                                 index === 0 && styles.firstMenuItem,
-                                item.disabled && styles.disabledMenuItem
                             ]}
                             onPress={item.onPress}
                             disabled={item.disabled}
                             activeOpacity={item.disabled ? 1 : 0.7}
                         >
-                            <View style={[styles.itemLeft, item.disabled && { opacity: 0.5 }]}>
+                            <View style={styles.itemLeft}>
                                 <Image source={item.image} style={styles.itemIcon} />
                                 <Text style={styles.itemTitle}>{item.title}</Text>
                             </View>
                             {/* Arrow without tail: Chevron Forward */}
-                            {!item.disabled && (
-                                <Ionicons name="chevron-forward" size={20} color="#999" />
-                            )}
+                            <Ionicons name="chevron-forward" size={20} color="#080808" />
                         </TouchableOpacity>
                     ))}
                 </View>
@@ -124,9 +121,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
         color: '#000',
-    },
-    disabledMenuItem: {
-        backgroundColor: '#F9F9F9',
     },
 });
 
