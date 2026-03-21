@@ -18,7 +18,7 @@ function PopularQuestionScreen() {
             id: '1',
             title: 'How do I report fares?',
             subtitle: 'Get started',
-            answer: 'To report a fare, simply search for your route or select one from the Home screen. Once you\'re on the Route details, tap the "Share Fare" button and enter the amount you paid. This helps others know the current market price!',
+            answer: 'To report a fare, simply click the add icon from the Home screen, it will lead you to the update fare screen. Once you\'re on the Update fare screen, fill in the details and submit. This helps others know the current market price!',
             onPress: (item: any) => router.push({ pathname: '/help/AnswerToQuestionScreen', params: { title: item.title, answer: item.answer } })
         },
         {

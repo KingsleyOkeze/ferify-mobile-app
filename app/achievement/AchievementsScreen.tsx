@@ -35,6 +35,14 @@ const badgeImages: any = {
     },
 };
 
+const levelIcons: any = {
+    1: require('@/assets/images/levels-icons/level_1_icon.png'),
+    2: require('@/assets/images/levels-icons/level_2_icon.png'),
+    3: require('@/assets/images/levels-icons/level_3_icon.png'),
+    4: require('@/assets/images/levels-icons/level_4_icon.png'),
+    5: require('@/assets/images/levels-icons/level_5_icon.png'),
+};
+
 export default function AchievementsScreen() {
     const router = useRouter();
     const [loading, setLoading] = React.useState(true);
@@ -181,7 +189,11 @@ export default function AchievementsScreen() {
                                 {levels.map((level) => (
                                     <View key={level.id} style={styles.levelCard}>
                                         <View style={[styles.levelImageContainer, !level.earned && styles.dullLevel]}>
-                                            <Ionicons name="trophy" size={32} color={level.earned ? "#080808" : "#999"} />
+                                            <Image 
+                                                source={levelIcons[level.id]}
+                                                style={[styles.levelIconImage, !level.earned && { tintColor: '#999' }]}
+                                                resizeMode="contain"
+                                            />
                                         </View>
                                         <Text style={styles.levelLabel}>{level.label}</Text>
                                     </View>
@@ -348,6 +360,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
+        backgroundColor: '#F3F3F3', // Light background for icons
+    },
+    levelIconImage: {
+        width: 40,
+        height: 40,
     },
     dullLevel: {
         opacity: 0.4,
