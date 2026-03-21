@@ -62,11 +62,14 @@ export default function NotificationScreen() {
         const iconCfg = getIconForType(item.type);
 
         return (
-            <View style={[
-                styles.notificationItem,
-                index === 0 && styles.firstItem,
-                !item.isRead && styles.unreadItem
-            ]}>
+            <View 
+                key={item.id || index.toString()}
+                style={[
+                    styles.notificationItem,
+                    index === 0 && styles.firstItem,
+                    !item.isRead && styles.unreadItem
+                ]}
+            >
                 <View style={styles.iconContainer}>
                     <Image source={iconCfg.image} style={styles.iconImage} resizeMode="contain" />
                     {!item.isRead && <View style={styles.unreadIndicator} />}
@@ -100,7 +103,7 @@ export default function NotificationScreen() {
             ) : (
                 <FlatList
                     data={notifications}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item, index) => item.id || index.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
