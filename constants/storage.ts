@@ -29,6 +29,7 @@ export const STORAGE_KEYS = {
     NOTIFICATION_SETTINGS: 'NOTIFICATION_SETTINGS_CACHE',
     NOTIFICATION_TOKEN: 'notification_token',
     LAST_USER_NAME: 'last_user_name',
+    NOTIFICATIONS_CACHE: 'cache_notifications',
 };
 
 export const CACHE_TTL = {

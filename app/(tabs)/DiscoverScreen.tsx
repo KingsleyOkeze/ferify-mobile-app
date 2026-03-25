@@ -34,7 +34,21 @@ function DiscoverScreen() {
 
     const fetchDiscoverData = useCallback(async () => {
         try {
-            const location = await getCachedLocation() || await fetchAndCacheLocation();
+            // Add a 2s timeout to location fetching so it NEVER hangs the screen
+            const fetchLocationWithTimeout = async () => {
+                const fetchTask = async () => {
+                    const cached = await getCachedLocation();
+                    if (cached) return cached;
+                    return await fetchAndCacheLocation();
+                };
+
+                return Promise.race([
+                    fetchTask(),
+                    new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000))
+                ]);
+            };
+            
+            const location = await fetchLocationWithTimeout();
 
             const params: any = {};
             if (location) {
@@ -42,18 +56,25 @@ function DiscoverScreen() {
                 params.lat = location.latitude;
             }
 
+            // 8s timeout per request — fail fast instead of hanging through retries
+            const requestConfig = { params, timeout: 8000 };
+            
             const [recentRes, popularRes, insightsRes] = await Promise.all([
-                api.get('/api/fare/nearby', { params: { ...params, radius: 20000 } }),
-                api.get('/api/fare/popular', { params }),
-                api.get('/api/fare/insights', { params })
+                api.get('/api/fare/nearby', { ...requestConfig, params: { ...params, radius: 20000 } }),
+                api.get('/api/fare/popular', requestConfig),
+                api.get('/api/fare/insights', requestConfig)
             ]);
+            console.log("[DISCOVER] APIs completed successfully.");
 
-            if (recentRes.data) setRecentlyUpdated(recentRes.data.fares || []);
-            if (popularRes.data) setPopularRoutes(popularRes.data);
-            if (insightsRes.data) setInsights(insightsRes.data);
-        } catch (error) {
-            console.error("Error fetching discover data:", error);
+            setRecentlyUpdated(recentRes.data?.fares || []);
+            setPopularRoutes(popularRes.data || []);
+            setInsights(insightsRes.data || []);
+            console.log("[DISCOVER] State updated.");
+        } catch (error: any) {
+            console.error("[DISCOVER] Error fetching data:", error?.message || error);
+            // Don't rethrow — we want to show the empty state, not stay stuck
         } finally {
+            console.log("[DISCOVER] Finally block executing — clearing spinner.");
             setLoading(false);
             setRefreshing(false);
         }
@@ -289,7 +310,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 15,
-        // backgroundColor: 'red'
     },
     sectionTitle: {
         fontSize: 16,
@@ -430,7 +450,6 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         gap: 16,
-        // marginBottom: 30
     },
     popularRouteCard: {
         flexDirection: 'row',
@@ -521,13 +540,10 @@ const styles = StyleSheet.create({
         borderColor: '#F0F0F0',
     },
     tipIconContainer: {
-        // width: 48,
-        // height: 48,
         borderRadius: 24,
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 12,
-        // backgroundColor: 'red'
     },
     tipIcon: {
         width: 32,

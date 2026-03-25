@@ -10,7 +10,14 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ferify.app"
+      "bundleIdentifier": "com.ferify.app",
+      "infoPlist": {
+        "NSSpeechRecognitionUsageDescription": "Allow Ferify to use speech recognition for voice search.",
+        "NSMicrophoneUsageDescription": "Allow Ferify to use the microphone for voice search."
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "package": "com.ferify.app",
@@ -27,8 +34,18 @@
         "MODIFY_AUDIO_SETTINGS",
         "RECORD_AUDIO",
         "VIBRATE",
-        "RECEIVE_BOOT_COMPLETED"
-      ]
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "INTERNET",
+        "MODIFY_AUDIO_SETTINGS",
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "bundler": "metro",
@@ -91,6 +108,9 @@
       "eas": {
         "projectId": "e4f4dbf3-bf02-44d2-a560-b5168fc6e2f8"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e4f4dbf3-bf02-44d2-a560-b5168fc6e2f8"
     }
   }
 }

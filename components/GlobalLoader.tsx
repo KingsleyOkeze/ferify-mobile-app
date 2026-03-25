@@ -26,16 +26,18 @@ export default function GlobalLoader({ visible }: GlobalLoaderProps) {
 
     useEffect(() => {
         if (visible) {
-            rotation.value = 0;
+            cancelAnimation(rotation);
             rotation.value = withRepeat(
                 withTiming(360, {
                     duration: 1000,
                     easing: Easing.linear,
                 }),
-                -1 // Infinite repeat
+                -1,  // Infinite repeat
+                false // Don't reverse direction
             );
         } else {
             cancelAnimation(rotation);
+            rotation.value = 0;
         }
     }, [visible]);
 

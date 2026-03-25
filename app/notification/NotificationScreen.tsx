@@ -9,6 +9,7 @@ import {
     StatusBar,
     ActivityIndicator,
     Image,
+    RefreshControl,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -107,6 +108,14 @@ export default function NotificationScreen() {
                     renderItem={renderItem}
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={loading}
+                            onRefresh={fetchNotifications}
+                            tintColor="#080808"
+                            colors={["#080808"]}
+                        />
+                    }
                     ListEmptyComponent={() => (
                         <View style={styles.emptyContainer}>
                             <Ionicons name="notifications-off-outline" size={60} color="#DADADA" />
@@ -147,8 +156,9 @@ const styles = StyleSheet.create({
     },
     loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
+        marginTop: 150,
     },
     notificationItem: {
         flexDirection: 'row',

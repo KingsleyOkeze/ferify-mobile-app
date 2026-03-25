@@ -22,7 +22,7 @@ import { useRouter, useFocusEffect } from "expo-router";
 import { ActivityIndicator } from "react-native";
 import api from "@/services/api";
 import { getCachedLocation, fetchAndCacheLocation } from "@/services/locationService";
-import { io } from "socket.io-client";
+// socket.io-client import removed — fare updates use REST polling instead
 import busImage from "../../assets/images/transportation-icons/busImage.png";
 import kekeImage from "../../assets/images/transportation-icons/kekeImage.png";
 import okadaImage from "../../assets/images/transportation-icons/okadaImage.png";
@@ -54,8 +54,21 @@ function HomeScreen() {
     const loadNearbyFares = useCallback(async () => {
         setLoadingNearby(true);
         try {
-            // Try to get location, but don't block if it fails
-            const location = await getCachedLocation() || await fetchAndCacheLocation();
+            // Add a 2s timeout to location fetching so it NEVER hangs the screen
+            const fetchLocationWithTimeout = async () => {
+                const fetchTask = async () => {
+                    const cached = await getCachedLocation();
+                    if (cached) return cached;
+                    return await fetchAndCacheLocation();
+                };
+
+                return Promise.race([
+                    fetchTask(),
+                    new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000))
+                ]);
+            };
+            
+            const location = await fetchLocationWithTimeout();
 
             const params: any = {};
             if (location) {
@@ -64,7 +77,8 @@ function HomeScreen() {
                 params.radius = 10000; // 10km
             }
 
-            const response = await api.get('/api/fare/nearby', { params });
+            // 8s timeout to fail fast instead of hanging through heavy retries
+            const response = await api.get('/api/fare/nearby', { params, timeout: 8000 });
 
             if (response.data) {
                 const { fares, isLocal } = response.data;
@@ -117,28 +131,10 @@ function HomeScreen() {
         };
         checkNotificationPrompt();
 
-        // Socket connection for real-time updates
-        const serverUrl = process.env.EXPO_PUBLIC_SERVER_URL || '';
-        const socket = io(serverUrl, {
-            path: '/api/fare/socket.io',
-            transports: ['websocket']
-        });
-
-        socket.on('nearby_contribution', (newFare: any) => {
-            console.log('New nearby fare received via socket:', newFare);
-            setNearbyFares(prev => {
-                const exists = prev.find(f => f.id === newFare.id);
-                if (exists) return prev;
-                return [newFare, ...prev].slice(0, 3);
-            });
-            setIsLocalFeed(true);
-        });
-
-        // Silent refresh at intervals while staying on screen
+        // Polling-based refresh every 60 seconds (replaces socket for simplicity)
         const interval = setInterval(loadNearbyFares, 60000);
 
         return () => {
-            socket.disconnect();
             clearInterval(interval);
             cleanupNotifications();
         };
