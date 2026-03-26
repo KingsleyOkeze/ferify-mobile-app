@@ -9,6 +9,7 @@ import {
     StatusBar,
     ActivityIndicator,
     Image,
+    RefreshControl,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -62,11 +63,14 @@ export default function NotificationScreen() {
         const iconCfg = getIconForType(item.type);
 
         return (
-            <View style={[
-                styles.notificationItem,
-                index === 0 && styles.firstItem,
-                !item.isRead && styles.unreadItem
-            ]}>
+            <View 
+                key={item.id || index.toString()}
+                style={[
+                    styles.notificationItem,
+                    index === 0 && styles.firstItem,
+                    !item.isRead && styles.unreadItem
+                ]}
+            >
                 <View style={styles.iconContainer}>
                     <Image source={iconCfg.image} style={styles.iconImage} resizeMode="contain" />
                     {!item.isRead && <View style={styles.unreadIndicator} />}
@@ -100,10 +104,18 @@ export default function NotificationScreen() {
             ) : (
                 <FlatList
                     data={notifications}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item, index) => item.id || index.toString()}
                     renderItem={renderItem}
                     contentContainerStyle={styles.listContent}
                     showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={loading}
+                            onRefresh={fetchNotifications}
+                            tintColor="#080808"
+                            colors={["#080808"]}
+                        />
+                    }
                     ListEmptyComponent={() => (
                         <View style={styles.emptyContainer}>
                             <Ionicons name="notifications-off-outline" size={60} color="#DADADA" />
@@ -144,8 +156,9 @@ const styles = StyleSheet.create({
     },
     loadingContainer: {
         flex: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
+        marginTop: 150,
     },
     notificationItem: {
         flexDirection: 'row',

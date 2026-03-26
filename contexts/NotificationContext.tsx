@@ -39,6 +39,9 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@/constants/storage';
+
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const { user, isAuthenticated } = useAuth();
     const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -46,6 +49,20 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(false);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [activeInAppNotification, setActiveInAppNotification] = useState<Notification | null>(null);
+
+    // Load notifications from cache on initialization
+    const loadCachedNotifications = async () => {
+        try {
+            const cachedData = await AsyncStorage.getItem(STORAGE_KEYS.NOTIFICATIONS_CACHE);
+            if (cachedData) {
+                const parsedData = JSON.parse(cachedData);
+                setNotifications(parsedData);
+                setUnreadCount(parsedData.filter((n: Notification) => !n.isRead).length);
+            }
+        } catch (error) {
+            console.error('Error loading cached notifications:', error);
+        }
+    };
 
     // Sync System App Icon Badge
     useEffect(() => {
@@ -74,8 +91,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         try {
             const response = await api.get('/api/notification/user-notification-history/history');
             const data = response.data.notifications || [];
+            
             setNotifications(data);
             setUnreadCount(data.filter((n: Notification) => !n.isRead).length);
+            
+            // Save to cache
+            await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_CACHE, JSON.stringify(data));
         } catch (error) {
             console.error('Error fetching notification history:', error);
         } finally {
@@ -87,8 +108,12 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         if (!isAuthenticated || unreadCount === 0) return;
         try {
             await api.patch('/api/notification/user-notification-history/mark-read');
-            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+            const updatedNotifications = notifications.map(n => ({ ...n, isRead: true }));
+            setNotifications(updatedNotifications);
             setUnreadCount(0);
+            
+            // Update cache
+            await AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_CACHE, JSON.stringify(updatedNotifications));
         } catch (error) {
             console.error('Error marking notifications as read:', error);
         }
@@ -166,9 +191,17 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
             }
         });
 
-        newSocket.on('new_notification', (notification: Notification) => {
+        newSocket.on('new_notification', async (notification: Notification) => {
             console.log('🔔 New notification received:', notification);
-            setNotifications(prev => [notification, ...prev]);
+            
+            setNotifications(prev => {
+                const updated = [notification, ...prev];
+                // Update cache asynchronously
+                AsyncStorage.setItem(STORAGE_KEYS.NOTIFICATIONS_CACHE, JSON.stringify(updated))
+                    .catch(err => console.error('Error caching new notification:', err));
+                return updated;
+            });
+            
             setUnreadCount(prev => prev + 1);
             setActiveInAppNotification(notification);
 
@@ -182,7 +215,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
 
     useEffect(() => {
         if (isAuthenticated && user?.id) {
-            fetchNotifications();
+            // Load from cache first for instant UI
+            loadCachedNotifications().then(() => {
+                // Then fetch fresh data from server
+                fetchNotifications();
+            });
 
             let currentSocket: Socket | null = null;
 
@@ -224,6 +261,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
         } else {
             setNotifications([]);
             setUnreadCount(0);
+            AsyncStorage.removeItem(STORAGE_KEYS.NOTIFICATIONS_CACHE).catch(() => {});
             if (socket) {
                 console.log('🧹 Cleaning up socket on logout...');
                 socket.disconnect();

@@ -31,8 +31,12 @@ const RippleRing = ({ delay }: { delay: number }) => {
     const ring = useSharedValue(0);
 
     useEffect(() => {
+        // Cancel any stale animation first, reset to known state
+        cancelAnimation(ring);
+        ring.value = 0;
+
         ring.value = withDelay(
-            delay, // Delay set by prop + some base offset if needed
+            delay,
             withRepeat(
                 withTiming(1, {
                     duration: 2000,
@@ -42,7 +46,11 @@ const RippleRing = ({ delay }: { delay: number }) => {
                 false
             )
         );
-        return () => cancelAnimation(ring);
+
+        return () => {
+            cancelAnimation(ring);
+            ring.value = 0;
+        };
     }, []);
 
     const style = useAnimatedStyle(() => {
@@ -60,6 +68,10 @@ const ProcessingSpinner = () => {
     const rotation = useSharedValue(0);
 
     useEffect(() => {
+        // Ensure clean state before starting
+        cancelAnimation(rotation);
+        rotation.value = 0;
+
         rotation.value = withRepeat(
             withTiming(360, {
                 duration: 1000,
@@ -68,7 +80,11 @@ const ProcessingSpinner = () => {
             -1,
             false
         );
-        return () => cancelAnimation(rotation);
+
+        return () => {
+            cancelAnimation(rotation);
+            rotation.value = 0;
+        };
     }, []);
 
     const animatedStyle = useAnimatedStyle(() => {
