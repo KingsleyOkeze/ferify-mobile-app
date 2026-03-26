@@ -95,6 +95,5 @@ export default function Index() {
             ? "/auth/login/LoginScreen"
             : "/auth/onboarding/OnboardingScreen";
 
-    // return <Redirect href={targetRoute} />;
-    return <Redirect href={"/auth/login/LoginScreen"} />;
+    return <Redirect href={targetRoute} />;
 }
