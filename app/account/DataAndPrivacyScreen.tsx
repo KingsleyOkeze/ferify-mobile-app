@@ -280,7 +280,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     menuContainer: {
-        // paddingHorizontal: 20,
     },
     menuItem: {
         flexDirection: 'row',

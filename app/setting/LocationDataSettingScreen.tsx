@@ -45,7 +45,7 @@ function LocationDataSettingScreen() {
             setSelectedOption(cached.shareLocationData ? 'while_using' : 'never');
         }
 
-        // 3. Fetch fresh from Backend
+        // Fetch fresh from Backend
         try {
             const response = await api.get('/api/user/privacy');
             if (response.data && response.data.privacy) {
@@ -177,7 +177,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     listContainer: {
-        // paddingHorizontal: 20, 
     },
     listItem: {
         flexDirection: 'row',

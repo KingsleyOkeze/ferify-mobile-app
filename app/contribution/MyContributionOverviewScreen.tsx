@@ -201,7 +201,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#FBFBFB',
-        // paddingTop: 4,
     },
     header: {
         paddingHorizontal: 16,
@@ -252,7 +251,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     cardImage: {
-        // fontSize: 18,
         width: 20,
         height: 20,
         marginRight: 6,
@@ -263,14 +261,14 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        flex: 1, // Allow text to wrap if needed
+        flex: 1, 
     },
     cardValue: {
         fontSize: 20,
         fontWeight: '600',
         fontFamily: 'BrittiSemibold',
         color: '#080808',
-        alignSelf: 'flex-end', // Align number to right end
+        alignSelf: 'flex-end', 
     },
     // Empty State Styles
     emptyStateContainer: {
@@ -304,13 +302,11 @@ const styles = StyleSheet.create({
         width: '80%'
     },
     menuContainer: {
-        // paddingHorizontal: 20,
     },
     menuItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        // paddingVertical: 18,
         paddingHorizontal: 16,
         backgroundColor: '#fff',
         borderTopWidth: 1,
@@ -319,8 +315,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
         height: 87
     },
-    // firstMenuItem: {
-    // },
     itemLeft: {
         flexDirection: 'row',
         alignItems: 'center',

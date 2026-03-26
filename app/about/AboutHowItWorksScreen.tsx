@@ -76,7 +76,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,

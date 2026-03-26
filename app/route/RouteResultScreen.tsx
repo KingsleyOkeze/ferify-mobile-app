@@ -280,7 +280,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
@@ -387,7 +386,6 @@ const styles = StyleSheet.create({
     breakdownToggleDisabled: {
         flexDirection: 'row',
         alignItems: 'center',
-        // backgroundColor: '#F5F5F5',
         paddingHorizontal: 12,
         paddingVertical: 8,
         borderRadius: 8,
@@ -425,11 +423,9 @@ const styles = StyleSheet.create({
     progressLine: {
         position: 'absolute',
         top: 20,
-        bottom: 120, // Stop before end
+        bottom: 120, 
         width: 2,
         backgroundColor: '#E0E0E0',
-        // Note: React Native doesn't support CSS gradients on Views easily without libraries
-        // Used a solid color for now, simulating structure.
     },
     progressNode: {
         width: 24,
@@ -568,7 +564,6 @@ const styles = StyleSheet.create({
         bottom: 6,
     },
     verifyButton: {
-        // flex: 1,
         width: '48%',
         backgroundColor: '#080808',
         height: 50,
@@ -588,7 +583,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 30,
         backgroundColor: '#fff',
-        paddingBottom: 50, // Moved up a bit
+        paddingBottom: 50, 
     },
     noDataImage: {
         width: 200,

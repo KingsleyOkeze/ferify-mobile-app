@@ -109,10 +109,10 @@ export default function OnboardingScreen() {
 
     // Automatic carousel progression
     useEffect(() => {
-        // const timer = setInterval(() => {
-        //     setStep(prev => (prev + 1) % slides.length);
-        // }, 5000); // 5 seconds per slide
-        // return () => clearInterval(timer);
+        const timer = setInterval(() => {
+            setStep(prev => (prev + 1) % slides.length);
+        }, 5000); // 5 seconds per slide
+        return () => clearInterval(timer);
     }, []);
 
 
@@ -229,7 +229,6 @@ const styles = StyleSheet.create({
         marginTop: 'auto',
         marginBottom: 24,
         gap: 10,
-        // backgroundColor: 'purple'
     },
     dot: {
         height: 6,
@@ -247,8 +246,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         alignSelf: 'center',
         maxWidth: 217,
-        // height: 87,
-        // backgroundColor: 'green'
     },
     title: {
         fontFamily: "BrittiBold",
@@ -261,19 +258,14 @@ const styles = StyleSheet.create({
 
     subtitleContainer: {
         alignSelf: 'center',
-        // width: '85%',
-        marginBottom: 72, // Space between subtitle and buttons
-        // backgroundColor: 'red',
-        // minHeight: 48,
+        marginBottom: 72, 
         justifyContent: 'center',
         alignItems: 'center',
-        // maxWidth: 283,
         maxWidth: 279,
     },
     subtitle: {
         fontFamily: "BrittiRegular",
         fontSize: 16,
-        // width: '95%',
         color: "#757575",
         textAlign: "center",
         lineHeight: 24,
@@ -284,7 +276,6 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         gap: 12,
         marginBottom: 40,
-        // backgroundColor: 'yellow'
     },
     btn: {
         flex: 1,

@@ -163,9 +163,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        // paddingHorizontal: 16,
         paddingTop: 8,
-        // paddingBottom: 24,
     },
     backButton: {
         width: 40,
@@ -195,7 +193,6 @@ const styles = StyleSheet.create({
         lineHeight: 24,
         paddingHorizontal: 16,
         fontFamily: 'BrittiRegular',
-        // width: '90%'
     },
     listSection: {
         marginBottom: 32,
@@ -265,7 +262,6 @@ const styles = StyleSheet.create({
         height: 82,
         justifyContent: 'center',
         alignItems: 'center',
-        // paddingVertical: 20,
         paddingHorizontal: 16,
     },
     whatStaysDescription: {

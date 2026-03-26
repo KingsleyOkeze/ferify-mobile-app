@@ -310,7 +310,6 @@ const styles = StyleSheet.create({
         paddingBottom: 32,
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 24,
@@ -364,7 +363,6 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginLeft: 20,
-        // marginTop: 5,
         marginBottom: 16,
     },
     card: {
@@ -403,7 +401,6 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#393939',
-        // marginBottom: 2,
         lineHeight: 24,
     },
     reportIssueText: {
@@ -417,8 +414,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 600,
         color: '#080808',
-        // marginTop: 10,
-        // marginBottom: 2,
         lineHeight: 24
     },
     cardTimeText: {

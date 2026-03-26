@@ -196,9 +196,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 20,
         paddingTop: 8,
-        // paddingBottom: 20,
-        // borderBottomWidth: 1,
-        // borderBottomColor: '#F0F0F0',
     },
     headerButton: {
         padding: 4,

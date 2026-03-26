@@ -52,18 +52,18 @@ function AnswerToQuestionScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FBFBFB', // White/Off-white background for screen
+        backgroundColor: '#FBFBFB',
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'center', // Center content (Title)
+        justifyContent: 'center', 
         paddingHorizontal: 16,
         paddingTop: 8,
         paddingBottom: 24,
         borderBottomWidth: 1,
         borderBottomColor: '#EFEFEF',
-        position: 'relative', // For absolute positioning of buttons
+        position: 'relative', 
     },
     headerButtonLeft: {
         position: 'absolute',

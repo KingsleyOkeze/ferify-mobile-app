@@ -80,7 +80,7 @@ export default function VerifyPasswordResetScreen() {
 
         showLoader();
         try {
-            // 1. Verify Password Reset OTP
+            // Verify Password Reset OTP
             const response = await api.post("/api/user/account/reset-password/verify", {
                 otp: otpCode,
                 newPassword: newPassword

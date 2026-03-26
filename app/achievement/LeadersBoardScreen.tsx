@@ -217,7 +217,6 @@ const styles = StyleSheet.create({
     },
     toggleOuterContainer: {
         paddingHorizontal: 16,
-        // marginTop: 8,
         marginBottom: 32,
         width: 300,
         height: 44,

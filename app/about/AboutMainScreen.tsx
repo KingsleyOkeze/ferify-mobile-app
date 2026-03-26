@@ -17,12 +17,12 @@ function AboutMainScreen() {
         {
             id: 'what',
             title: 'What is Ferify',
-            onPress: () => { router.push('./AboutAppScreen') }, // Placeholder for navigation
+            onPress: () => { router.push('./AboutAppScreen') }, 
         },
         {
             id: 'how',
             title: 'How it work',
-            onPress: () => { router.push('./AboutHowItWorksScreen') }, // Placeholder for navigation
+            onPress: () => { router.push('./AboutHowItWorksScreen') }, 
         },
     ];
 
@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     listContainer: {
-        // paddingHorizontal: 20, 
         backgroundColor: '#DADADA',
         borderTopWidth: 1,
         borderTopColor: '#DADADA',
@@ -103,11 +102,7 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
         color: '#080808',
         height: 64,
-    },
-    // firstListItem: {
-    //     borderTopWidth: 1,
-    //     borderTopColor: '#DADADA',
-    // },
+    },      
     itemTitle: {
         fontSize: 16,
         fontWeight: 600,

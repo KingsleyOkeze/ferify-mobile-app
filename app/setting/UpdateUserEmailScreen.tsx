@@ -169,7 +169,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 18,
@@ -219,12 +218,6 @@ const styles = StyleSheet.create({
         color: '#000',
         marginBottom: 10,
     },
-    // currentValue: {
-    //     fontSize: 14,
-    //     fontWeight: 400,
-    //     fontFamily: 'BrittiRegular',
-    //     color: '#666',
-    // },
     inputGroup: {
         marginBottom: 20,
         width: '100%',

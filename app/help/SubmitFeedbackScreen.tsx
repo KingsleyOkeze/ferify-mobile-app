@@ -125,7 +125,6 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 16,
         paddingTop: 10,
-        // paddingBottom: 8,
     },
     backButton: {
         alignSelf: 'flex-start',
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
         borderColor: '#E0E0E0',
         borderRadius: 12,
         paddingHorizontal: 16,
-        paddingVertical: 12, // Consistent padding
+        paddingVertical: 12, 
         fontSize: 16,
         fontFamily: 'BrittiRegular',
         color: '#080808',
@@ -175,16 +174,10 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         backgroundColor: '#080808',
-        borderRadius: 100, // Pill shape
+        borderRadius: 100,
         height: 56,
         justifyContent: 'center',
         alignItems: 'center',
-        // marginTop: 24,
-        // shadowColor: "#000",
-        // shadowOffset: { width: 0, height: 4 },
-        // shadowOpacity: 0.2,
-        // shadowRadius: 8,
-        // elevation: 4,
     },
     submitButtonDisabled: {
         backgroundColor: '#666',
