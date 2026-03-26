@@ -51,7 +51,7 @@ function NotificationSettingScreen() {
 
     const loadSettings = async () => {
         try {
-            // 1. Try Cache First (Smart Caching)
+            // Try Cache First (Smart Caching)
             const cached = await cacheHelper.getRaw(CACHE_KEY);
             if (cached) {
                 const parsed = JSON.parse(cached);
@@ -60,7 +60,7 @@ function NotificationSettingScreen() {
                 if (parsed.notificationSound !== undefined) setNotificationSound(parsed.notificationSound);
             }
 
-            // 2. Fetch from Backend
+            // Fetch from Backend
             const response = await api.get('/api/user/notification-settings');
             const { settings } = response.data;
 
@@ -215,8 +215,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        // paddingVertical: 20,
-        // paddingHorizontal: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
         height: 87,

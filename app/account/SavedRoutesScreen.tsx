@@ -181,8 +181,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#F0F0F0',
     },
     firstMenuItem: {
-        // borderTopWidth: 1,
-        // borderTopColor: '#F0F0F0',
     },
     itemLeft: {
         flexDirection: 'row',

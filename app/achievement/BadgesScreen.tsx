@@ -359,10 +359,8 @@ const styles = StyleSheet.create({
     },
     requirementTag: {
         paddingHorizontal: 12,
-        // paddingVertical: 6,
         borderRadius: 100,
         marginHorizontal: 4,
-        // marginBottom: 8,
     },
     requirementText: {
         fontSize: 18,
@@ -394,14 +392,13 @@ const styles = StyleSheet.create({
     },
     progressBarFill: {
         height: '100%',
-        backgroundColor: '#080808', // Black progress bar
+        backgroundColor: '#080808', 
         borderRadius: 100,
     },
     progressText: {
         fontSize: 16,
         fontFamily: 'BrittiSemibold',
-        color: '#080808',
-        // paddingBottom: 5,
+        color: '#080808', 
         height: 18
     },
     okayButton: {

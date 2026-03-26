@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
@@ -241,7 +240,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     updateButtonDisabled: {
-        backgroundColor: '#CECECE', // Grey background
+        backgroundColor: '#CECECE', 
     },
     updateButtonText: {
         fontSize: 16,

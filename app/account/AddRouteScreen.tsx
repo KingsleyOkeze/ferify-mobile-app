@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         paddingHorizontal: 16,
         paddingVertical: 14,
-        paddingRight: 40, // space for loader
+        paddingRight: 40, 
         fontSize: 16,
         color: '#000',
         borderWidth: 2,

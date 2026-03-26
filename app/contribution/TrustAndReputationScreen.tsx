@@ -159,7 +159,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 20,
         paddingHorizontal: 12,
-        // borderBottomWidth: 1,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: '#DADADA',
@@ -213,7 +212,6 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     factorsList: {
-        // Container for list items
     },
     listItem: {
         flexDirection: 'row',

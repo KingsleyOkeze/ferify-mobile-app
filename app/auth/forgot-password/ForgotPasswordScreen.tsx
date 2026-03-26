@@ -113,9 +113,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#FBFBFB',
     },
     header: {
-        // paddingHorizontal: 16,
         paddingTop: 10,
-        // paddingBottom: 20,
     },
     headerButton: {
         width: 40,
@@ -157,7 +155,6 @@ const styles = StyleSheet.create({
     inputWrapper: {
         backgroundColor: "#F5F7F9",
         borderRadius: 12,
-        // paddingHorizontal: 16,
         height: 56,
         justifyContent: "center",
     },

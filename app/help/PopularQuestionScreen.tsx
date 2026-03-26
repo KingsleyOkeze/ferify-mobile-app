@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
         fontWeight: 400,
         fontFamily: 'BrittiRegular',
         color: '#080808',
-        flex: 1, // Ensure text takes available space
+        flex: 1, 
         marginRight: 16,
         lineHeight: 24
     },

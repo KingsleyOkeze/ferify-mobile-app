@@ -64,7 +64,7 @@ function PrivacyAndSafetySettingScreen() {
 
     const saveSelection = async () => {
         const previousVisibility = profileVisibility;
-        setProfileVisibility(tempSelection); // Optimistic update
+        setProfileVisibility(tempSelection); 
         setModalVisible(false);
 
         try {
@@ -323,7 +323,6 @@ const styles = StyleSheet.create({
     saveButton: {
         backgroundColor: '#080808',
         borderRadius: 100,
-        // height: 50,
     },
     cancelButtonText: {
         color: '#080808',

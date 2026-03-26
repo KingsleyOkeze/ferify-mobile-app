@@ -260,7 +260,6 @@ const styles = StyleSheet.create({
     },
     header: {
         paddingHorizontal: 16,
-        // paddingBottom: 20,
         borderBottomWidth: 1,
         borderBottomColor: '#F5F5F5',
     },
@@ -360,7 +359,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 8,
-        backgroundColor: '#F3F3F3', // Light background for icons
+        backgroundColor: '#F3F3F3', 
     },
     levelIconImage: {
         width: 40,
@@ -401,7 +400,7 @@ const styles = StyleSheet.create({
     leadershipList: {
         borderRadius: 8,
         marginBottom: 10,
-        paddingVertical: 8, // Add padding to container
+        paddingVertical: 8, 
     },
     leadershipItem: {
         backgroundColor: '#F3F3F3',
@@ -423,7 +422,7 @@ const styles = StyleSheet.create({
         fontFamily: 'BrittiSemibold',
         color: '#080808',
         marginRight: 16,
-        width: 30, // Fixed width for alignment
+        width: 30,
     },
     leadershipText: {
         fontSize: 14,

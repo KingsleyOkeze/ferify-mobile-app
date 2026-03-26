@@ -120,7 +120,6 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 16,
         borderTopRightRadius: 16,
         minHeight: 335,
-        // paddingBottom: 32,
         paddingHorizontal: 20,
         maxHeight: height * 0.7,
     },

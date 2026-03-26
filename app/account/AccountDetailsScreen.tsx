@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
         color: '#000',
     },
     deleteText: {
-        color: '#E53935', // Red
+        color: '#E53935', 
     },
     // Modal Styles
     modalOverlay: {

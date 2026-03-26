@@ -57,11 +57,11 @@ const styles = StyleSheet.create({
         width: '31.5%',
         height: 107.84,
         borderWidth: 1,
-        borderColor: 'transparent', // Default transparent border
+        borderColor: 'transparent',
         paddingVertical: 12,
     },
     cardSelected: {
-        borderColor: '#080808', // Black border when selected
+        borderColor: '#080808',
     },
     image: {
         width: 50.17,

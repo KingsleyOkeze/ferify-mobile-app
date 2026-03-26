@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
         paddingBottom: 40,
     },
     listContainer: {
-        // paddingHorizontal: 20, 
     },
     listItem: {
         flexDirection: 'row',
@@ -170,7 +169,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         height: 87,
         paddingHorizontal: 20,
-        // backgroundColor: '#fff',
         borderBottomWidth: 1,
         borderBottomColor: '#DADADA',
     },

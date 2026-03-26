@@ -152,7 +152,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#F0F0F0',
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 18,
@@ -212,7 +211,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         fontFamily: 'BrittiRegular',
         color: '#393939',
-        // fontStyle: 'italic',
     },
     updateButton: {
         height: 56,

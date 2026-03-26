@@ -201,7 +201,6 @@ const styles = StyleSheet.create({
     },
     header: {
         marginTop: 8,
-        // marginBottom: 24,
         marginLeft: -4,
     },
     backButton: {
@@ -229,7 +228,6 @@ const styles = StyleSheet.create({
         color: '#080808',
     },
     textContainer: {
-        // marginBottom: 32,
     },
     title: {
         fontSize: 20,

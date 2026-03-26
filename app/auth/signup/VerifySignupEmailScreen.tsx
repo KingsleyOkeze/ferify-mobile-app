@@ -93,7 +93,7 @@ export default function VerifySignupEmailScreen() {
     const handleVerify = async (otpCode: string) => {
         showLoader();
         try {
-            // 1. Verify OTP
+            // Verify OTP
             const verifyResponse = await api.post("/api/user/auth/register/verify-otp", {
                 email: email,
                 code: otpCode
@@ -101,12 +101,12 @@ export default function VerifySignupEmailScreen() {
 
             console.log("OTP verified:", verifyResponse.data);
 
-            // 2. Login User (Backend returns tokens)
+            // Login User (Backend returns tokens)
             if (verifyResponse.data.accessToken) {
                 const userData = verifyResponse.data.user || { email, id: verifyResponse.data.userId || 'temp-id' };
                 await login(userData, verifyResponse.data.accessToken, verifyResponse.data.refreshToken);
 
-                // 3. Navigate to Profile Setup
+                // Navigate to Profile Setup
                 router.replace('/auth/signup/FullNameInputScreen');
             }
         } catch (error: any) {

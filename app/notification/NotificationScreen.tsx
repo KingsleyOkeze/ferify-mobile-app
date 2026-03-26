@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
         minHeight: 142,
     },
     unreadItem: {
-        backgroundColor: '#F0F7FF', // Subtle light blue highlight
+        backgroundColor: '#F0F7FF', 
         shadowColor: '#2196F3',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,

@@ -21,8 +21,8 @@ import api from '@/services/api';
 import { useLoader } from '@/contexts/LoaderContext';
 import { useToast } from '@/contexts/ToastContext';
 
-import LocationInputs from '@/components/LocationInputs';     // ← added
-import LocationRecommendation from '@/components/LocationRecommendation';         // ← added
+import LocationInputs from '@/components/LocationInputs';     
+import LocationRecommendation from '@/components/LocationRecommendation';        
 import { getCachedLocation, fetchAndCacheLocation } from '@/services/locationService';
 
 const { width } = Dimensions.get('window');

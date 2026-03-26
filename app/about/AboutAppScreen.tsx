@@ -74,7 +74,6 @@ const styles = StyleSheet.create({
         borderBottomColor: '#DADADA',
     },
     headerButton: {
-        // padding: 4,
     },
     headerTitle: {
         fontSize: 20,
@@ -108,7 +107,6 @@ const styles = StyleSheet.create({
     logo: {
         width: 27.94,
         height: 32,
-        // color: '#fff',
         fontSize: 40,
         fontWeight: 'bold',
     },
